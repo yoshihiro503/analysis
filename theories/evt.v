@@ -50,28 +50,32 @@ HB.factory Record TopologicalLmod_isEvt (R : numDomainType) E
 HB.builders Context R E of TopologicalLmod_isEvt R E.
 
   Definition entourage : set_system (E * E):=
-  fun P=> exists U, nbhs 0 U-> forall xy : E*E, (xy.1 -xy.2) \in U -> xy \in P.
+  fun P=> exists U, nbhs 0 U/\(forall xy : E*E, (xy.1 -xy.2) \in U -> xy \in P).
 
   Lemma entourage_filter : Filter entourage.
   Proof.
-    split; first by exists [set: E] => _ xy _ //.
-      move => P Q [/= U HP] [/=V HQ]; rewrite /entourage.
-      exists (U`&`V); rewrite nbhsE //= => //= [[B HB]]; rewrite subsetI => [[BU BV]] xy.
-      rewrite !in_setI => /andP[H1 H2]; apply/andP; split.
-      apply: HP; last by [].
-        rewrite nbhsE //=; exists B; last by [].
-        by apply: HB.
-     apply: HQ; last by [].
-        rewrite nbhsE //=; exists B; last by [].
-        by apply: HB. 
-    move => P Q PQ; rewrite /entourage /= => [[U H]]; exists U.
-    by move => N xy Hxy; rewrite in_setE; apply: PQ; rewrite -in_setE; apply:H.
+    split.
+      exists [set: E]; split; first by apply: filter_nbhsT.
+        by move => xy; rewrite !in_setE //=.
+        move => P Q; rewrite /entourage nbhsE //=.
+        move => [U [[B B0] BU Bxy]]  [V [[C C0] CV Cxy]]. 
+        exists (U`&`V); split.
+          exists (B`&`C); first by apply/open_nbhsI.
+          by apply:setISS.
+       move => xy; rewrite !in_setI.
+       move/andP => [xyU xyV]; apply/andP;split; first by apply:Bxy.
+       by apply: Cxy.
+    move => P Q PQ; rewrite /entourage /= => [[U [HU Hxy]]]; exists U; split => //.
+    by move => xy Uxy; rewrite in_setE; apply: PQ; rewrite -in_setE; apply:Hxy.
   Qed.
   
   Lemma entourage_refl_subproof :
-        forall A : set (E * E), entourage A -> [set xy | xy.1 = xy.2] `<=` A.
-  Admitted.
-  Locate "^-1".
+    forall A : set (E * E), entourage A -> [set xy | xy.1 = xy.2] `<=` A.
+  Proof. (*why bother with \in ?*)
+    rewrite /entourage => A [/=U [U0 Uxy]] xy //= /eqP; rewrite -subr_eq0 => /eqP xyE. 
+    by rewrite -in_setE; apply: Uxy; rewrite xyE in_setE; apply: nbhs_singleton.
+  Qed.   
+
   Lemma entourage_inv_subproof :
         forall A : set (E * E), entourage A -> entourage A^-1%classic.
   Admitted.
