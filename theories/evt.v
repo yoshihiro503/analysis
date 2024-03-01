@@ -31,10 +31,11 @@ Local Notation "A ^-1" := ([set xy | A (xy.2, xy.1)]) : classical_set_scope.
 
 Definition convex (R : ringType) (M : lmodType R) (A : set M) :=
   forall x y lambda, lambda *: x + (1 - lambda) *: y \in A. 
-
+ 
 HB.mixin Record Uniform_isEvt (R : numDomainType) E of Uniform E & GRing.Lmodule R E := {
-    add_continuous : continuous (uncurry (@GRing.add E));
-    scale_continuous : continuous (uncurry (@GRing.scale R E) : R^o * E -> E);
+    add_continuous : continuous (fun x : E*E => x.1 + x.2); (*continuous (uncurry (@GRing.add E))*)
+    scale_continuous : continuous (fun z: R^o * E => z.1 *: z.2);
+    (* continuous (uncurry (@GRing.scale R E) : R^o * E -> E) *)
     locally_convex : exists B : set (set E), (forall b, b \in B -> convex b) /\ (basis B)
   }.
 
@@ -47,6 +48,7 @@ HB.factory Record TopologicalLmod_isEvt (R : numDomainType) E
     scale_continuous : continuous (uncurry (@GRing.scale R E) : R^o * E -> E);
     locally_convex : exists B : set (set E), (forall b, b \in B -> convex b) /\ (basis B)     
   }.
+
 HB.builders Context R E of TopologicalLmod_isEvt R E.
 
   Definition entourage : set_system (E * E):=
@@ -75,15 +77,37 @@ HB.builders Context R E of TopologicalLmod_isEvt R E.
     rewrite /entourage => A [/=U [U0 Uxy]] xy //= /eqP; rewrite -subr_eq0 => /eqP xyE. 
     by rewrite -in_setE; apply: Uxy; rewrite xyE in_setE; apply: nbhs_singleton.
   Qed.   
+ 
+  Lemma nbhs0N: forall (U : set E), nbhs 0 U -> nbhs 0 (-%R@`U).
+  Proof.
+    move => U U0.
+    move: (@scale_continuous ((-1,0)) U); rewrite /= scaler0  => /(_ U0).
+    rewrite !nbhs_simpl => //= [[]] //= V; rewrite nbhsE /= => [[V1]  [B ?]] BV H. 
+    exists B => //= x Bx; exists (-1 *: x); last by rewrite scaleN1r opprK.
+    move: (H (-1,x)); apply; split =>  /=.
+    move: V1 => [] //= ? ?; apply => [] /=; first by rewrite subrr normr0 //.
+    (* how to simplify nbhs A p -> A p*)
+    by apply: BV. 
+  Qed.
 
-  Lemma entourage_inv_subproof :
-        forall A : set (E * E), entourage A -> entourage A^-1%classic.
+  
+  Lemma nbhsT: forall (U : set E), nbhs 0 U -> nbhs 0 (-%R@`U).
   Admitted.
+  
+  Lemma entourage_inv_subproof :
+    forall A : set (E * E), entourage A -> entourage A^-1%classic.
+  Proof.
+    move => A [/=U].
+    (* rewrite nbhsE /= =>  [U [U0 Hxy]]; exists [set x | -x \in U]; split. *)
+    (* rewrite nbhsE /=. *)
+  Admitted.
+
   Lemma entourage_split_ex_subproof :
         forall A : set (E * E),
         entourage A -> exists2 B : set (E * E), entourage B & B \; B `<=` A.
   Admitted.
-  Lemma nbhsE_subproof : nbhs = nbhs_ entourage.
+
+Lemma nbhsE_subproof : nbhs = nbhs_ entourage.
   Admitted.
 
   HB.instance Definition _ := Nbhs_isUniform_mixin.Build E
@@ -91,3 +115,22 @@ HB.builders Context R E of TopologicalLmod_isEvt R E.
     entourage_inv_subproof entourage_split_ex_subproof
     nbhsE_subproof.
 HB.end.
+
+Search "evt".
+
+
+(* HB.factory Record isUniform M of Pointed M := { *)
+(*   entourage : set_system (M * M); *)
+(*   entourage_filter : Filter entourage; *)
+(*   entourage_refl : forall A, entourage A -> [set xy | xy.1 = xy.2] `<=` A; *)
+(*   entourage_inv : forall A, entourage A -> entourage (A^-1)%classic; *)
+(*   entourage_split_ex : *)
+(*     forall A, entourage A -> exists2 B, entourage B & B \; B `<=` A; *)
+(* }. *)
+
+(* HB.builders Context M of isUniform M. *)
+(*   HB.instance Definition _ := @hasNbhs.Build M (nbhs_ entourage). *)
+(*   HB.instance Definition _ := @Nbhs_isUniform.Build M entourage *)
+(*     entourage_filter entourage_refl entourage_inv entourage_split_ex erefl. *)
+(* HB.end. *)
+         
