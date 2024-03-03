@@ -42,7 +42,7 @@ HB.mixin Record Uniform_isEvt (R : numDomainType) E of Uniform E & GRing.Lmodule
 HB.structure Definition Evt (R : numDomainType) :=
   {E of Uniform_isEvt R E & Uniform E & GRing.Lmodule R E}. 
 
-HB.factory Record TopologicalLmod_isEvt (R : numDomainType) E
+HB.factory Record TopologicalLmod_isEvt (R : numFieldType) E
       of Topological E & GRing.Lmodule R E := {
     add_continuous : continuous (uncurry (@GRing.add E));
     scale_continuous : continuous (uncurry (@GRing.scale R E) : R^o * E -> E);
@@ -85,19 +85,21 @@ HB.builders Context R E of TopologicalLmod_isEvt R E.
     near=> x; move =>  //=; exists (-x); last by rewrite opprK.
     rewrite -scaleN1r; apply: (BU (-1,x)); split => //=; last first.
       by near:x; rewrite nearE.                            
-    rewrite near_simpl in B1.
-    admit. (*Again, Nbhs A p -> A p*)
+    move: B1 => [] //= ? ?; apply => [] /=;  first by rewrite subrr normr0 //. 
       Unshelve. all: by end_near.
-  Admitted. 
-    (* move: (@scale_continuous ((-1,0)) U); rewrite /= scaler0  => /(_ U0). *)
-    (* rewrite !nbhs_simpl => //= [[]] //= V; rewrite nbhsE /= => [[V1]  [B ?]] BV H.  *)
-    (* exists B => //= x Bx; exists (-1 *: x); last by rewrite scaleN1r opprK. *)
-    (* move: (H (-1,x)); apply; split =>  /=.  *)
-    (* move: V1 => [] //= ? ?; apply => [] /=;  first by rewrite subrr normr0 //. *)
-    (* (* how to simplify nbhs A p -> A p*) *)
-    (* by apply: BV.  *)
-     (* Qed. *)
+  Qed.
 
+  Lemma nbhs0_scaler: forall (U : set E) (r:R),  (r != 0) -> nbhs 0 U -> nbhs 0 ([eta *:%R r]@`U).
+  Proof.
+    move => U r r0 U0. move: (@scale_continuous ((r^-1,0)) U); rewrite /= scaler0 => /(_ U0).
+    rewrite !near_simpl =>//= [[B] [B1 B2] BU]. 
+    near=> x; move =>  //=; exists (r^-1*:x); last by rewrite scalerA divrr ?scale1r ?unitfE //=.  
+    apply: (BU (r^-1,x)); split => //=; last by near:x; rewrite nearE.
+    by apply: nbhs_singleton.                        
+    Unshelve. all: by end_near.
+  Qed.
+
+  
   Lemma nbhsT: forall (U : set E), forall (x : E), nbhs 0 U -> nbhs x ([eta +%R x]@`U).
   Proof.
   move => U x U0. 
@@ -105,18 +107,20 @@ HB.builders Context R E of TopologicalLmod_isEvt R E.
   rewrite !near_simpl nearE => //= [[B] [B1 B2] BU] ; near=> x0.
   (* how to deal with pairs without near*)
   exists (x0-x); last by rewrite //= addrCA subrr addr0.
-  apply: (BU (x0,-x)); split => //=; last first.   admit. (*Again, Nbhs A p -> A p*)
+  apply: (BU (x0,-x)); split => //=; last by apply: nbhs_singleton. 
   by near: x0; rewrite nearE.  
   Unshelve. all: by end_near.
-  Admitted.  
+  Qed.
 
   Lemma entourage_inv_subproof :
     forall A : set (E * E), entourage A -> entourage A^-1%classic.
   Proof.
-    move => A [/=U [U0 Uxy]]; rewrite /entourage /=.
-    (* rewrite nbhsE /= =>  [U [U0 Hxy]]; exists [set x | -x \in U]; split. *)
-    (* rewrite nbhsE /=. *)
-  Admitted.
+  move => A [/=U [U0 Uxy]]; rewrite /entourage /=.
+  exists (-%R@`U); split; first by apply: nbhs0N.
+  move => xy; rewrite in_setE -opprB => [[yx] Uyx] => /oppr_inj H.
+  by apply: Uxy; rewrite in_setE /= -H.
+  Qed.
+
 
   Lemma entourage_split_ex_subproof :
         forall A : set (E * E),
