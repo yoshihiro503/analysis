@@ -80,24 +80,40 @@ HB.builders Context R E of TopologicalLmod_isEvt R E.
  
   Lemma nbhs0N: forall (U : set E), nbhs 0 U -> nbhs 0 (-%R@`U).
   Proof.
-    move => U U0.
-    move: (@scale_continuous ((-1,0)) U); rewrite /= scaler0  => /(_ U0).
-    rewrite !nbhs_simpl => //= [[]] //= V; rewrite nbhsE /= => [[V1]  [B ?]] BV H. 
-    exists B => //= x Bx; exists (-1 *: x); last by rewrite scaleN1r opprK.
-    move: (H (-1,x)); apply; split =>  /=.
-    move: V1 => [] //= ? ?; apply => [] /=; first by rewrite subrr normr0 //.
-    (* how to simplify nbhs A p -> A p*)
-    by apply: BV. 
-  Qed.
+    move => U U0. move: (@scale_continuous ((-1,0)) U); rewrite /= scaler0 => /(_ U0).
+    rewrite !near_simpl =>//= [[B] [B1 B2] BU]. 
+    near=> x; move =>  //=; exists (-x); last by rewrite opprK.
+    rewrite -scaleN1r; apply: (BU (-1,x)); split => //=; last first.
+      by near:x; rewrite nearE.                            
+    rewrite near_simpl in B1.
+    admit. (*Again, Nbhs A p -> A p*)
+      Unshelve. all: by end_near.
+  Admitted. 
+    (* move: (@scale_continuous ((-1,0)) U); rewrite /= scaler0  => /(_ U0). *)
+    (* rewrite !nbhs_simpl => //= [[]] //= V; rewrite nbhsE /= => [[V1]  [B ?]] BV H.  *)
+    (* exists B => //= x Bx; exists (-1 *: x); last by rewrite scaleN1r opprK. *)
+    (* move: (H (-1,x)); apply; split =>  /=.  *)
+    (* move: V1 => [] //= ? ?; apply => [] /=;  first by rewrite subrr normr0 //. *)
+    (* (* how to simplify nbhs A p -> A p*) *)
+    (* by apply: BV.  *)
+     (* Qed. *)
 
-  
-  Lemma nbhsT: forall (U : set E), nbhs 0 U -> nbhs 0 (-%R@`U).
-  Admitted.
-  
+  Lemma nbhsT: forall (U : set E), forall (x : E), nbhs 0 U -> nbhs x ([eta +%R x]@`U).
+  Proof.
+  move => U x U0. 
+  move: (@add_continuous (x,-x) U) => /=; rewrite subrr => /(_ U0) //=.
+  rewrite !near_simpl nearE => //= [[B] [B1 B2] BU] ; near=> x0.
+  (* how to deal with pairs without near*)
+  exists (x0-x); last by rewrite //= addrCA subrr addr0.
+  apply: (BU (x0,-x)); split => //=; last first.   admit. (*Again, Nbhs A p -> A p*)
+  by near: x0; rewrite nearE.  
+  Unshelve. all: by end_near.
+  Admitted.  
+
   Lemma entourage_inv_subproof :
     forall A : set (E * E), entourage A -> entourage A^-1%classic.
   Proof.
-    move => A [/=U].
+    move => A [/=U [U0 Uxy]]; rewrite /entourage /=.
     (* rewrite nbhsE /= =>  [U [U0 Hxy]]; exists [set x | -x \in U]; split. *)
     (* rewrite nbhsE /=. *)
   Admitted.
