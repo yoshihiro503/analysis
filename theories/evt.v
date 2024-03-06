@@ -52,13 +52,13 @@ HB.factory Record TopologicalLmod_isEvt (R : numFieldType) E
 HB.builders Context R E of TopologicalLmod_isEvt R E.
 
   Definition entourage : set_system (E * E):=
-  fun P=> exists U, nbhs 0 U/\(forall xy : E*E, (xy.1 -xy.2) \in U -> xy \in P).
+  fun P=> exists U, nbhs 0 U /\ (forall xy : E * E, (xy.1 - xy.2) \in U -> xy \in P).
 
   Lemma entourage_filter : Filter entourage.
   Proof.
     split.
       exists [set: E]; split; first by apply: filter_nbhsT.
-        by move => xy; rewrite !in_setE //=.
+        by move => xy //=. 
         move => P Q; rewrite /entourage nbhsE //=.
         move => [U [[B B0] BU Bxy]]  [V [[C C0] CV Cxy]]. 
         exists (U`&`V); split.
@@ -68,7 +68,7 @@ HB.builders Context R E of TopologicalLmod_isEvt R E.
        move/andP => [xyU xyV]; apply/andP;split; first by apply:Bxy.
        by apply: Cxy.
     move => P Q PQ; rewrite /entourage /= => [[U [HU Hxy]]]; exists U; split => //.
-    by move => xy Uxy; rewrite in_setE; apply: PQ; rewrite -in_setE; apply:Hxy.
+    by move => xy /Hxy /[!inE] /PQ. 
   Qed.
   
   Lemma entourage_refl_subproof :
@@ -78,10 +78,10 @@ HB.builders Context R E of TopologicalLmod_isEvt R E.
     by rewrite -in_setE; apply: Uxy; rewrite xyE in_setE; apply: nbhs_singleton.
   Qed.   
  
-  Lemma nbhs0N: forall (U : set E), nbhs 0 U -> nbhs 0 (-%R@`U).
+  Lemma nbhs0N: forall (U : set E), nbhs 0 U -> nbhs 0 (-%R @` U).
   Proof.
     move => U U0. move: (@scale_continuous ((-1,0)) U); rewrite /= scaler0 => /(_ U0).
-    rewrite !near_simpl =>//= [[B] [B1 B2] BU]. 
+    move => [] //= [B] B12  [B1 B2] BU.  
     near=> x; move =>  //=; exists (-x); last by rewrite opprK.
     rewrite -scaleN1r; apply: (BU (-1,x)); split => //=; last first.
       by near:x; rewrite nearE.                            
@@ -89,23 +89,22 @@ HB.builders Context R E of TopologicalLmod_isEvt R E.
       Unshelve. all: by end_near.
   Qed.
 
-  Lemma nbhs0_scaler: forall (U : set E) (r:R),  (r != 0) -> nbhs 0 U -> nbhs 0 ([eta *:%R r]@`U).
+  Lemma nbhs0_scaler: forall (U : set E) (r : R),  (r != 0) -> nbhs 0 U -> nbhs 0 ( *:%R r @` U).
   Proof.
-    move => U r r0 U0. move: (@scale_continuous ((r^-1,0)) U); rewrite /= scaler0 => /(_ U0).
-    rewrite !near_simpl =>//= [[B] [B1 B2] BU]. 
-    near=> x; move =>  //=; exists (r^-1*:x); last by rewrite scalerA divrr ?scale1r ?unitfE //=.  
-    apply: (BU (r^-1,x)); split => //=; last by near:x; rewrite nearE.
+    move => U r r0 U0; move: (@scale_continuous ((r^-1,0)) U); rewrite /= scaler0 => /(_ U0).
+    case=>//= [B] [B1 B2] BU. 
+    near=> x => //=; exists (r^-1*:x); last by rewrite scalerA divrr ?scale1r ?unitfE //=.  
+    apply: (BU (r^-1,x)); split => //=; last by near: x.
     by apply: nbhs_singleton.                        
     Unshelve. all: by end_near.
   Qed.
 
   
-  Lemma nbhsT: forall (U : set E), forall (x : E), nbhs 0 U -> nbhs x ([eta +%R x]@`U).
+  Lemma nbhsT: forall (U : set E), forall (x : E), nbhs 0 U -> nbhs x (+%R x @`U).
   Proof.
   move => U x U0. 
   move: (@add_continuous (x,-x) U) => /=; rewrite subrr => /(_ U0) //=.
-  rewrite !near_simpl nearE => //= [[B] [B1 B2] BU] ; near=> x0.
-  (* how to deal with pairs without near*)
+  case=> //= [B] [B1 B2] BU. near=> x0.
   exists (x0-x); last by rewrite //= addrCA subrr addr0.
   apply: (BU (x0,-x)); split => //=; last by apply: nbhs_singleton. 
   by near: x0; rewrite nearE.  
@@ -135,22 +134,5 @@ Lemma nbhsE_subproof : nbhs = nbhs_ entourage.
     entourage_inv_subproof entourage_split_ex_subproof
     nbhsE_subproof.
 HB.end.
-
-Search "evt".
-
-
-(* HB.factory Record isUniform M of Pointed M := { *)
-(*   entourage : set_system (M * M); *)
-(*   entourage_filter : Filter entourage; *)
-(*   entourage_refl : forall A, entourage A -> [set xy | xy.1 = xy.2] `<=` A; *)
-(*   entourage_inv : forall A, entourage A -> entourage (A^-1)%classic; *)
-(*   entourage_split_ex : *)
-(*     forall A, entourage A -> exists2 B, entourage B & B \; B `<=` A; *)
-(* }. *)
-
-(* HB.builders Context M of isUniform M. *)
-(*   HB.instance Definition _ := @hasNbhs.Build M (nbhs_ entourage). *)
-(*   HB.instance Definition _ := @Nbhs_isUniform.Build M entourage *)
-(*     entourage_filter entourage_refl entourage_inv entourage_split_ex erefl. *)
-(* HB.end. *)
-         
+  
+Definition dual {R : ringType} (E : lmodType R) := {scalar E}. 
