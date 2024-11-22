@@ -1,0 +1,37 @@
+on:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+
+
+jobs:
+  generate-html-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Graphviz
+        uses: ts-graphviz/setup-graphviz@v2
+
+      - run: |
+          mkdir -p output/$BRANCH
+          echo "<h1>$BRANCH</h1>" > output/$BRANCH/index.html
+          echo "<p>PR-$pr_number</p>" > output/$pr_number/index.html
+          pwd
+          ls -l
+        env:
+          BRANCH: ${{ github.ref_name }}
+          pr_number: ${{ github.event.pull_request.number }}
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        env:
+          BRANCH: ${{ github.ref_name }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./output
+          keep_files: false
+          user_name: github-actions
+          user_email: github-actions@github.com
