@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module mathcomp.analysis.showcase.summability</title>
+<meta name="description" content="Documentation of Coq module mathcomp.analysis.showcase.summability" />
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="init()">
+
+  <main>
+    <div class="sidebar">
+      <h2>Files</h2>
+      
+    </div>
+
+  <div class="coq">
+
+    <div class="content">
+      <p><a href="./index.html">Top</a></p>
+      <h1 class="title">Module mathcomp.analysis.showcase.summability</h1>
+<span class="vernacular">From</span><span class="id"> HB</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> structures</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> all_ssreflect</span><span class="id"> ssralg</span><span class="id"> ssrint</span><span class="id"> ssrnum</span><span class="id"> finmap</span><span class="id"> matrix</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> interval</span><span class="id"> zmodp</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> boolp</span><span class="id"> classical_sets</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> ereal</span><span class="id"> reals</span><span class="id"> signed</span><span class="id"> topology</span><span class="id"> normedtype</span>.<br/>
+<br/>
+<div class="ssrdoc md">
+This file proposes a replacement for the definition `summable` (file
+`realsum.v`).
+</div>
+<br/>
+<span class="gallina-kwd">Set</span><span class="vernacular"> Implicit</span><span class="vernacular"> Arguments</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Strict</span><span class="vernacular"> Implicit</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Printing</span><span class="vernacular"> Implicit</span><span class="vernacular"> Defensive</span>.<br/>
+<span class="vernacular">Import</span><span class="id"> GRing</span>.<span class="id">Theory</span><span class="id"> Num</span>.<span class="id">Def</span><span class="id"> Num</span>.<span class="id">Theory</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> classical_set_scope</span>.<br/>
+<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="id"> fintype</span><span class="id"> bigop</span><span class="id"> finmap</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> totally</span>.<br/>
+<br/>
+<span class="vernacular">Import</span><span class="id"> fintype</span><span class="id"> bigop</span><span class="id"> finmap</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> fset_scope</span>.<br/>
+<span class="vernacular">Definition</span><span class="id"> totally</span><span class="id"> {I</span><span class="id"> :</span><span class="id"> choiceType}</span><span class="id"> :</span><span class="id"> set_system</span><span class="id"> {fset</span><span class="id"> I}</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">filter_from</span><span class="id"> setT</span> (<span class="gallina-kwd">fun</span><span class="id"> A</span><span class="id"> =&gt;</span><span class="id"> [set</span><span class="id"> B</span><span class="id"> |</span><span class="id"> A</span><span class="id"> `&lt;=`</span><span class="id"> B]</span>).<br/>
+<br/>
+<span class="vernacular">Instance</span><span class="id"> totally_filter</span><span class="id"> {I</span><span class="id"> :</span><span class="id"> choiceType}</span><span class="id"> :</span><span class="id"> ProperFilter</span> (<span class="id">@totally</span><span class="id"> I</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">eapply</span><span class="id"> filter_from_proper;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> A</span><span class="id"> _;</span><span class="gallina-kwd"> exists</span><span class="id"> A;</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> fsubset_refl</span>.<br/>
+<span class="id">apply:</span><span class="id"> filter_fromT_filter;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="gallina-kwd"> exists</span><span class="id"> fset0</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> A</span><span class="id"> B</span><span class="id"> /=;</span><span class="gallina-kwd"> exists</span> (<span class="id">A</span><span class="id"> `|`</span><span class="id"> B</span>)<span class="id"> =&gt;</span><span class="id"> P</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> fsubUset</span><span class="id"> =&gt;</span><span class="id"> /andP[]</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> partial_sum</span><span class="id"> {I</span><span class="id"> :</span><span class="id"> choiceType}</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> zmodType}</span><br/>
+&nbsp;&nbsp;(<span class="id">x</span><span class="id"> :</span><span class="id"> I</span><span class="id"> -&gt;</span><span class="id"> R</span>) (<span class="id">A</span><span class="id"> :</span><span class="id"> {fset</span><span class="id"> I}</span>)<span class="id"> :</span><span class="id"> R</span><span class="id"> :=</span><span class="id"> \sum_</span>(<span class="id">i</span><span class="id"> :</span><span class="id"> A</span>)<span class="id"> x</span> (<span class="id">val</span><span class="id"> i</span>).<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> sum</span> (<span class="id">I</span><span class="id"> :</span><span class="id"> choiceType</span>)<span class="id"> {K</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> normedModType</span><span class="id"> K}</span><br/>
+&nbsp;&nbsp;&nbsp;(<span class="id">x</span><span class="id"> :</span><span class="id"> I</span><span class="id"> -&gt;</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> R</span><span class="id"> :=</span><span class="id"> lim</span> (<span class="id">partial_sum</span><span class="id"> x</span><span class="id"> @</span><span class="id"> totally</span>).<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> summable</span> (<span class="id">I</span><span class="id"> :</span><span class="id"> choiceType</span>)<span class="id"> {K</span><span class="id"> :</span><span class="id"> realType}</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> normedModType</span><span class="id"> K}</span><br/>
+&nbsp;&nbsp;&nbsp;(<span class="id">x</span><span class="id"> :</span><span class="id"> I</span><span class="id"> -&gt;</span><span class="id"> R</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;&nbsp;<span class="id">\forall</span><span class="id"> M</span><span class="id"> \near</span><span class="id"> +oo%R,</span><span class="id"> \forall</span><span class="id"> J</span><span class="id"> \near</span><span class="id"> totally,</span><br/>
+&nbsp;&nbsp;&nbsp;(<span class="id">partial_sum</span> (<span class="gallina-kwd">fun</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> `|x</span><span class="id"> i|</span>)<span class="id"> J</span><span class="id"> &lt;=</span><span class="id"> M</span>)<span class="id">%R</span>.<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> totally</span>.<br/>
+
+      <div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/">a fork of coq2html</a></div>
+    </div>
+  </div>
+    </main>
+</body>
+</html>

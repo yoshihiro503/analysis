@@ -1,0 +1,351 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module mathcomp.analysis.convex</title>
+<meta name="description" content="Documentation of Coq module mathcomp.analysis.convex" />
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="init()">
+
+  <main>
+    <div class="sidebar">
+      <h2>Files</h2>
+      
+    </div>
+
+  <div class="coq">
+
+    <div class="content">
+      <p><a href="./index.html">Top</a></p>
+      <h1 class="title">Module mathcomp.analysis.convex</h1>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> all_ssreflect</span><span class="id"> ssralg</span><span class="id"> ssrint</span><span class="id"> ssrnum</span><span class="id"> finmap</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> matrix</span><span class="id"> interval</span><span class="id"> zmodp</span><span class="id"> vector</span><span class="id"> fieldext</span><span class="id"> falgebra</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> mathcomp_extra</span><span class="id"> boolp</span><span class="id"> classical_sets</span><span class="id"> set_interval</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> functions</span><span class="id"> cardinality</span><span class="id"> ereal</span><span class="id"> reals</span><span class="id"> signed</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> topology</span><span class="id"> prodnormedzmodule</span><span class="id"> normedtype</span><span class="id"> derive</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> realfun</span><span class="id"> itv</span>.<br/>
+<span class="vernacular">From</span><span class="id"> HB</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> structures</span>.<br/>
+<br/>
+<div class="ssrdoc md">
+# Convexity
+
+This file provides a small account of convexity using convex spaces, to be
+completed with material from infotheo.
+
+```
+  isConvexSpace R T == interface for convex spaces
+      ConvexSpace R == structure of convex space
+        a &lt;| t |&gt; b == convexity operator
+```
+
+E : lmodType R with R : realDomainType and R : realDomainType are shown to
+be convex spaces with the following aliases:
+      convex_lmodType E == E : lmodType T as a convex spaces
+convex_realDomainType R == R : realDomainType as a convex space
+
+</div>
+<br/>
+<span class="vernacular">Reserved</span><span class="vernacular"> Notation</span> <span class="id">&quot;x &lt;| p |&gt; y&quot;</span> (<span class="id">format</span> <span class="id">&quot;x  &lt;| p |&gt;  y&quot;</span><span class="id">,</span><span class="gallina-kwd"> at</span><span class="id"> level</span><span class="id"> 49</span>).<br/>
+<br/>
+<span class="gallina-kwd">Set</span><span class="vernacular"> Implicit</span><span class="vernacular"> Arguments</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Strict</span><span class="vernacular"> Implicit</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Printing</span><span class="vernacular"> Implicit</span><span class="vernacular"> Defensive</span>.<br/>
+<br/>
+<span class="vernacular">Import</span><span class="id"> Order</span>.<span class="id">TTheory</span><span class="id"> GRing</span>.<span class="id">Theory</span><span class="id"> Num</span>.<span class="id">Def</span><span class="id"> Num</span>.<span class="id">Theory</span>.<br/>
+<span class="vernacular">Import</span><span class="id"> numFieldTopology</span>.<span class="vernacular">Exports</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> classical_set_scope</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ring_scope</span>.<br/>
+<br/>
+<span class="vernacular">Import</span><span class="id"> numFieldNormedType</span>.<span class="vernacular">Exports</span>.<br/>
+<br/>
+<span class="vernacular">Declare</span><span class="vernacular"> Scope</span><span class="id"> convex_scope</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> convex_scope</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">mixin</span><span class="vernacular"> Record</span><span class="id"> isConvexSpace</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realDomainType</span>)<span class="id"> T</span><span class="id"> :=</span><span class="id"> {</span><br/>
+&nbsp;&nbsp;<span class="id">conv</span><span class="id"> :</span><span class="id"> {i01</span><span class="id"> R}</span><span class="id"> -&gt;</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> T</span><span class="id"> ;</span><br/>
+&nbsp;&nbsp;<span class="id">conv0</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> a</span><span class="id"> b,</span><span class="id"> conv</span><span class="id"> 0%:i01</span><span class="id"> a</span><span class="id"> b</span><span class="id"> =</span><span class="id"> a</span><span class="id"> ;</span><br/>
+&nbsp;&nbsp;<span class="id">convmm</span><span class="id"> :</span><span class="gallina-kwd"> forall</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> {i01</span><span class="id"> R}</span>)<span class="id"> a,</span><span class="id"> conv</span><span class="id"> p</span><span class="id"> a</span><span class="id"> a</span><span class="id"> =</span><span class="id"> a</span><span class="id"> ;</span><br/>
+&nbsp;&nbsp;<span class="id">convC</span><span class="id"> :</span><span class="gallina-kwd"> forall</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> {i01</span><span class="id"> R}</span>)<span class="id"> a</span><span class="id"> b,</span><span class="id"> conv</span><span class="id"> p</span><span class="id"> a</span><span class="id"> b</span><span class="id"> =</span><span class="id"> conv</span> (<span class="id">1</span><span class="id"> -</span><span class="id"> p%:inum</span>)<span class="id">%:i01</span><span class="id"> b</span><span class="id"> a;</span><br/>
+&nbsp;&nbsp;<span class="id">convA</span><span class="id"> :</span><span class="gallina-kwd"> forall</span> (<span class="id">p</span><span class="id"> q</span><span class="id"> r</span><span class="id"> :</span><span class="id"> {i01</span><span class="id"> R}</span>) (<span class="id">a</span><span class="id"> b</span><span class="id"> c</span><span class="id"> :</span><span class="id"> T</span>)<span class="id">,</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">p%:inum</span><span class="id"> *</span> (<span class="id">`1-</span>(<span class="id">q%:inum</span>))<span class="id"> =</span> (<span class="id">`1-</span>(<span class="id">p%:inum</span><span class="id"> *</span><span class="id"> q%:inum</span>))<span class="id"> *</span><span class="id"> r%:inum</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">conv</span><span class="id"> p</span><span class="id"> a</span> (<span class="id">conv</span><span class="id"> q</span><span class="id"> b</span><span class="id"> c</span>)<span class="id"> =</span><span class="id"> conv</span> (<span class="id">p%:inum</span><span class="id"> *</span><span class="id"> q%:inum</span>)<span class="id">%:i01</span> (<span class="id">conv</span><span class="id"> r</span><span class="id"> a</span><span class="id"> b</span>)<span class="id"> c</span><br/>
+<span class="id">}</span>.<br/>
+<br/>
+<span class="id">#[short</span>(<span class="id">type=convType</span>)<span class="id">]</span><br/>
+<span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> ConvexSpace</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realDomainType</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">{T</span><span class="id"> of</span><span class="id"> isConvexSpace</span><span class="id"> R</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> Choice</span><span class="id"> T}</span>.<br/>
+<br/>
+<span class="vernacular">Notation</span> <span class="id">&quot;a &lt;| p |&gt; b&quot;</span><span class="id"> :=</span> (<span class="id">conv</span><span class="id"> p</span><span class="id"> a</span><span class="id"> b</span>)<span class="id"> :</span><span class="id"> convex_scope</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> convex_space_lemmas</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> R</span> (<span class="id">A</span><span class="id"> :</span><span class="id"> convType</span><span class="id"> R</span>).<br/>
+<span class="vernacular">Implicit</span><span class="id"> Types</span><span class="id"> a</span><span class="id"> b</span><span class="id"> :</span><span class="id"> A</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> conv1</span><span class="id"> a</span><span class="id"> b</span><span class="id"> :</span><span class="id"> a</span><span class="id"> &lt;|</span><span class="id"> 1%:i01</span><span class="id"> |&gt;</span><span class="id"> b</span><span class="id"> =</span><span class="id"> b</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> convC/=</span><span class="id"> [X</span><span class="gallina-kwd"> in</span><span class="id"> _</span><span class="id"> &lt;|</span><span class="id"> X</span><span class="id"> |&gt;</span><span class="id"> _]</span>(_<span class="id"> :</span><span class="id"> _</span><span class="id"> =</span><span class="id"> 0%:i01</span>)<span class="id"> ?conv0//</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply/val_inj</span><span class="id"> =&gt;</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> subrr</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> convex_space_lemmas</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> convex_scope</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> convex_lmodType</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realDomainType}</span> (<span class="id">E</span><span class="id"> :</span><span class="id"> lmodType</span><span class="id"> R</span>)<span class="id"> :</span><span class="gallina-kwd"> Type</span><span class="id"> :=</span><span class="id"> E</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> lmodType_convex_space</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realDomainType}</span><span class="id"> {E'</span><span class="id"> :</span><span class="id"> lmodType</span><span class="id"> R}</span>.<br/>
+<span class="vernacular">Implicit</span><span class="gallina-kwd"> Type</span><span class="id"> p</span><span class="id"> q</span><span class="id"> r</span><span class="id"> :</span><span class="id"> {i01</span><span class="id"> R}</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> E</span><span class="id"> :=</span><span class="id"> convex_lmodType</span><span class="id"> E'</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> avg</span><span class="id"> p</span> (<span class="id">a</span><span class="id"> b</span><span class="id"> :</span><span class="id"> E</span>)<span class="id"> :=</span><span class="id"> `1-</span>(<span class="id">p%:inum</span>)<span class="id"> *:</span><span class="id"> a</span><span class="id"> +</span><span class="id"> p%:inum</span><span class="id"> *:</span><span class="id"> b</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> avg0</span><span class="id"> a</span><span class="id"> b</span><span class="id"> :</span><span class="id"> avg</span><span class="id"> 0%:i01</span><span class="id"> a</span><span class="id"> b</span><span class="id"> =</span><span class="id"> a</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /avg/=</span><span class="id"> onem0</span><span class="id"> scale0r</span><span class="id"> scale1r</span><span class="id"> addr0</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> avgI</span><span class="id"> p</span><span class="id"> x</span><span class="id"> :</span><span class="id"> avg</span><span class="id"> p</span><span class="id"> x</span><span class="id"> x</span><span class="id"> =</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /avg</span><span class="id"> -scalerDl/=</span><span class="id"> addrC</span><span class="id"> add_onemK</span><span class="id"> scale1r</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> avgC</span><span class="id"> p</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> avg</span><span class="id"> p</span><span class="id"> x</span><span class="id"> y</span><span class="id"> =</span><span class="id"> avg</span> (<span class="id">1</span><span class="id"> -</span> (<span class="id">p%:inum</span>))<span class="id">%:i01</span><span class="id"> y</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /avg</span><span class="id"> onemK</span><span class="id"> addrC</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> avgA</span><span class="id"> p</span><span class="id"> q</span><span class="id"> r</span> (<span class="id">a</span><span class="id"> b</span><span class="id"> c</span><span class="id"> :</span><span class="id"> E</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">p%:inum</span><span class="id"> *</span> (<span class="id">`1-</span>(<span class="id">q%:inum</span>))<span class="id"> =</span> (<span class="id">`1-</span>(<span class="id">p%:inum</span><span class="id"> *</span><span class="id"> q%:inum</span>))<span class="id"> *</span><span class="id"> r%:inum</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">avg</span><span class="id"> p</span><span class="id"> a</span> (<span class="id">avg</span><span class="id"> q</span><span class="id"> b</span><span class="id"> c</span>)<span class="id"> =</span><span class="id"> avg</span> (<span class="id">p%:inum</span><span class="id"> *</span><span class="id"> q%:inum</span>)<span class="id">%:i01</span> (<span class="id">avg</span><span class="id"> r</span><span class="id"> a</span><span class="id"> b</span>)<span class="id"> c</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> pq;</span><span class="id"> rewrite</span><span class="id"> /avg</span>.<br/>
+<span class="id">rewrite</span><span class="id"> [in</span><span class="id"> LHS]scalerDr</span><span class="id"> [in</span><span class="id"> LHS]addrA</span><span class="id"> [in</span><span class="id"> RHS]scalerDr;</span><span class="id"> congr</span> (_<span class="id"> +</span><span class="id"> _</span><span class="id"> +</span><span class="id"> _</span>).<br/>
+<span class="id">-</span><span class="id"> rewrite</span><span class="id"> scalerA;</span><span class="id"> congr</span> (_<span class="id"> *:</span><span class="id"> _</span>)<span class="id"> =&gt;</span><span class="id"> /=</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> mulrDr</span><span class="id"> mulr1</span><span class="id"> mulrN</span><span class="id"> -pq</span><span class="id"> mulrBr</span><span class="id"> mulr1</span><span class="id"> opprB</span><span class="id"> addrA</span><span class="id"> subrK</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> 2!scalerA;</span><span class="id"> congr</span> (_<span class="id"> *:</span><span class="id"> _</span>).<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> scalerA</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Choice</span>.<span class="id">on</span><span class="id"> E</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">isConvexSpace</span>.<span class="id">Build</span><span class="id"> R</span><span class="id"> E</span><span class="id"> avg0</span><span class="id"> avgI</span><span class="id"> avgC</span><span class="id"> avgA</span>.<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> lmodType_convex_space</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> convex_realDomainType</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realDomainType</span>)<span class="id"> :</span><span class="gallina-kwd"> Type</span><span class="id"> :=</span><span class="id"> R^o</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> realDomainType_convex_space</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realDomainType}</span>.<br/>
+<span class="vernacular">Implicit</span><span class="id"> Types</span><span class="id"> p</span><span class="id"> q</span><span class="id"> :</span><span class="id"> {i01</span><span class="id"> R}</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> E</span><span class="id"> :=</span><span class="id"> @convex_realDomainType</span><span class="id"> R</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> avg</span><span class="id"> p</span> (<span class="id">a</span><span class="id"> b</span><span class="id"> :</span><span class="id"> convex_lmodType</span><span class="id"> R^o</span>)<span class="id"> :=</span><span class="id"> a</span><span class="id"> &lt;|</span><span class="id"> p</span><span class="id"> |&gt;</span><span class="id"> b</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> avg0</span><span class="id"> a</span><span class="id"> b</span><span class="id"> :</span><span class="id"> avg</span><span class="id"> 0%:i01</span><span class="id"> a</span><span class="id"> b</span><span class="id"> =</span><span class="id"> a</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /avg</span><span class="id"> conv0</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> avgI</span><span class="id"> p</span><span class="id"> x</span><span class="id"> :</span><span class="id"> avg</span><span class="id"> p</span><span class="id"> x</span><span class="id"> x</span><span class="id"> =</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /avg</span><span class="id"> convmm</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> avgC</span><span class="id"> p</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> avg</span><span class="id"> p</span><span class="id"> x</span><span class="id"> y</span><span class="id"> =</span><span class="id"> avg</span> (<span class="id">1</span><span class="id"> -</span> (<span class="id">p%:inum</span>))<span class="id">%:i01</span><span class="id"> y</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /avg</span><span class="id"> convC</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> avgA</span><span class="id"> p</span><span class="id"> q</span><span class="id"> r</span> (<span class="id">a</span><span class="id"> b</span><span class="id"> c</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">p%:inum</span><span class="id"> *</span> (<span class="id">`1-</span>(<span class="id">q%:inum</span>))<span class="id"> =</span> (<span class="id">`1-</span>(<span class="id">p%:inum</span><span class="id"> *</span><span class="id"> q%:inum</span>))<span class="id"> *</span><span class="id"> r%:inum</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">avg</span><span class="id"> p</span><span class="id"> a</span> (<span class="id">avg</span><span class="id"> q</span><span class="id"> b</span><span class="id"> c</span>)<span class="id"> =</span><span class="id"> avg</span> (<span class="id">p%:inum</span><span class="id"> *</span><span class="id"> q%:inum</span>)<span class="id">%:i01</span> (<span class="id">avg</span><span class="id"> r</span><span class="id"> a</span><span class="id"> b</span>)<span class="id"> c</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> h;</span><span class="id"> rewrite</span><span class="id"> /avg</span> (<span class="id">convA</span><span class="id"> _</span><span class="id"> _</span><span class="id"> r</span>). Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> @isConvexSpace</span>.<span class="id">Build</span><span class="id"> R</span><span class="id"> R^o</span><br/>
+&nbsp;&nbsp;_<span class="id"> avg0</span><span class="id"> avgI</span><span class="id"> avgC</span><span class="id"> avgA</span>.<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> realDomainType_convex_space</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> conv_realDomainType</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realDomainType}</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> conv_gt0</span> (<span class="id">a</span><span class="id"> b</span><span class="id"> :</span><span class="id"> R^o</span>) (<span class="id">t</span><span class="id"> :</span><span class="id"> {i01</span><span class="id"> R}</span>)<span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> a</span><span class="id"> -&gt;</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> b</span><span class="id"> -&gt;</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> a</span><span class="id"> &lt;|</span><span class="id"> t</span><span class="id"> |&gt;</span><span class="id"> b</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> a0</span><span class="id"> b0</span>.<br/>
+<span class="id">have</span><span class="id"> [-&gt;|t0]</span><span class="id"> :=</span><span class="id"> eqVneq</span><span class="id"> t</span><span class="id"> 0%:i01;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> conv0</span>.<br/>
+<span class="id">have</span><span class="id"> [-&gt;|t1]</span><span class="id"> :=</span><span class="id"> eqVneq</span><span class="id"> t</span><span class="id"> 1%:i01;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> conv1</span>.<br/>
+<span class="id">rewrite</span><span class="id"> addr_gt0//</span><span class="id"> mulr_gt0//;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> lt_neqAle</span><span class="id"> eq_sym</span><span class="id"> t0/=</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> onem_gt0//</span><span class="id"> lt_neqAle</span><span class="id"> t1/=</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> convRE</span> (<span class="id">a</span><span class="id"> b</span><span class="id"> :</span><span class="id"> R^o</span>) (<span class="id">t</span><span class="id"> :</span><span class="id"> {i01</span><span class="id"> R}</span>)<span class="id"> :</span><span class="id"> a</span><span class="id"> &lt;|</span><span class="id"> t</span><span class="id"> |&gt;</span><span class="id"> b</span><span class="id"> =</span><span class="id"> `1-</span>(<span class="id">t%:inum</span>)<span class="id"> *</span><span class="id"> a</span><span class="id"> +</span><span class="id"> t%:inum</span><span class="id"> *</span><span class="id"> b</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> conv_realDomainType</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> convex_function</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>) (<span class="id">D</span><span class="id"> :</span><span class="id"> set</span><span class="id"> R</span>) (<span class="id">f</span><span class="id"> :</span><span class="id"> R</span><span class="id"> -&gt;</span><span class="id"> R^o</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">forall</span> (<span class="id">t</span><span class="id"> :</span><span class="id"> {i01</span><span class="id"> R}</span>)<span class="id">,</span><span class="id"> {in</span><span class="id"> D</span><span class="id"> &amp;,</span><span class="gallina-kwd"> forall</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> R^o</span>)<span class="id">,</span> (<span class="id">f</span> (<span class="id">x</span><span class="id"> &lt;|</span><span class="id"> t</span><span class="id"> |&gt;</span><span class="id"> y</span>)<span class="id"> &lt;=</span><span class="id"> f</span><span class="id"> x</span><span class="id"> &lt;|</span><span class="id"> t</span><span class="id"> |&gt;</span><span class="id"> f</span><span class="id"> y</span>)<span class="id">%R}</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> twice_derivable_convex</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realType}</span>.<br/>
+<span class="vernacular">Variables</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> R</span><span class="id"> -&gt;</span><span class="id"> R^o</span>) (<span class="id">a</span><span class="id"> b</span><span class="id"> :</span><span class="id"> R^o</span>).<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> Df</span><span class="id"> :=</span><span class="id"> 'D_1</span><span class="id"> f</span>.<br/>
+<span class="vernacular">Let</span><span class="id"> DDf</span><span class="id"> :=</span><span class="id"> 'D_1</span><span class="id"> Df</span>.<br/>
+<br/>
+<span class="vernacular">Hypothesis</span><span class="id"> DDf_ge0</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> x,</span><span class="id"> a</span><span class="id"> &lt;</span><span class="id"> x</span><span class="id"> &lt;</span><span class="id"> b</span><span class="id"> -&gt;</span><span class="id"> 0</span><span class="id"> &lt;=</span><span class="id"> DDf</span><span class="id"> x</span>.<br/>
+<span class="vernacular">Hypothesis</span><span class="id"> cvg_left</span><span class="id"> :</span> (<span class="id">f</span><span class="id"> @</span><span class="id"> b^'-</span>)<span class="id"> --&gt;</span><span class="id"> f</span><span class="id"> b</span>.<br/>
+<span class="vernacular">Hypothesis</span><span class="id"> cvg_right</span><span class="id"> :</span> (<span class="id">f</span><span class="id"> @</span><span class="id"> a^'+</span>)<span class="id"> --&gt;</span><span class="id"> f</span><span class="id"> a</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> L</span><span class="id"> x</span><span class="id"> :=</span><span class="id"> f</span><span class="id"> a</span><span class="id"> +</span><span class="id"> factor</span><span class="id"> a</span><span class="id"> b</span><span class="id"> x</span><span class="id"> *</span> (<span class="id">f</span><span class="id"> b</span><span class="id"> -</span><span class="id"> f</span><span class="id"> a</span>).<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> LE</span><span class="id"> x</span><span class="id"> :</span><span class="id"> a</span><span class="id"> &lt;</span><span class="id"> b</span><span class="id"> -&gt;</span><span class="id"> L</span><span class="id"> x</span><span class="id"> =</span><span class="id"> factor</span><span class="id"> b</span><span class="id"> a</span><span class="id"> x</span><span class="id"> *</span><span class="id"> f</span><span class="id"> a</span><span class="id"> +</span><span class="id"> factor</span><span class="id"> a</span><span class="id"> b</span><span class="id"> x</span><span class="id"> *</span><span class="id"> f</span><span class="id"> b</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> ab;</span><span class="id"> rewrite</span><span class="id"> /L</span><span class="id"> -</span>(<span class="id">@onem_factor</span><span class="id"> _</span><span class="id"> a</span>)<span class="id"> ?lt_eqF//</span><span class="id"> /onem</span><span class="id"> mulrBl</span><span class="id"> mul1r</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -addrA</span><span class="id"> -mulrN</span><span class="id"> -mulrDr</span> (<span class="id">addrC</span> (<span class="id">f</span><span class="id"> b</span>)).<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> convexf_ptP</span><span class="id"> :</span><span class="id"> a</span><span class="id"> &lt;</span><span class="id"> b</span><span class="id"> -&gt;</span> (<span class="gallina-kwd">forall</span><span class="id"> x,</span><span class="id"> a</span><span class="id"> &lt;=</span><span class="id"> x</span><span class="id"> &lt;=</span><span class="id"> b</span><span class="id"> -&gt;</span><span class="id"> 0</span><span class="id"> &lt;=</span><span class="id"> L</span><span class="id"> x</span><span class="id"> -</span><span class="id"> f</span><span class="id"> x</span>)<span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">forall</span><span class="id"> t,</span><span class="id"> f</span> (<span class="id">a</span><span class="id"> &lt;|</span><span class="id"> t</span><span class="id"> |&gt;</span><span class="id"> b</span>)<span class="id"> &lt;=</span><span class="id"> f</span><span class="id"> a</span><span class="id"> &lt;|</span><span class="id"> t</span><span class="id"> |&gt;</span><span class="id"> f</span><span class="id"> b</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> ab</span><span class="id"> h</span><span class="id"> t;</span><span class="id"> set</span><span class="id"> x</span><span class="id"> :=</span><span class="id"> a</span><span class="id"> &lt;|</span><span class="id"> t</span><span class="id"> |&gt;</span><span class="id"> b;</span><span class="id"> have</span><span class="id"> /h</span><span class="id"> :</span><span class="id"> a</span><span class="id"> &lt;=</span><span class="id"> x</span><span class="id"> &lt;=</span><span class="id"> b</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -</span>(<span class="id">conv1</span><span class="id"> a</span><span class="id"> b</span>)<span class="id"> -{1}</span>(<span class="id">conv0</span><span class="id"> a</span><span class="id"> b</span>)<span class="id"> /x</span><span class="id"> !le_line_path//=</span><span class="id"> itv_ge0/=</span>.<br/>
+<span class="id">rewrite</span><span class="id"> subr_ge0</span><span class="id"> =&gt;</span><span class="id"> /le_trans;</span><span class="id"> apply</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> LE//</span><span class="id"> /x</span><span class="id"> line_pathK</span><span class="id"> ?lt_eqF//</span><span class="id"> convC</span><span class="id"> line_pathK</span><span class="id"> ?gt_eqF</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Hypothesis</span><span class="id"> HDf</span><span class="id"> :</span><span class="id"> {in</span><span class="id"> `]a,</span><span class="id"> b[,</span><span class="gallina-kwd"> forall</span><span class="id"> x,</span><span class="id"> derivable</span><span class="id"> f</span><span class="id"> x</span><span class="id"> 1}</span>.<br/>
+<span class="vernacular">Hypothesis</span><span class="id"> HDDf</span><span class="id"> :</span><span class="id"> {in</span><span class="id"> `]a,</span><span class="id"> b[,</span><span class="gallina-kwd"> forall</span><span class="id"> x,</span><span class="id"> derivable</span><span class="id"> Df</span><span class="id"> x</span><span class="id"> 1}</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> cDf</span><span class="id"> :</span><span class="id"> {within</span><span class="id"> `]a,</span><span class="id"> b[,</span><span class="id"> continuous</span><span class="id"> Df}</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> apply:</span><span class="id"> derivable_within_continuous</span><span class="id"> =&gt;</span><span class="id"> z</span><span class="id"> zab;</span><span class="id"> exact:</span><span class="id"> HDDf</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> second_derivative_convex</span> (<span class="id">t</span><span class="id"> :</span><span class="id"> {i01</span><span class="id"> R}</span>)<span class="id"> :</span><span class="id"> a</span><span class="id"> &lt;=</span><span class="id"> b</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">f</span> (<span class="id">a</span><span class="id"> &lt;|</span><span class="id"> t</span><span class="id"> |&gt;</span><span class="id"> b</span>)<span class="id"> &lt;=</span><span class="id"> f</span><span class="id"> a</span><span class="id"> &lt;|</span><span class="id"> t</span><span class="id"> |&gt;</span><span class="id"> f</span><span class="id"> b</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> le_eqVlt</span><span class="id"> =&gt;</span><span class="id"> /predU1P[&lt;-|/[dup]</span><span class="id"> ab];</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> !convmm</span>.<br/>
+<span class="id">move/convexf_ptP;</span><span class="id"> apply</span><span class="id"> =&gt;</span><span class="id"> x</span><span class="id"> /andP[]</span>.<br/>
+<span class="id">rewrite</span><span class="id"> le_eqVlt</span><span class="id"> =&gt;</span><span class="id"> /predU1P[&lt;-|ax]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /L</span><span class="id"> factorl</span><span class="id"> mul0r</span><span class="id"> addr0</span><span class="id"> subrr</span>.<br/>
+<span class="id">rewrite</span><span class="id"> le_eqVlt</span><span class="id"> =&gt;</span><span class="id"> /predU1P[-&gt;|xb]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /L</span><span class="id"> factorr</span><span class="id"> ?lt_eqF//</span><span class="id"> mul1r</span><span class="id"> addrAC</span><span class="id"> addrA</span><span class="id"> subrK</span><span class="id"> subrr</span>.<br/>
+<span class="id">have</span><span class="id"> [c2</span><span class="id"> Ic2</span><span class="id"> Hc2]</span><span class="id"> :</span><span class="gallina-kwd"> exists2</span><span class="id"> c2,</span><span class="id"> x</span><span class="id"> &lt;</span><span class="id"> c2</span><span class="id"> &lt;</span><span class="id"> b</span><span class="id"> &amp;</span> (<span class="id">f</span><span class="id"> b</span><span class="id"> -</span><span class="id"> f</span><span class="id"> x</span>)<span class="id"> /</span> (<span class="id">b</span><span class="id"> -</span><span class="id"> x</span>)<span class="id"> =</span><span class="id"> 'D_1</span><span class="id"> f</span><span class="id"> c2</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> xbf</span><span class="id"> :</span><span class="id"> {in</span><span class="id"> `]x,</span><span class="id"> b[,</span><span class="gallina-kwd"> forall</span><span class="id"> z,</span><span class="id"> derivable</span><span class="id"> f</span><span class="id"> z</span><span class="id"> 1}</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">in1_subset_itv</span> (<span class="id">subset_itvW</span><span class="id"> _</span><span class="id"> _</span> (<span class="id">ltW</span><span class="id"> ax</span>) (<span class="id">lexx</span><span class="id"> b</span>))<span class="id"> HDf</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> derivef</span><span class="id"> z</span><span class="id"> :</span><span class="id"> z</span><span class="id"> \in</span><span class="id"> `]x,</span><span class="id"> b[</span><span class="id"> -&gt;</span><span class="id"> is_derive</span><span class="id"> z</span><span class="id"> 1</span><span class="id"> f</span> (<span class="id">'D_1</span><span class="id"> f</span><span class="id"> z</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> zxb;</span><span class="id"> apply/derivableP/xbf;</span><span class="id"> exact:</span><span class="id"> zxb</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> [|z</span><span class="id"> zxb</span><span class="id"> fbfx]</span><span class="id"> :=</span><span class="id"> MVT</span><span class="id"> xb</span><span class="id"> derivef</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply/</span>(<span class="id">derivable_oo_continuous_bnd_within</span> (<span class="id">And3</span><span class="id"> xbf</span><span class="id"> _</span><span class="id"> cvg_left</span>))<span class="id">/cvg_at_right_filter</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">have</span><span class="id"> :=</span><span class="id"> derivable_within_continuous</span><span class="id"> HDf</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> continuous_open_subspace//;</span><span class="id"> last</span><span class="id"> exact:</span><span class="id"> interval_open</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply;</span><span class="id"> rewrite</span><span class="id"> inE/=</span><span class="id"> in_itv/=</span><span class="id"> ax</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span><span class="id"> z</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> rewrite</span><span class="id"> fbfx</span><span class="id"> -mulrA</span><span class="id"> divff</span><span class="id"> ?mulr1//</span><span class="id"> subr_eq0</span><span class="id"> gt_eqF</span>.<br/>
+<span class="id">have</span><span class="id"> [c1</span><span class="id"> Ic1</span><span class="id"> Hc1]</span><span class="id"> :</span><span class="gallina-kwd"> exists2</span><span class="id"> c1,</span><span class="id"> a</span><span class="id"> &lt;</span><span class="id"> c1</span><span class="id"> &lt;</span><span class="id"> x</span><span class="id"> &amp;</span> (<span class="id">f</span><span class="id"> x</span><span class="id"> -</span><span class="id"> f</span><span class="id"> a</span>)<span class="id"> /</span> (<span class="id">x</span><span class="id"> -</span><span class="id"> a</span>)<span class="id"> =</span><span class="id"> 'D_1</span><span class="id"> f</span><span class="id"> c1</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> axf</span><span class="id"> :</span><span class="id"> {in</span><span class="id"> `]a,</span><span class="id"> x[,</span><span class="gallina-kwd"> forall</span><span class="id"> z,</span><span class="id"> derivable</span><span class="id"> f</span><span class="id"> z</span><span class="id"> 1}</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">in1_subset_itv</span> (<span class="id">subset_itvW</span><span class="id"> _</span><span class="id"> _</span> (<span class="id">lexx</span><span class="id"> a</span>) (<span class="id">ltW</span><span class="id"> xb</span>))<span class="id"> HDf</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> derivef</span><span class="id"> z</span><span class="id"> :</span><span class="id"> z</span><span class="id"> \in</span><span class="id"> `]a,</span><span class="id"> x[</span><span class="id"> -&gt;</span><span class="id"> is_derive</span><span class="id"> z</span><span class="id"> 1</span><span class="id"> f</span> (<span class="id">'D_1</span><span class="id"> f</span><span class="id"> z</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> zax;</span><span class="id"> apply</span><span class="id"> /derivableP/axf</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> [|z</span><span class="id"> zax</span><span class="id"> fxfa]</span><span class="id"> :=</span><span class="id"> MVT</span><span class="id"> ax</span><span class="id"> derivef</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply/</span>(<span class="id">derivable_oo_continuous_bnd_within</span> (<span class="id">And3</span><span class="id"> axf</span><span class="id"> cvg_right</span><span class="id"> _</span>))<span class="id">/cvg_at_left_filter</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">have</span><span class="id"> :=</span><span class="id"> derivable_within_continuous</span><span class="id"> HDf</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> continuous_open_subspace//;</span><span class="id"> last</span><span class="id"> exact:</span><span class="id"> interval_open</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply;</span><span class="id"> rewrite</span><span class="id"> inE/=</span><span class="id"> in_itv/=</span><span class="id"> ax</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span><span class="id"> z</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> rewrite</span><span class="id"> fxfa</span><span class="id"> -mulrA</span><span class="id"> divff</span><span class="id"> ?mulr1//</span><span class="id"> subr_eq0</span><span class="id"> gt_eqF</span>.<br/>
+<span class="id">have</span><span class="id"> c1c2</span><span class="id"> :</span><span class="id"> c1</span><span class="id"> &lt;</span><span class="id"> c2</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move:</span><span class="id"> Ic2</span><span class="id"> Ic1</span><span class="id"> =&gt;</span><span class="id"> /andP[+</span><span class="id"> _]</span><span class="id"> =&gt;</span><span class="id"> /[swap]</span><span class="id"> /andP[_]</span><span class="id"> /lt_trans;</span><span class="id"> apply</span>.<br/>
+<span class="id">have</span><span class="id"> [d</span><span class="id"> Id</span><span class="id"> h]</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">exists2</span><span class="id"> d,</span><span class="id"> c1</span><span class="id"> &lt;</span><span class="id"> d</span><span class="id"> &lt;</span><span class="id"> c2</span><span class="id"> &amp;</span> (<span class="id">'D_1</span><span class="id"> f</span><span class="id"> c2</span><span class="id"> -</span><span class="id"> 'D_1</span><span class="id"> f</span><span class="id"> c1</span>)<span class="id"> /</span> (<span class="id">c2</span><span class="id"> -</span><span class="id"> c1</span>)<span class="id"> =</span><span class="id"> DDf</span><span class="id"> d</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> h</span><span class="id"> :</span><span class="id"> {in</span><span class="id"> `]c1,</span><span class="id"> c2[,</span><span class="gallina-kwd"> forall</span><span class="id"> z,</span><span class="id"> derivable</span><span class="id"> Df</span><span class="id"> z</span><span class="id"> 1}</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply:</span> (<span class="id">in1_subset_itv</span> (<span class="id">subset_itvW</span><span class="id"> _</span><span class="id"> _</span> (<span class="id">ltW</span> (<span class="id">andP</span><span class="id"> Ic1</span>).<span class="id">1</span>) (<span class="id">lexx</span><span class="id"> _</span>))).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply:</span> (<span class="id">in1_subset_itv</span> (<span class="id">subset_itvW</span><span class="id"> _</span><span class="id"> _</span> (<span class="id">lexx</span><span class="id"> _</span>) (<span class="id">ltW</span> (<span class="id">andP</span><span class="id"> Ic2</span>).<span class="id">2</span>))).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> HDDf</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> derivef</span><span class="id"> z</span><span class="id"> :</span><span class="id"> z</span><span class="id"> \in</span><span class="id"> `]c1,</span><span class="id"> c2[</span><span class="id"> -&gt;</span><span class="id"> is_derive</span><span class="id"> z</span><span class="id"> 1</span><span class="id"> Df</span> (<span class="id">'D_1</span><span class="id"> Df</span><span class="id"> z</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> zc1c2;</span><span class="id"> apply/derivableP/h</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> [|z</span><span class="id"> zc1c2</span><span class="id"> {}h]</span><span class="id"> :=</span><span class="id"> MVT</span><span class="id"> c1c2</span><span class="id"> derivef</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply:</span> (<span class="id">derivable_oo_continuous_bnd_within</span> (<span class="id">And3</span><span class="id"> h</span><span class="id"> _</span><span class="id"> _</span>)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">+</span><span class="id"> apply:</span><span class="id"> cvg_at_right_filter</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">move:</span><span class="id"> cDf;</span><span class="id"> rewrite</span><span class="id"> continuous_open_subspace//;</span><span class="id"> last</span><span class="id"> exact:</span><span class="id"> interval_open</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply;</span><span class="id"> rewrite</span><span class="id"> inE/=</span><span class="id"> in_itv/=</span> (<span class="id">andP</span><span class="id"> Ic1</span>).<span class="id">1</span> (<span class="id">lt_trans</span><span class="id"> _</span> (<span class="id">andP</span><span class="id"> Ic2</span>).<span class="id">2</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">+</span><span class="id"> apply:</span><span class="id"> cvg_at_left_filter</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">move:</span><span class="id"> cDf;</span><span class="id"> rewrite</span><span class="id"> continuous_open_subspace//;</span><span class="id"> last</span><span class="id"> exact:</span><span class="id"> interval_open</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply;</span><span class="id"> rewrite</span><span class="id"> inE/=</span><span class="id"> in_itv/=</span> (<span class="id">andP</span><span class="id"> Ic2</span>).<span class="id">2</span> (<span class="id">lt_trans</span> (<span class="id">andP</span><span class="id"> Ic1</span>).<span class="id">1</span>).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span><span class="id"> z</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> rewrite</span><span class="id"> h</span><span class="id"> -mulrA</span><span class="id"> divff</span><span class="id"> ?mulr1//</span><span class="id"> subr_eq0</span><span class="id"> gt_eqF</span>.<br/>
+<span class="id">have</span><span class="id"> LfE</span><span class="id"> :</span><span class="id"> L</span><span class="id"> x</span><span class="id"> -</span><span class="id"> f</span><span class="id"> x</span><span class="id"> =</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;((<span class="id">x</span><span class="id"> -</span><span class="id"> a</span>)<span class="id"> *</span> (<span class="id">b</span><span class="id"> -</span><span class="id"> x</span>))<span class="id"> /</span> (<span class="id">b</span><span class="id"> -</span><span class="id"> a</span>)<span class="id"> *</span> ((<span class="id">f</span><span class="id"> b</span><span class="id"> -</span><span class="id"> f</span><span class="id"> x</span>)<span class="id"> /</span> (<span class="id">b</span><span class="id"> -</span><span class="id"> x</span>))<span class="id"> -</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;((<span class="id">b</span><span class="id"> -</span><span class="id"> x</span>)<span class="id"> *</span><span class="id"> factor</span><span class="id"> a</span><span class="id"> b</span><span class="id"> x</span>)<span class="id"> *</span> ((<span class="id">f</span><span class="id"> x</span><span class="id"> -</span><span class="id"> f</span><span class="id"> a</span>)<span class="id"> /</span> (<span class="id">x</span><span class="id"> -</span><span class="id"> a</span>)).<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> !mulrA</span><span class="id"> -</span>(<span class="id">mulrC</span> (<span class="id">b</span><span class="id"> -</span><span class="id"> x</span>))<span class="id"> -</span>(<span class="id">mulrC</span> (<span class="id">b</span><span class="id"> -</span><span class="id"> x</span>)<span class="id">^-1</span>)<span class="id"> !mulrA</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> mulVf</span><span class="id"> ?mul1r</span><span class="id"> ?subr_eq0</span><span class="id"> ?gt_eqF//</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -</span>(<span class="id">mulrC</span> (<span class="id">x</span><span class="id"> -</span><span class="id"> a</span>))<span class="id"> -</span>(<span class="id">mulrC</span> (<span class="id">x</span><span class="id"> -</span><span class="id"> a</span>)<span class="id">^-1</span>)<span class="id"> !mulrA</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> mulVf</span><span class="id"> ?mul1r</span><span class="id"> ?subr_eq0</span><span class="id"> ?gt_eqF//</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -/</span>(<span class="id">factor</span><span class="id"> a</span><span class="id"> b</span><span class="id"> x</span>).<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -</span>(<span class="id">opprB</span><span class="id"> a</span><span class="id"> b</span>)<span class="id"> -</span>(<span class="id">opprB</span><span class="id"> x</span><span class="id"> b</span>)<span class="id"> invrN</span><span class="id"> mulrNN</span><span class="id"> -/</span>(<span class="id">factor</span><span class="id"> b</span><span class="id"> a</span><span class="id"> x</span>).<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -</span>(<span class="id">@onem_factor</span><span class="id"> _</span><span class="id"> a</span>)<span class="id"> ?lt_eqF//</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> /onem</span><span class="id"> mulrBl</span><span class="id"> mul1r</span><span class="id"> opprB</span><span class="id"> addrA</span><span class="id"> -mulrDr</span><span class="id"> addrA</span><span class="id"> subrK</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /L</span><span class="id"> -addrA</span><span class="id"> addrC</span><span class="id"> opprB</span><span class="id"> -addrA</span> (<span class="id">addrC</span> (<span class="id">f</span><span class="id"> a</span>)).<br/>
+<span class="id">have</span><span class="id"> {Hc1</span><span class="id"> Hc2}</span><span class="id"> -&gt;</span><span class="id"> :</span><span class="id"> L</span><span class="id"> x</span><span class="id"> -</span><span class="id"> f</span><span class="id"> x</span><span class="id"> =</span> (<span class="id">b</span><span class="id"> -</span><span class="id"> x</span>)<span class="id"> *</span> (<span class="id">x</span><span class="id"> -</span><span class="id"> a</span>)<span class="id"> *</span> (<span class="id">c2</span><span class="id"> -</span><span class="id"> c1</span>)<span class="id"> /</span> (<span class="id">b</span><span class="id"> -</span><span class="id"> a</span>)<span class="id"> *</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((<span class="id">'D_1</span><span class="id"> f</span><span class="id"> c2</span><span class="id"> -</span><span class="id"> 'D_1</span><span class="id"> f</span><span class="id"> c1</span>)<span class="id"> /</span> (<span class="id">c2</span><span class="id"> -</span><span class="id"> c1</span>)).<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> LfE</span><span class="id"> Hc2</span><span class="id"> Hc1</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -</span>(<span class="id">mulrC</span> (<span class="id">b</span><span class="id"> -</span><span class="id"> x</span>))<span class="id"> mulrA</span><span class="id"> -mulrBr</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> (<span class="id">mulrC</span> (<span class="id">'D_1</span><span class="id"> f</span><span class="id"> c2</span><span class="id"> -</span><span class="id"> _</span>))<span class="id"> ![in</span><span class="id"> RHS]mulrA;</span><span class="id"> congr</span><span class="id"> *%R</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -2!mulrA;</span><span class="id"> congr</span><span class="id"> *%R</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> mulrCA</span><span class="id"> divff</span><span class="id"> ?mulr1//</span><span class="id"> subr_eq0</span><span class="id"> gt_eqF</span>.<br/>
+<span class="id">rewrite</span><span class="id"> {}h</span><span class="id"> mulr_ge0//;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> DDf_ge0//;</span><span class="id"> apply/andP;</span><span class="id"> split</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span> (<span class="id">lt_trans</span> (<span class="id">andP</span><span class="id"> Ic1</span>).<span class="id">1</span>)<span class="id">//;</span><span class="id"> case/andP</span><span class="id"> :</span><span class="id"> Id</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span> (<span class="id">lt_trans</span> (<span class="id">andP</span><span class="id"> Id</span>).<span class="id">2</span>)<span class="id">//;</span><span class="id"> case/andP</span><span class="id"> :</span><span class="id"> Ic2</span>.<br/>
+<span class="id">rewrite</span><span class="id"> mulr_ge0//</span><span class="id"> ?invr_ge0</span><span class="id"> ?subr_ge0</span><span class="id"> ?</span>(<span class="id">ltW</span><span class="id"> ab</span>)<span class="id">//</span>.<br/>
+<span class="id">rewrite</span><span class="id"> mulr_ge0//</span><span class="id"> ?subr_ge0</span><span class="id"> ?</span>(<span class="id">ltW</span><span class="id"> c1c2</span>)<span class="id">//</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> mulr_ge0//</span><span class="id"> subr_ge0</span><span class="id"> ltW</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> twice_derivable_convex</span>.<br/>
+
+      <div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/">a fork of coq2html</a></div>
+    </div>
+  </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,493 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module mathcomp.analysis.homotopy_theory.wedge_sigT</title>
+<meta name="description" content="Documentation of Coq module mathcomp.analysis.homotopy_theory.wedge_sigT" />
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="init()">
+
+  <main>
+    <div class="sidebar">
+      <h2>Files</h2>
+      
+    </div>
+
+  <div class="coq">
+
+    <div class="content">
+      <p><a href="./index.html">Top</a></p>
+      <h1 class="title">Module mathcomp.analysis.homotopy_theory.wedge_sigT</h1>
+<span class="vernacular">From</span><span class="id"> HB</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> structures</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> all_ssreflect</span><span class="id"> all_algebra</span><span class="id"> finmap</span><span class="id"> generic_quotient</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> mathcomp_extra</span><span class="id"> boolp</span><span class="id"> classical_sets</span><span class="id"> functions</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> cardinality</span><span class="id"> fsbigop</span><span class="id"> reals</span><span class="id"> signed</span><span class="id"> topology</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> separation_axioms</span><span class="id"> function_spaces</span>.<br/>
+<br/>
+<div class="ssrdoc md">
+# wedge sum for sigT
+A foundational construction for homotopy theory. It glues a dependent sum
+at a single point. It's classicaly used in the proof that every free group
+is a fundamental group of some space. We also will use it as part of our
+construction of paths and path concatenation.
+```
+   wedge_rel p0 x y == x and y are equal, or they are (p0 i) and
+                       (p0 j) for some i and j
+           wedge p0 == the quotient of {i : X i} along `wedge_rel p0`
+       wedge_lift i == the lifting of elements of (X i) into the wedge
+          pwedge p0 == the wedge of ptopologicalTypes at their designated
+                       point
+        wedge_fun f == lifts a family of functions on each component into
+                       a function on the wedge, when they all agree at the
+                       wedge point
+         wedge_prod == the mapping from the wedge as a quotient of sums to
+                       the wedge as a subspace of the product topology.
+                       It's an embedding when the index is finite.
+bpwedge_shared_pt b == the shared point in the bpwedge. Either zero or one
+                       depending on `b`.
+            bpwedge == wedge of two bipointed spaces gluing zero to one
+       bpwedge_lift == wedge_lift specialized to the bipointed wedge
+```
+
+The type `wedge p0` is endowed with the structures of:
+- topology via `quotient_topology`
+- quotient
+
+The type `pwedge` is endowed with the structures of:
+- topology via `quotient_topology`
+- quotient
+- pointed
+
+The type `bpwedge` is endowed with the structures of:
+- topology via `quotient_topology`
+- quotient
+- bipointed
+</div>
+<br/>
+<span class="gallina-kwd">Set</span><span class="vernacular"> Implicit</span><span class="vernacular"> Arguments</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Strict</span><span class="vernacular"> Implicit</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Printing</span><span class="vernacular"> Implicit</span><span class="vernacular"> Defensive</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> classical_set_scope</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ring_scope</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> quotient_scope</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> wedge</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {I</span><span class="id"> :</span><span class="id"> choiceType}</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> I</span><span class="id"> -&gt;</span><span class="id"> topologicalType</span>) (<span class="id">p0</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> i,</span><span class="id"> X</span><span class="id"> i</span>).<br/>
+<span class="vernacular">Implicit</span><span class="id"> Types</span><span class="id"> i</span><span class="id"> :</span><span class="id"> I</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> wedge_rel'</span> (<span class="id">a</span><span class="id"> b</span><span class="id"> :</span><span class="id"> {i</span><span class="id"> &amp;</span><span class="id"> X</span><span class="id"> i}</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;(<span class="id">a</span><span class="id"> ==</span><span class="id"> b</span>)<span class="id"> ||</span> ((<span class="id">projT2</span><span class="id"> a</span><span class="id"> ==</span><span class="id"> p0</span><span class="id"> _</span>)<span class="id"> &amp;&amp;</span> (<span class="id">projT2</span><span class="id"> b</span><span class="id"> ==</span><span class="id"> p0</span><span class="id"> _</span>)).<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> wedge_rel_refl</span><span class="id"> :</span><span class="id"> reflexive</span><span class="id"> wedge_rel'</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?;</span><span class="id"> rewrite</span><span class="id"> /wedge_rel'</span><span class="id"> eqxx</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> wedge_rel_sym</span><span class="id"> :</span><span class="id"> symmetric</span><span class="id"> wedge_rel'</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> a</span><span class="id"> b;</span><span class="id"> apply/is_true_inj/propext;</span><span class="id"> rewrite</span><span class="id"> /wedge_rel';</span><span class="id"> split;</span><br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> (<span class="id">eq_sym</span><span class="id"> b</span>)<span class="id"> andbC</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> wedge_rel_trans</span><span class="id"> :</span><span class="id"> transitive</span><span class="id"> wedge_rel'</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> a</span><span class="id"> b</span><span class="id"> c</span><span class="id"> /predU1P[-&gt;</span><span class="id"> //|]</span><span class="id"> +</span><span class="id"> /predU1P[&lt;-</span><span class="id"> //|];</span><span class="id"> rewrite</span><span class="id"> /wedge_rel'</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> /andP[/eqP</span><span class="id"> -&gt;</span><span class="id"> /eqP</span><span class="id"> &lt;-]</span><span class="id"> /andP[_</span><span class="id"> /eqP</span><span class="id"> &lt;-];</span><span class="id"> rewrite</span><span class="id"> !eqxx</span><span class="id"> orbC</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> wedge_rel</span><span class="id"> :=</span><span class="id"> EquivRel</span><span class="id"> _</span><span class="id"> wedge_rel_refl</span><span class="id"> wedge_rel_sym</span><span class="id"> wedge_rel_trans</span>.<br/>
+<span class="id">Global</span><span class="vernacular"> Opaque</span><span class="id"> wedge_rel</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> wedge</span><span class="id"> :=</span><span class="id"> {eq_quot</span><span class="id"> wedge_rel}</span>.<br/>
+<span class="vernacular">Definition</span><span class="id"> wedge_lift</span><span class="id"> i</span><span class="id"> :</span><span class="id"> X</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> wedge</span><span class="id"> :=</span><span class="id"> \pi_wedge</span><span class="id"> \o</span><span class="id"> existT</span><span class="id"> X</span><span class="id"> i</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Topological</span>.<span class="id">copy</span><span class="id"> wedge</span> (<span class="id">quotient_topology</span><span class="id"> wedge</span>).<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Quotient</span>.<span class="id">on</span><span class="id"> wedge</span>.<br/>
+<span class="id">Global</span><span class="vernacular"> Opaque</span><span class="id"> wedge</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> wedge_lift_continuous</span><span class="id"> i</span><span class="id"> :</span><span class="id"> continuous</span> (<span class="id">@wedge_lift</span><span class="id"> i</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?;</span><span class="id"> apply:</span><span class="id"> continuous_comp</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> pi_continuous</span>. Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> i</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">@isContinuous</span>.<span class="id">Build</span><span class="id"> _</span><span class="id"> _</span> (<span class="id">@wedge_lift</span><span class="id"> i</span>) (<span class="id">@wedge_lift_continuous</span><span class="id"> i</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> wedge_lift_nbhs</span><span class="id"> i</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> X</span><span class="id"> i</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">closed</span><span class="id"> [set</span><span class="id"> p0</span><span class="id"> i]</span><span class="id"> -&gt;</span><span class="id"> x</span><span class="id"> !=</span><span class="id"> p0</span><span class="id"> _</span><span class="id"> -&gt;</span><span class="id"> @wedge_lift</span><span class="id"> i</span><span class="id"> @</span><span class="id"> x</span><span class="id"> =</span><span class="id"> nbhs</span> (<span class="id">@wedge_lift</span><span class="id"> _</span><span class="id"> x</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> clx0</span><span class="id"> xNx0;</span><span class="id"> rewrite</span><span class="id"> eqEsubset;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> U;</span><span class="id"> first</span><span class="id"> last</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> ?;</span><span class="id"> exact:</span><span class="id"> wedge_lift_continuous</span>.<br/>
+<span class="id">rewrite</span><span class="id"> ?nbhsE</span><span class="id"> /=</span><span class="id"> =&gt;</span><span class="id"> -[V</span><span class="id"> [oV</span><span class="id"> Vx</span><span class="id"> VU]]</span>.<br/>
+<span class="gallina-kwd">exists</span> (<span class="id">@wedge_lift</span><span class="id"> i</span><span class="id"> @`</span> (<span class="id">V</span><span class="id"> `&amp;`</span><span class="id"> ~`</span><span class="id"> [set</span><span class="id"> p0</span><span class="id"> i]</span>))<span class="id">;</span><span class="id"> first</span><span class="id"> last</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> /=</span><span class="id"> [l]</span><span class="id"> [Vl</span><span class="id"> lx]</span><span class="id"> &lt;-;</span><span class="id"> exact:</span><span class="id"> VU</span>.<br/>
+<span class="id">split;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="gallina-kwd"> exists</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //=;</span><span class="id"> exact/eqP</span>.<br/>
+<span class="id">rewrite</span><span class="id"> /open</span><span class="id"> /=</span><span class="id"> /quotient_open</span><span class="id"> /wedge_lift</span><span class="id"> /=</span>.<br/>
+<span class="id">suff</span><span class="id"> -&gt;</span><span class="id"> :</span><span class="id"> \pi_wedge</span><span class="id"> @^-1`</span> (<span class="id">@wedge_lift</span><span class="id"> i</span><span class="id"> @`</span> (<span class="id">V</span><span class="id"> `&amp;`</span><span class="id"> ~`[set</span><span class="id"> p0</span><span class="id"> i]</span>))<span class="id"> =</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">existT</span><span class="id"> X</span><span class="id"> i</span><span class="id"> @`</span> (<span class="id">V</span><span class="id"> `&amp;`</span><span class="id"> ~`</span><span class="id"> [set</span><span class="id"> p0</span><span class="id"> i]</span>).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> existT_open_map;</span><span class="id"> apply:</span><span class="id"> openI</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> closed_openC</span>.<br/>
+<span class="id">rewrite</span><span class="id"> eqEsubset;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> t</span><span class="id"> /=</span><span class="id"> [l</span><span class="id"> [Vl]</span><span class="id"> lNx0];</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> &lt;-;</span><span class="gallina-kwd"> exists</span><span class="id"> l</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> case/eqmodP/predU1P</span><span class="id"> =&gt;</span><span class="id"> [&lt;-|/andP</span><span class="id"> [/eqP]//];</span><span class="gallina-kwd"> exists</span><span class="id"> l</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> wedge_liftE</span><span class="id"> i</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> X</span><span class="id"> i</span>)<span class="id"> j</span> (<span class="id">y</span><span class="id"> :</span><span class="id"> X</span><span class="id"> j</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">wedge_lift</span> (<span class="id">p0</span><span class="id"> j</span>)<span class="id"> =</span><span class="id"> wedge_lift</span> (<span class="id">p0</span><span class="id"> i</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> apply/eqmodP/orP;</span><span class="id"> right;</span><span class="id"> rewrite</span><span class="id"> !eqxx</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> wedge_openP</span> (<span class="id">U</span><span class="id"> :</span><span class="id"> set</span><span class="id"> wedge</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">open</span><span class="id"> U</span><span class="id"> &lt;-&gt;</span><span class="gallina-kwd"> forall</span><span class="id"> i,</span><span class="id"> open</span> (<span class="id">@wedge_lift</span><span class="id"> i</span><span class="id"> @^-1`</span><span class="id"> U</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">split=&gt;</span><span class="id"> [oU</span><span class="id"> i|oiU]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> open_comp</span><span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> x</span><span class="id"> _;</span><span class="id"> exact:</span><span class="id"> wedge_lift_continuous</span>.<br/>
+<span class="id">have</span><span class="id"> :</span><span class="id"> open</span> (<span class="id">\bigcup_i</span> (<span class="id">@wedge_lift</span><span class="id"> i</span><span class="id"> @`</span> (<span class="id">@wedge_lift</span><span class="id"> i</span><span class="id"> @^-1`</span><span class="id"> U</span>))).<br/>
+&nbsp;&nbsp;<span class="id">apply/sigT_openP</span><span class="id"> =&gt;</span><span class="id"> i;</span><span class="id"> move:</span> (<span class="id">oiU</span><span class="id"> i</span>)<span class="id">;</span><span class="id"> congr</span><span class="id"> open</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> eqEsubset;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> x</span><span class="id"> /=</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> Ux;</span><span class="gallina-kwd"> exists</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="gallina-kwd"> exists</span><span class="id"> x</span>.<br/>
+&nbsp;&nbsp;<span class="id">case=&gt;</span><span class="id"> j</span><span class="id"> _</span><span class="id"> /=</span><span class="id"> []</span><span class="id"> y</span><span class="id"> Uy</span><span class="id"> /eqmodP</span><span class="id"> /predU1P[R|]</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">have</span><span class="id"> E</span><span class="id"> :</span><span class="id"> j</span><span class="id"> =</span><span class="id"> i</span><span class="gallina-kwd"> by</span><span class="id"> move:</span><span class="id"> R;</span><span class="id"> apply:</span><span class="id"> existT_inj1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -E</span><span class="gallina-kwd"> in</span><span class="id"> x</span><span class="id"> R</span><span class="id"> *;</span><span class="id"> rewrite</span><span class="id"> -</span>(<span class="id">existT_inj2</span><span class="id"> R</span>).<br/>
+&nbsp;&nbsp;<span class="id">case/andP</span><span class="id"> =&gt;</span><span class="id"> /eqP/=</span><span class="id"> +</span><span class="id"> /eqP</span><span class="id"> -&gt;</span><span class="id"> =&gt;</span><span class="id"> yj</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> yj</span> (<span class="id">wedge_liftE</span><span class="id"> x</span><span class="id"> y</span>)<span class="gallina-kwd"> in</span><span class="id"> Uy</span>.<br/>
+<span class="id">congr</span><span class="id"> open;</span><span class="id"> rewrite</span><span class="id"> eqEsubset;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> /=</span><span class="id"> z</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> case=&gt;</span><span class="id"> i</span><span class="id"> _</span><span class="id"> /=</span><span class="id"> [x]</span><span class="id"> Ux</span><span class="id"> &lt;-</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> Uz;</span><span class="gallina-kwd"> exists</span> (<span class="id">projT1</span> (<span class="id">repr</span><span class="id"> z</span>))<span class="id"> =&gt;</span><span class="id"> //=</span>.<br/>
+<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span> (<span class="id">projT2</span> (<span class="id">repr</span><span class="id"> z</span>))<span class="id">;</span><span class="id"> rewrite</span><span class="id"> /wedge_lift</span><span class="id"> /=</span><span class="id"> surjective_existT</span><span class="id"> reprK</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> wedge_point_nbhs</span><span class="id"> i0</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">nbhs</span> (<span class="id">wedge_lift</span> (<span class="id">p0</span><span class="id"> i0</span>))<span class="id"> =</span><span class="id"> \bigcap_i</span> (<span class="id">@wedge_lift</span><span class="id"> i</span><span class="id"> @</span><span class="id"> p0</span><span class="id"> i</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> eqEsubset;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //=</span><span class="id"> U</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> ?nbhs_simpl</span>.<br/>
+&nbsp;&nbsp;<span class="id">case=&gt;</span><span class="id"> V</span><span class="id"> [/=</span><span class="id"> oV</span><span class="id"> Vp]</span><span class="id"> VU</span><span class="id"> j</span><span class="id"> _;</span><span class="id"> apply:</span><span class="id"> wedge_lift_continuous</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span> (<span class="id">filterS</span><span class="id"> VU</span>)<span class="id">;</span><span class="id"> first</span><span class="id"> exact:</span> (<span class="id">@nbhs_filter</span><span class="id"> wedge</span>).<br/>
+&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> open_nbhs_nbhs;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span> (<span class="id">wedge_liftE</span> (<span class="id">p0</span><span class="id"> i0</span>)).<br/>
+<span class="id">move=&gt;</span><span class="id"> Uj;</span><span class="id"> have</span><span class="id"> V_</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> i,</span><span class="id"> {V</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">X</span><span class="id"> i</span>)<span class="id"> |</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">[/\</span><span class="id"> open</span><span class="id"> V,</span><span class="id"> V</span> (<span class="id">p0</span><span class="id"> i</span>)<span class="id"> &amp;</span><span class="id"> V</span><span class="id"> `&lt;=`</span><span class="id"> @wedge_lift</span><span class="id"> i</span><span class="id"> @^-1`</span><span class="id"> U]}</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> j;</span><span class="id"> apply:</span><span class="id"> cid;</span><span class="id"> have</span><span class="id"> /Uj</span><span class="id"> :</span><span class="id"> [set:</span><span class="id"> I]</span><span class="id"> j</span><span class="gallina-kwd"> by</span><span class="id"> []</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> nbhsE</span><span class="id"> /=</span><span class="id"> =&gt;</span><span class="id"> -[B</span><span class="id"> [?</span><span class="id"> ?</span><span class="id"> ?]];</span><span class="gallina-kwd"> exists</span><span class="id"> B</span>.<br/>
+<span class="id">pose</span><span class="id"> W</span><span class="id"> :=</span><span class="id"> \bigcup_i</span> (<span class="id">@wedge_lift</span><span class="id"> i</span>)<span class="id"> @`</span> (<span class="id">projT1</span> (<span class="id">V_</span><span class="id"> i</span>)).<br/>
+<span class="gallina-kwd">exists</span><span class="id"> W;</span><span class="id"> split</span>.<br/>
+<span class="id">-</span><span class="id"> apply/wedge_openP</span><span class="id"> =&gt;</span><span class="id"> i;</span><span class="id"> rewrite</span><span class="id"> /W;</span><span class="id"> have</span><span class="id"> [+</span><span class="id"> Vpj</span><span class="id"> _]</span><span class="id"> :=</span><span class="id"> projT2</span> (<span class="id">V_</span><span class="id"> i</span>).<br/>
+&nbsp;&nbsp;<span class="id">congr</span> (_<span class="id"> _</span>)<span class="id">;</span><span class="id"> rewrite</span><span class="id"> eqEsubset;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> z;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> Viz;</span><span class="gallina-kwd"> exists</span><span class="id"> i</span>.<br/>
+&nbsp;&nbsp;<span class="id">case</span><span class="id"> =&gt;</span><span class="id"> j</span><span class="id"> _</span><span class="id"> /=</span><span class="id"> []</span><span class="id"> w</span><span class="id"> /=</span><span class="id"> svw</span><span class="id"> /eqmodP</span><span class="id"> /predU1P[[E]|]</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> E</span><span class="gallina-kwd"> in</span><span class="id"> w</span><span class="id"> svw</span><span class="id"> *</span><span class="id"> =&gt;</span><span class="id"> R;</span><span class="id"> rewrite</span><span class="id"> -</span>(<span class="id">existT_inj2</span><span class="id"> R</span>).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> case/andP</span><span class="id"> =&gt;</span><span class="id"> /eqP</span><span class="id"> /=</span><span class="id"> _</span><span class="id"> /eqP</span><span class="id"> -&gt;</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="gallina-kwd"> exists</span><span class="id"> i0</span><span class="id"> =&gt;</span><span class="id"> //=;</span><span class="gallina-kwd"> exists</span> (<span class="id">p0</span><span class="id"> i0</span>)<span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> have</span><span class="id"> [_</span><span class="id"> +</span><span class="id"> _]</span><span class="id"> :=</span><span class="id"> projT2</span> (<span class="id">V_</span><span class="id"> i0</span>).<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> [j</span><span class="id"> _</span><span class="id"> [x</span><span class="id"> ?</span><span class="id"> &lt;-]];</span><span class="id"> have</span><span class="id"> [_</span><span class="id"> _]</span><span class="id"> :=</span><span class="id"> projT2</span> (<span class="id">V_</span><span class="id"> j</span>)<span class="id">;</span><span class="id"> exact</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Variant</span><span class="id"> wedge_nbhs_spec</span> (<span class="id">z</span><span class="id"> :</span><span class="id"> wedge</span>)<span class="id"> :</span><span class="id"> wedge</span><span class="id"> -&gt;</span><span class="id"> set_system</span><span class="id"> wedge</span><span class="id"> -&gt;</span><span class="gallina-kwd"> Type</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> wedge_liftsPoint</span><span class="id"> i0</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">wedge_nbhs_spec</span><span class="id"> z</span> (<span class="id">wedge_lift</span> (<span class="id">p0</span><span class="id"> i0</span>)) (<span class="id">\bigcap_i</span> (<span class="id">@wedge_lift</span><span class="id"> i</span><span class="id"> @</span><span class="id"> p0</span><span class="id"> i</span>))<br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> WedgeNotPoint</span> (<span class="id">i</span><span class="id"> :</span><span class="id"> I</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> X</span><span class="id"> i</span>)<span class="id"> of</span> (<span class="id">x</span><span class="id"> !=</span><span class="id"> p0</span><span class="id"> i</span>)<span class="id">:</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">wedge_nbhs_spec</span><span class="id"> z</span> (<span class="id">wedge_lift</span><span class="id"> x</span>) (<span class="id">@wedge_lift</span><span class="id"> i</span><span class="id"> @</span><span class="id"> x</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> wedge_nbhs_specP</span> (<span class="id">z</span><span class="id"> :</span><span class="id"> wedge</span>)<span class="id"> :</span> (<span class="gallina-kwd">forall</span><span class="id"> i,</span><span class="id"> closed</span><span class="id"> [set</span><span class="id"> p0</span><span class="id"> i]</span>)<span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">wedge_nbhs_spec</span><span class="id"> z</span><span class="id"> z</span> (<span class="id">nbhs</span><span class="id"> z</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> clP;</span><span class="id"> rewrite</span><span class="id"> -[z]</span>(<span class="id">@reprK</span><span class="id"> _</span><span class="id"> wedge</span>)<span class="id">;</span><span class="id"> case:</span> (<span class="id">repr</span><span class="id"> z</span>)<span class="id"> =&gt;</span><span class="id"> i</span><span class="id"> x</span>.<br/>
+<span class="id">have</span><span class="id"> [-&gt;|xpi]</span><span class="id"> :=</span><span class="id"> eqVneq</span><span class="id"> x</span> (<span class="id">p0</span><span class="id"> i</span>).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> wedge_point_nbhs</span><span class="id"> =&gt;</span><span class="id"> /=;</span><span class="id"> exact:</span><span class="id"> wedge_liftsPoint</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> -wedge_lift_nbhs</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> WedgeNotPoint</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> wedgeTE</span><span class="id"> :</span><span class="id"> \bigcup_i</span> (<span class="id">@wedge_lift</span><span class="id"> i</span>)<span class="id"> @`</span><span class="id"> setT</span><span class="id"> =</span><span class="id"> [set:</span><span class="id"> wedge]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> -subTset</span><span class="id"> =&gt;</span><span class="id"> z</span><span class="id"> _;</span><span class="id"> rewrite</span><span class="id"> -[z]reprK;</span><span class="gallina-kwd"> exists</span> (<span class="id">projT1</span> (<span class="id">repr</span><span class="id"> z</span>))<span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span> (<span class="id">projT2</span> (<span class="id">repr</span><span class="id"> z</span>))<span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> rewrite</span><span class="id"> /wedge_lift/=</span><span class="id"> surjective_existT</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> wedge_compact</span><span class="id"> :</span><span class="id"> finite_set</span><span class="id"> [set:</span><span class="id"> I]</span><span class="id"> -&gt;</span> (<span class="gallina-kwd">forall</span><span class="id"> i,</span><span class="id"> compact</span><span class="id"> [set:</span><span class="id"> X</span><span class="id"> i]</span>)<span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">compact</span><span class="id"> [set:</span><span class="id"> wedge]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> fsetI</span><span class="id"> cptX;</span><span class="id"> rewrite</span><span class="id"> -wedgeTE</span><span class="id"> -fsbig_setU</span><span class="id"> //;</span><span class="id"> apply:</span><span class="id"> big_ind</span>.<br/>
+<span class="id">-</span><span class="id"> exact:</span><span class="id"> compact0</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> ?;</span><span class="id"> exact:</span><span class="id"> compactU</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> i</span><span class="id"> _;</span><span class="id"> apply:</span><span class="id"> continuous_compact;</span><span class="id"> last</span><span class="id"> exact:</span><span class="id"> cptX</span>.<br/>
+<span class="id">exact/continuous_subspaceT/wedge_lift_continuous</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> wedge_connected</span><span class="id"> :</span> (<span class="gallina-kwd">forall</span><span class="id"> i,</span><span class="id"> connected</span><span class="id"> [set:</span><span class="id"> X</span><span class="id"> i]</span>)<span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">connected</span><span class="id"> [set:</span><span class="id"> wedge]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> ctdX;</span><span class="id"> rewrite</span><span class="id"> -wedgeTE</span>.<br/>
+<span class="id">have</span><span class="id"> [I0|/set0P[i0</span><span class="id"> Ii0]]</span><span class="id"> :=</span><span class="id"> eqVneq</span><span class="id"> [set:</span><span class="id"> I]</span><span class="id"> set0</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> [X</span><span class="gallina-kwd"> in</span><span class="id"> connected</span><span class="id"> X]</span>(_<span class="id"> :</span><span class="id"> _</span><span class="id"> =</span><span class="id"> set0</span>)<span class="id">;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> connected0</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> I0</span><span class="id"> bigcup_set0</span>.<br/>
+<span class="id">apply:</span><span class="id"> bigcup_connected</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists</span> (<span class="id">@wedge_lift</span><span class="id"> i0</span> (<span class="id">p0</span><span class="id"> _</span>))<span class="id"> =&gt;</span><span class="id"> i</span><span class="id"> Ii;</span><span class="gallina-kwd"> exists</span> (<span class="id">p0</span><span class="id"> i</span>)<span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> wedge_liftE</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> i</span><span class="id"> ?</span><span class="id"> /=;</span><span class="id"> apply:</span><span class="id"> connected_continuous_connected</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+<span class="id">exact/continuous_subspaceT/wedge_lift_continuous</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> wedge_fun</span><span class="id"> {Z</span><span class="id"> :</span><span class="id"> Type}</span> (<span class="id">f</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> i,</span><span class="id"> X</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> Z</span>)<span class="id"> :</span><span class="id"> wedge</span><span class="id"> -&gt;</span><span class="id"> Z</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">sigT_fun</span><span class="id"> f</span><span class="id"> \o</span><span class="id"> repr</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> wedge_fun_continuous</span><span class="id"> {Z</span><span class="id"> :</span><span class="id"> topologicalType}</span> (<span class="id">f</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> i,</span><span class="id"> X</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> Z</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="gallina-kwd">forall</span><span class="id"> i,</span><span class="id"> continuous</span> (<span class="id">f</span><span class="id"> i</span>))<span class="id"> -&gt;</span> (<span class="gallina-kwd">forall</span><span class="id"> i</span><span class="id"> j,</span><span class="id"> f</span><span class="id"> i</span> (<span class="id">p0</span><span class="id"> i</span>)<span class="id"> =</span><span class="id"> f</span><span class="id"> j</span> (<span class="id">p0</span><span class="id"> j</span>))<span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">continuous</span> (<span class="id">wedge_fun</span><span class="id"> f</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> cf</span><span class="id"> fE;</span><span class="id"> apply:</span><span class="id"> repr_comp_continuous;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> sigT_continuous</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> a</span><span class="id"> b</span><span class="id"> /eqP/eqmodP</span><span class="id"> /predU1P[-&gt;</span><span class="id"> //|/andP[/eqP</span><span class="id"> +</span><span class="id"> /eqP</span><span class="id"> +]]</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /sigT_fun</span><span class="id"> /=</span><span class="id"> =&gt;</span><span class="id"> -&gt;</span><span class="id"> -&gt;;</span><span class="id"> exact/eqP</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> wedge_lift_funE</span><span class="id"> {Z</span><span class="id"> :</span><span class="id"> Type}</span> (<span class="id">f</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> i,</span><span class="id"> X</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> Z</span>)<span class="id"> i0</span> (<span class="id">a</span><span class="id"> :</span><span class="id"> X</span><span class="id"> i0</span>)<span class="id">:</span><br/>
+&nbsp;&nbsp;(<span class="gallina-kwd">forall</span><span class="id"> i</span><span class="id"> j,</span><span class="id"> f</span><span class="id"> i</span> (<span class="id">p0</span><span class="id"> i</span>)<span class="id"> =</span><span class="id"> f</span><span class="id"> j</span> (<span class="id">p0</span><span class="id"> j</span>))<span class="id"> -&gt;</span><span class="id"> wedge_fun</span><span class="id"> f</span> (<span class="id">wedge_lift</span><span class="id"> a</span>)<span class="id"> =</span><span class="id"> f</span><span class="id"> i0</span><span class="id"> a</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> fE</span>.<br/>
+<span class="id">rewrite</span><span class="id"> /wedge_fun/=</span><span class="id"> /sigT_fun</span><span class="id"> /=;</span><span class="id"> case:</span><span class="id"> piP</span><span class="id"> =&gt;</span><span class="id"> z</span><span class="id"> /=</span><span class="id"> /eqmodP</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move/predU1P</span><span class="id"> =&gt;</span><span class="id"> [&lt;-</span><span class="id"> //|/andP[/=</span><span class="id"> /eqP</span><span class="id"> -&gt;</span><span class="id"> /eqP</span><span class="id"> -&gt;]]</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> wedge_fun_comp</span><span class="id"> {Z1</span><span class="id"> Z2</span><span class="id"> :</span><span class="id"> Type}</span> (<span class="id">h</span><span class="id"> :</span><span class="id"> Z1</span><span class="id"> -&gt;</span><span class="id"> Z2</span>) (<span class="id">f</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> i,</span><span class="id"> X</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> Z1</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">h</span><span class="id"> \o</span><span class="id"> wedge_fun</span><span class="id"> f</span><span class="id"> =</span><span class="id"> wedge_fun</span> (<span class="gallina-kwd">fun</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> h</span><span class="id"> \o</span><span class="id"> f</span><span class="id"> i</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact/funext</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Section</span><span class="id"> wedge_as_product</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> wedge_prod</span><span class="id"> :</span><span class="id"> wedge</span><span class="id"> -&gt;</span><span class="id"> prod_topology</span><span class="id"> X</span><span class="id"> :=</span><span class="id"> wedge_fun</span> (<span class="id">dfwith</span><span class="id"> p0</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> wedge_prod_pointE</span> (<span class="id">i</span><span class="id"> j</span><span class="id"> :</span><span class="id"> I</span>)<span class="id"> :</span><span class="id"> dfwith</span><span class="id"> p0</span><span class="id"> i</span> (<span class="id">p0</span><span class="id"> i</span>)<span class="id"> =</span><span class="id"> dfwith</span><span class="id"> p0</span><span class="id"> j</span> (<span class="id">p0</span><span class="id"> j</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">apply:</span><span class="id"> functional_extensionality_dep</span><span class="id"> =&gt;</span><span class="id"> k</span><span class="id"> /=</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> case:</span><span class="id"> dfwithP</span><span class="id"> =&gt;</span><span class="id"> [|*];</span><span class="id"> case:</span><span class="id"> dfwithP</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> wedge_prod_inj</span><span class="id"> :</span><span class="id"> injective</span><span class="id"> wedge_prod</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">have</span><span class="id"> dfwithp0</span><span class="id"> :=</span><span class="id"> wedge_prod_pointE</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> a</span><span class="id"> b;</span><span class="id"> rewrite</span><span class="id"> -[a]</span>(<span class="id">@reprK</span><span class="id"> _</span><span class="id"> wedge</span>)<span class="id"> -[b]</span>(<span class="id">@reprK</span><span class="id"> _</span><span class="id"> wedge</span>).<br/>
+<span class="id">move</span><span class="id"> Ea</span><span class="id"> :</span> (<span class="id">repr</span><span class="id"> a</span>)<span class="id">=&gt;</span><span class="id"> [i</span><span class="id"> x];</span><span class="id"> move</span><span class="id"> Eb</span><span class="id"> :</span> (<span class="id">repr</span><span class="id"> b</span>)<span class="id"> =&gt;</span><span class="id"> [j</span><span class="id"> y]</span>.<br/>
+<span class="id">rewrite</span><span class="id"> /wedge_prod</span><span class="id"> !wedge_lift_funE//=</span><span class="id"> =&gt;</span><span class="id"> dfij;</span><span class="id"> apply/eqmodP/orP</span>.<br/>
+<span class="id">have</span><span class="id"> [E|E</span><span class="id"> /=]</span><span class="id"> :=</span><span class="id"> eqVneq</span><span class="id"> i</span><span class="id"> j</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -{}E</span><span class="gallina-kwd"> in</span><span class="id"> x</span><span class="id"> y</span><span class="id"> Ea</span><span class="id"> Eb</span><span class="id"> dfij</span><span class="id"> *;</span><span class="id"> left;</span><span class="id"> apply/eqP;</span><span class="id"> congr</span><span class="id"> existT</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> :</span><span class="id"> dfwith</span><span class="id"> p0</span><span class="id"> i</span><span class="id"> x</span><span class="id"> i</span><span class="id"> =</span><span class="id"> dfwith</span><span class="id"> p0</span><span class="id"> i</span><span class="id"> y</span><span class="id"> i</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> dfij</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> !dfwithin</span>.<br/>
+<span class="id">right;</span><span class="id"> apply/andP;</span><span class="id"> split;</span><span class="id"> apply/eqP</span>.<br/>
+<span class="id">-</span><span class="id"> have</span><span class="id"> :</span><span class="id"> dfwith</span><span class="id"> p0</span><span class="id"> i</span><span class="id"> x</span><span class="id"> i</span><span class="id"> =</span><span class="id"> dfwith</span><span class="id"> p0</span><span class="id"> j</span><span class="id"> y</span><span class="id"> i</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> dfij</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> dfwithin</span><span class="id"> =&gt;</span><span class="id"> -&gt;;</span><span class="id"> rewrite</span><span class="id"> dfwithout</span><span class="id"> //</span><span class="id"> eq_sym</span>.<br/>
+<span class="id">-</span><span class="id"> have</span><span class="id"> :</span><span class="id"> dfwith</span><span class="id"> p0</span><span class="id"> i</span><span class="id"> x</span><span class="id"> j</span><span class="id"> =</span><span class="id"> dfwith</span><span class="id"> p0</span><span class="id"> j</span><span class="id"> y</span><span class="id"> j</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> dfij</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> dfwithin</span><span class="id"> =&gt;</span><span class="id"> &lt;-;</span><span class="id"> rewrite</span><span class="id"> dfwithout</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> wedge_prod_continuous</span><span class="id"> :</span><span class="id"> continuous</span><span class="id"> wedge_prod</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">apply:</span><span class="id"> wedge_fun_continuous;</span><span class="id"> last</span><span class="id"> exact:</span><span class="id"> wedge_prod_pointE</span>.<br/>
+<span class="id">exact:</span><span class="id"> dfwith_continuous</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> wedge_prod_open</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> wedge</span>) (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span><span class="id"> wedge</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">finite_set</span><span class="id"> [set:</span><span class="id"> I]</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;(<span class="gallina-kwd">forall</span><span class="id"> i,</span><span class="id"> closed</span><span class="id"> [set</span><span class="id"> p0</span><span class="id"> i]</span>)<span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">nbhs</span><span class="id"> x</span><span class="id"> A</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">@nbhs</span><span class="id"> _</span> (<span class="id">subspace</span> (<span class="id">range</span><span class="id"> wedge_prod</span>)) (<span class="id">wedge_prod</span><span class="id"> x</span>) (<span class="id">wedge_prod</span><span class="id"> @`</span><span class="id"> A</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> fsetI</span><span class="id"> clI;</span><span class="id"> case:</span><span class="id"> wedge_nbhs_specP</span><span class="id"> =&gt;</span><span class="id"> [//|i0</span><span class="id"> bcA|i</span><span class="id"> z</span><span class="id"> zNp0</span><span class="id"> /=</span><span class="id"> wNz]</span>.<br/>
+&nbsp;&nbsp;<span class="id">pose</span><span class="id"> B_</span><span class="id"> i</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">subspace</span> (<span class="id">range</span><span class="id"> wedge_prod</span>))<span class="id"> :=</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">proj</span><span class="id"> i</span><span class="id"> @^-1`</span> (<span class="id">@wedge_lift</span><span class="id"> i</span><span class="id"> @^-1`</span><span class="id"> A</span>).<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> /finite_fsetP[fI</span><span class="id"> fIE]</span><span class="id"> :=</span><span class="id"> fsetI</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> /filterS</span><span class="id"> :</span> (<span class="id">\bigcap_</span>(<span class="id">i</span><span class="gallina-kwd"> in</span><span class="id"> [set`</span><span class="id"> fI]</span>)<span class="id"> B_</span><span class="id"> i</span>)<span class="id"> `&amp;`</span><span class="id"> range</span><span class="id"> wedge_prod</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">`&lt;=`</span><span class="id"> wedge_prod</span><span class="id"> @`</span><span class="id"> A</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> _</span><span class="id"> []</span><span class="id"> /[swap]</span><span class="id"> []</span><span class="id"> [z</span><span class="id"> _]</span><span class="id"> &lt;-</span><span class="id"> /=</span><span class="id"> Bwz;</span><span class="gallina-kwd"> exists</span><span class="id"> z</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">have</span><span class="id"> /Bwz</span><span class="id"> :</span><span class="id"> [set`</span><span class="id"> fI]</span> (<span class="id">projT1</span> (<span class="id">repr</span><span class="id"> z</span>))<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -fIE</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">congr</span> (<span class="id">A</span><span class="id"> _</span>)<span class="id">;</span><span class="id"> rewrite</span><span class="id"> /wedge_lift</span><span class="id"> /=</span><span class="id"> -[RHS]reprK</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply/eqmodP/orP;</span><span class="id"> left;</span><span class="id"> rewrite</span><span class="id"> /proj</span><span class="id"> /=</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /wedge_prod/=</span><span class="id"> /wedge_fun</span><span class="id"> /sigT_fun/=</span><span class="id"> dfwithin</span><span class="id"> surjective_existT</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply;</span><span class="id"> apply/nbhs_subspace_ex;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="gallina-kwd"> exists</span> (<span class="id">wedge_lift</span> (<span class="id">p0</span><span class="id"> i0</span>)).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists</span> (<span class="id">\bigcap_</span>(<span class="id">i</span><span class="gallina-kwd"> in</span><span class="id"> [set`</span><span class="id"> fI]</span>)<span class="id"> B_</span><span class="id"> i</span>)<span class="id">;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -setIA</span><span class="id"> setIid</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> filter_bigI</span><span class="id"> =&gt;</span><span class="id"> i</span><span class="id"> _;</span><span class="id"> rewrite</span><span class="id"> /B_;</span><span class="id"> apply:</span><span class="id"> proj_continuous</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> /bcA</span><span class="id"> :</span><span class="id"> [set:</span><span class="id"> I]</span><span class="id"> i</span><span class="gallina-kwd"> by</span><span class="id"> []</span>.<br/>
+&nbsp;&nbsp;<span class="id">congr</span> (<span class="id">nbhs</span><span class="id"> _</span><span class="id"> _</span>).<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> /proj</span><span class="id"> /wedge_prod</span><span class="id"> wedge_lift_funE;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> case:</span><span class="id"> dfwithP</span>.<br/>
+&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> wedge_prod_pointE</span>.<br/>
+<span class="id">rewrite</span><span class="id"> [x</span><span class="gallina-kwd"> in</span><span class="id"> nbhs</span><span class="id"> x</span><span class="id"> _]/wedge_prod</span><span class="id"> /=</span><span class="id"> wedge_lift_funE;</span><span class="id"> first</span><span class="id"> last</span>.<br/>
+&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> wedge_prod_pointE</span>.<br/>
+<span class="id">have</span><span class="id"> :</span><span class="id"> wedge_prod</span><span class="id"> @`</span> (<span class="id">A</span><span class="id"> `&amp;`</span> (<span class="id">@wedge_lift</span><span class="id"> i</span><span class="id"> @`</span><span class="id"> ~`[set</span><span class="id"> p0</span><span class="id"> i]</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">`&lt;=`</span> <span class="id"> wedge_prod</span><span class="id"> @`</span><span class="id"> A</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> []</span><span class="id"> ?</span><span class="id"> []</span><span class="id"> +</span><span class="id"> /=</span><span class="id"> [w]</span><span class="id"> wpi</span><span class="id"> =&gt;</span><span class="id"> /[swap]</span><span class="id"> &lt;-</span><span class="id"> Aw</span><span class="id"> &lt;-;</span><span class="gallina-kwd"> exists</span> (<span class="id">wedge_lift</span><span class="id"> w</span>).<br/>
+<span class="id">move/filterS;</span><span class="id"> apply;</span><span class="id"> apply/nbhs_subspace_ex</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists</span> (<span class="id">wedge_lift</span><span class="id"> z</span>)<span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /wedge_prod</span><span class="id"> wedge_lift_funE</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> wedge_prod_pointE</span>.<br/>
+<span class="gallina-kwd">exists</span> (<span class="id">proj</span><span class="id"> i</span><span class="id"> @^-1`</span> (<span class="id">@wedge_lift</span><span class="id"> i</span><span class="id"> @^-1`</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">A</span><span class="id"> `&amp;`</span> (<span class="id">@wedge_lift</span><span class="id"> i</span><span class="id"> @`</span><span class="id"> ~`[set</span><span class="id"> p0</span><span class="id"> i]</span>)))).<br/>
+&nbsp;&nbsp;<span class="id">apply/</span><span class="id"> proj_continuous;</span><span class="id"> rewrite</span><span class="id"> /proj</span><span class="id"> dfwithin</span><span class="id"> preimage_setI;</span><span class="id"> apply:</span><span class="id"> filterI</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> wNz</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> /filterS</span><span class="id"> :=</span><span class="id"> @preimage_image</span><span class="id"> _</span><span class="id"> _</span> (<span class="id">@wedge_lift</span><span class="id"> i</span>) (<span class="id">~`</span><span class="id"> [set</span><span class="id"> p0</span><span class="id"> i]</span>).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply;</span><span class="id"> apply:</span><span class="id"> open_nbhs_nbhs;</span><span class="id"> split;</span><span class="id"> [exact:</span><span class="id"> closed_openC|exact/eqP]</span>.<br/>
+<span class="id">rewrite</span><span class="id"> eqEsubset;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> prodX;</span><span class="id"> case</span><span class="id"> =&gt;</span><span class="id"> /[swap]</span><span class="id"> [][]</span><span class="id"> r</span><span class="id"> _</span><span class="id"> &lt;-</span><span class="id"> /=</span>.<br/>
+&nbsp;&nbsp;<span class="id">case</span><span class="id"> =&gt;</span><span class="id"> _</span><span class="id"> /[swap]</span><span class="id"> /wedge_prod_inj</span><span class="id"> -&gt;</span><span class="id"> [+</span><span class="id"> [e</span><span class="id"> /[swap]]]</span><span class="id"> =&gt;</span><span class="id"> /[swap]</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> &lt;-</span><span class="id"> Awe</span><span class="id"> eNpi;</span><span class="id"> rewrite</span><span class="id"> /proj</span><span class="id"> /wedge_prod</span><span class="id"> /=</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> wedge_lift_funE;</span><span class="id"> last</span><span class="id"> exact:</span><span class="id"> wedge_prod_pointE</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> dfwithin;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="gallina-kwd"> exists</span><span class="id"> e</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists</span> (<span class="id">wedge_lift</span><span class="id"> e</span>)<span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> wedge_lift_funE</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> wedge_prod_pointE</span>.<br/>
+<span class="id">case=&gt;</span><span class="id"> /[swap]</span><span class="id"> [][y]</span><span class="id"> yNpi</span><span class="id"> E</span><span class="id"> Ay</span>.<br/>
+<span class="id">have</span><span class="id"> [riE|R]</span><span class="id"> :=</span><span class="id"> eqVneq</span><span class="id"> i</span> (<span class="id">projT1</span> (<span class="id">repr</span><span class="id"> r</span>))<span class="id">;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> absurd</span><span class="id"> yNpi</span>.<br/>
+&nbsp;&nbsp;<span class="id">move:</span><span class="id"> E;</span><span class="id"> rewrite</span><span class="id"> /proj/wedge_prod</span><span class="id"> /wedge_fun</span><span class="id"> /=/sigT_fun</span><span class="id"> /=</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> dfwithout</span><span class="id"> //;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> eq_sym</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> case/eqmodP/orP</span><span class="id"> =&gt;</span><span class="id"> [/eqP</span><span class="id"> E|/andP[/=</span><span class="id"> /eqP//]];</span><span class="id"> exact:</span> (<span class="id">existT_inj2</span><span class="id"> E</span>).<br/>
+<span class="id">split;</span><span class="gallina-kwd"> exists</span> (<span class="id">wedge_lift</span><span class="id"> y</span>)<span class="id">;</span><span class="id"> [by</span><span class="id"> split;</span><span class="id"> [rewrite</span><span class="id"> E</span><span class="id"> |</span><span class="gallina-kwd"> exists</span><span class="id"> y]|</span><span class="id"> |by</span><span class="id"> []|]</span>.<br/>
+<span class="id">-</span><span class="id"> congr</span><span class="id"> wedge_prod;</span><span class="id"> rewrite</span><span class="id"> E</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> /proj</span><span class="id"> /wedge_prod</span><span class="id"> /wedge_fun</span><span class="id"> /=/sigT_fun</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> riE</span><span class="id"> dfwithin</span><span class="id"> /wedge_lift</span><span class="id"> /=</span><span class="id"> surjective_existT</span><span class="id"> reprK</span>.<br/>
+<span class="id">-</span><span class="id"> congr</span><span class="id"> wedge_prod;</span><span class="id"> rewrite</span><span class="id"> E</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> /proj</span><span class="id"> /wedge_prod</span><span class="id"> /wedge_fun</span><span class="id"> /=/sigT_fun</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> riE</span><span class="id"> dfwithin</span><span class="id"> /wedge_lift</span><span class="id"> /=</span><span class="id"> surjective_existT</span><span class="id"> reprK</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> wedge_as_product</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> wedge_hausdorff</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="gallina-kwd">forall</span><span class="id"> i,</span><span class="id"> hausdorff_space</span> (<span class="id">X</span><span class="id"> i</span>))<span class="id"> -&gt;</span><span class="id"> hausdorff_space</span><span class="id"> wedge</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> /hausdorff_product</span><span class="id"> hf</span><span class="id"> x</span><span class="id"> y</span><span class="id"> clxy</span>.<br/>
+<span class="id">apply/wedge_prod_inj/hf</span><span class="id"> =&gt;</span><span class="id"> U</span><span class="id"> V</span><span class="id"> /wedge_prod_continuous</span><span class="id"> nU</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> /wedge_prod_continuous</span><span class="id"> nV;</span><span class="id"> have</span><span class="id"> :=</span><span class="id"> clxy</span><span class="id"> _</span><span class="id"> _</span><span class="id"> nU</span><span class="id"> nV</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> case</span><span class="id"> =&gt;</span><span class="id"> z</span><span class="id"> [/=</span><span class="id"> ?</span><span class="id"> ?];</span><span class="gallina-kwd"> exists</span> (<span class="id">wedge_prod</span><span class="id"> z</span>).<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> wedge_fun_joint_continuous</span> (<span class="id">T</span><span class="id"> R</span><span class="id"> :</span><span class="id"> topologicalType</span>)<br/>
+&nbsp;&nbsp;(<span class="id">k</span><span class="id"> :</span><span class="gallina-kwd"> forall</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> I</span>)<span class="id">,</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> X</span><span class="id"> x</span><span class="id"> -&gt;</span><span class="id"> R</span>)<span class="id">:</span><br/>
+&nbsp;&nbsp;<span class="id">finite_set</span><span class="id"> [set:</span><span class="id"> I]</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;(<span class="gallina-kwd">forall</span><span class="id"> x,</span><span class="id"> closed</span><span class="id"> [set</span><span class="id"> p0</span><span class="id"> x]</span>)<span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;(<span class="gallina-kwd">forall</span><span class="id"> t</span><span class="id"> x</span><span class="id"> y,</span><span class="id"> k</span><span class="id"> x</span><span class="id"> t</span> (<span class="id">p0</span><span class="id"> x</span>)<span class="id"> =</span><span class="id"> k</span><span class="id"> y</span><span class="id"> t</span> (<span class="id">p0</span><span class="id"> y</span>))<span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;(<span class="gallina-kwd">forall</span><span class="id"> x,</span><span class="id"> continuous</span> (<span class="id">uncurry</span> (<span class="id">k</span><span class="id"> x</span>)))<span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">continuous</span> (<span class="id">uncurry</span> (<span class="gallina-kwd">fun</span><span class="id"> t</span><span class="id"> =&gt;</span><span class="id"> wedge_fun</span> (<span class="id">k^~</span><span class="id"> t</span>))).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> Ifin</span><span class="id"> clp0</span><span class="id"> kE</span><span class="id"> kcts</span><span class="id"> /=</span><span class="id"> [t</span><span class="id"> u]</span><span class="id"> U</span>.<br/>
+<span class="id">case</span><span class="id"> :</span> (<span class="id">wedge_nbhs_specP</span><span class="id"> u</span>)<span class="id"> =&gt;</span><span class="id"> [//|i0</span><span class="id"> /=|]</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> wedge_lift_funE</span><span class="id"> //</span><span class="id"> =&gt;</span><span class="id"> Ukp0</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> pq_</span><span class="id"> x</span><span class="id"> :</span><span class="id"> {PQ</span><span class="id"> :</span><span class="id"> set</span><span class="id"> T</span><span class="id"> *</span><span class="id"> set</span> (<span class="id">X</span><span class="id"> x</span>)<span class="id"> |</span><span class="id"> [/\</span><span class="id"> nbhs</span> (<span class="id">p0</span><span class="id"> x</span>)<span class="id"> PQ</span>.<span class="id">2,</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">nbhs</span><span class="id"> t</span><span class="id"> PQ</span>.<span class="id">1</span><span class="id"> &amp;</span><span class="id"> PQ</span>.<span class="id">1</span><span class="id"> `*`</span><span class="id"> PQ</span>.<span class="id">2</span><span class="id"> `&lt;=`</span><span class="id"> uncurry</span> (<span class="id">k</span><span class="id"> x</span>)<span class="id"> @^-1`</span><span class="id"> U]}</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> cid</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">move:</span><span class="id"> Ukp0;</span><span class="id"> rewrite</span> (<span class="id">@kE</span><span class="id"> t</span><span class="id"> i0</span><span class="id"> x</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[k</span><span class="id"> x</span><span class="id"> ]uncurryK</span><span class="id"> /curry=&gt;</span><span class="id"> /kcts[[P</span><span class="id"> Q]</span><span class="id"> [Pt</span><span class="id"> Qp0</span><span class="id"> pqU]]</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span> (<span class="id">P,</span><span class="id"> Q</span>).<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> UPQ</span><span class="id"> :</span><span class="id"> nbhs</span> (<span class="id">wedge_lift</span> (<span class="id">p0</span><span class="id"> i0</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">\bigcup_x</span> (<span class="id">@wedge_lift</span><span class="id"> x</span>)<span class="id"> @`</span> (<span class="id">projT1</span> (<span class="id">pq_</span><span class="id"> x</span>)).<span class="id">2</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> wedge_point_nbhs</span><span class="id"> =&gt;</span><span class="id"> r</span><span class="id"> _</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> case:</span> (<span class="id">projT2</span> (<span class="id">pq_</span><span class="id"> r</span>))<span class="id"> =&gt;</span><span class="id"> /filterS</span><span class="id"> +</span><span class="id"> ?</span><span class="id"> ?;</span><span class="id"> apply</span><span class="id"> =&gt;</span><span class="id"> z</span><span class="id"> /=</span><span class="id"> ?;</span><span class="gallina-kwd"> exists</span><span class="id"> r</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> /finite_fsetP</span><span class="id"> [fI</span><span class="id"> fIE]</span><span class="id"> :=</span><span class="id"> Ifin</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> UPt</span><span class="id"> :</span><span class="id"> nbhs</span><span class="id"> t</span> (<span class="id">\bigcap_</span>(<span class="id">r</span><span class="gallina-kwd"> in</span><span class="id"> [set`</span><span class="id"> fI]</span>) (<span class="id">projT1</span> (<span class="id">pq_</span><span class="id"> r</span>)).<span class="id">1</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> filter_bigI</span><span class="id"> =&gt;</span><span class="id"> x</span><span class="id"> ?;</span><span class="id"> case:</span> (<span class="id">projT2</span> (<span class="id">pq_</span><span class="id"> x</span>)).<br/>
+&nbsp;&nbsp;<span class="id">near_simpl</span><span class="id"> =&gt;</span><span class="id"> /=;</span><span class="id"> near=&gt;</span><span class="id"> t1</span><span class="id"> t2</span><span class="id"> =&gt;</span><span class="id"> /=</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> [//|x</span><span class="id"> _</span><span class="id"> [w</span><span class="id"> /=]</span><span class="id"> ?</span><span class="id"> &lt;-]:=</span><span class="id"> near</span><span class="id"> UPQ</span><span class="id"> t2</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> wedge_lift_funE</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;<span class="id">case:</span> (<span class="id">projT2</span> (<span class="id">pq_</span><span class="id"> x</span>))<span class="id"> =&gt;</span><span class="id"> ?</span><span class="id"> Npt</span><span class="id"> /</span>(_ (<span class="id">t1,</span><span class="id"> w</span>))<span class="id"> =&gt;</span><span class="id"> /=;</span><span class="id"> apply;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span> (<span class="id">near</span><span class="id"> UPt</span><span class="id"> t1</span>)<span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> rewrite</span><span class="id"> -fIE</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> x</span><span class="id"> {}u</span><span class="id"> uNp0</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> wedge_lift_funE</span><span class="id"> //=</span><span class="id"> -[k</span><span class="id"> x]uncurryK</span><span class="id"> /curry</span>.<br/>
+<span class="id">move/kcts;</span><span class="id"> rewrite</span><span class="id"> nbhs_simpl</span><span class="id"> /=</span><span class="id"> =&gt;</span><span class="id"> -[[P</span><span class="id"> Q]</span><span class="id"> [Pt</span><span class="id"> Qu]</span><span class="id"> PQU]</span>.<br/>
+<span class="id">have</span><span class="id"> wQu</span><span class="id"> :</span><span class="id"> nbhs</span> (<span class="id">wedge_lift</span><span class="id"> u</span>) ((<span class="id">@wedge_lift</span><span class="id"> x</span>)<span class="id"> @`</span><span class="id"> Q</span>).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -wedge_lift_nbhs</span><span class="id"> //=;</span><span class="id"> apply:</span><span class="id"> filterS</span><span class="id"> Qu</span><span class="id"> =&gt;</span><span class="id"> z;</span><span class="gallina-kwd"> exists</span><span class="id"> z</span>.<br/>
+<span class="id">near_simpl;</span><span class="id"> near=&gt;</span><span class="id"> t1</span><span class="id"> t2</span><span class="id"> =&gt;</span><span class="id"> /=</span>.<br/>
+<span class="id">have</span><span class="id"> [//|l</span><span class="id"> ?</span><span class="id"> &lt;-]</span><span class="id"> :=</span><span class="id"> near</span><span class="id"> wQu</span><span class="id"> t2;</span><span class="id"> rewrite</span><span class="id"> wedge_lift_funE//</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply:</span> (<span class="id">PQU</span> (<span class="id">t1,l</span>))<span class="id">;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span> (<span class="id">near</span><span class="id"> Pt</span><span class="id"> t1</span>).<br/>
+<span class="id">Unshelve</span>.<span class="id"> all:</span><span class="gallina-kwd"> by</span><span class="id"> end_near</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> wedge</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> pwedge</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {I</span><span class="id"> :</span><span class="id"> pointedType}</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> I</span><span class="id"> -&gt;</span><span class="id"> ptopologicalType</span>).<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> pwedge</span><span class="id"> :=</span><span class="id"> wedge</span> (<span class="gallina-kwd">fun</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> @point</span> (<span class="id">X</span><span class="id"> i</span>)).<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> pwedge_point</span><span class="id"> :</span><span class="id"> pwedge</span><span class="id"> :=</span><span class="id"> wedge_lift</span><span class="id"> _</span> (<span class="id">@point</span> (<span class="id">X</span> (<span class="id">@point</span><span class="id"> I</span>))).<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Topological</span>.<span class="id">on</span><span class="id"> pwedge</span>.<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Quotient</span>.<span class="id">on</span><span class="id"> pwedge</span>.<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> isPointed</span>.<span class="id">Build</span><span class="id"> pwedge</span><span class="id"> pwedge_point</span>.<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> pwedge</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> bpwedge</span>.<br/>
+<span class="vernacular">Context</span> (<span class="id">X</span><span class="id"> Y</span><span class="id"> :</span><span class="id"> bpTopologicalType</span>).<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> bpwedge_shared_pt</span><span class="id"> b</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">if</span><span class="id"> b</span><span class="gallina-kwd"> return</span> (<span class="gallina-kwd">if</span><span class="id"> b</span><span class="gallina-kwd"> then</span><span class="id"> X</span><span class="gallina-kwd"> else</span><span class="id"> Y</span>)<span class="gallina-kwd"> then</span><span class="id"> @one</span><span class="id"> X</span><span class="gallina-kwd"> else</span><span class="id"> @zero</span><span class="id"> Y</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Notation</span><span class="id"> bpwedge</span><span class="id"> :=</span> (<span class="id">@wedge</span><span class="id"> bool</span><span class="id"> _</span><span class="id"> bpwedge_shared_pt</span>).<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Notation</span><span class="id"> bpwedge_lift</span><span class="id"> :=</span> (<span class="id">@wedge_lift</span><span class="id"> bool</span><span class="id"> _</span><span class="id"> bpwedge_shared_pt</span>).<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> wedge_neq</span><span class="id"> :</span><span class="id"> @bpwedge_lift</span><span class="id"> true</span><span class="id"> zero</span><span class="id"> !=</span><span class="id"> @bpwedge_lift</span><span class="id"> false</span><span class="id"> one</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> apply/eqP</span><span class="id"> =&gt;</span><span class="id"> /eqmodP/predU1P[//|/andP[/=</span><span class="id"> +</span><span class="id"> _]];</span><span class="id"> exact/negP/zero_one_neq</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> bpwedgeE</span><span class="id"> :</span><span class="id"> @bpwedge_lift</span><span class="id"> true</span><span class="id"> one</span><span class="id"> =</span><span class="id"> @bpwedge_lift</span><span class="id"> false</span><span class="id"> zero</span> .<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> apply/eqmodP/orP;</span><span class="id"> rewrite</span><span class="id"> !eqxx;</span><span class="id"> right</span>. Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> @isBiPointed</span>.<span class="id">Build</span><br/>
+&nbsp;&nbsp;<span class="id">bpwedge</span> (<span class="id">@bpwedge_lift</span><span class="id"> true</span><span class="id"> zero</span>) (<span class="id">@bpwedge_lift</span><span class="id"> false</span><span class="id"> one</span>)<span class="id"> wedge_neq</span>.<br/>
+<span class="vernacular">End</span><span class="id"> bpwedge</span>.<br/>
+<br/>
+<span class="vernacular">Notation</span><span class="id"> bpwedge</span><span class="id"> X</span><span class="id"> Y</span><span class="id"> :=</span> (<span class="id">@wedge</span><span class="id"> bool</span><span class="id"> _</span> (<span class="id">bpwedge_shared_pt</span><span class="id"> X</span><span class="id"> Y</span>)).<br/>
+<span class="vernacular">Notation</span><span class="id"> bpwedge_lift</span><span class="id"> X</span><span class="id"> Y</span><span class="id"> :=</span> (<span class="id">@wedge_lift</span><span class="id"> bool</span><span class="id"> _</span> (<span class="id">bpwedge_shared_pt</span><span class="id"> X</span><span class="id"> Y</span>)).<br/>
+
+      <div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/">a fork of coq2html</a></div>
+    </div>
+  </div>
+    </main>
+</body>
+</html>

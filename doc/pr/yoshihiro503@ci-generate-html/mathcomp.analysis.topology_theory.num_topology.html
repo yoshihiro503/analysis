@@ -1,0 +1,208 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module mathcomp.analysis.topology_theory.num_topology</title>
+<meta name="description" content="Documentation of Coq module mathcomp.analysis.topology_theory.num_topology" />
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="init()">
+
+  <main>
+    <div class="sidebar">
+      <h2>Files</h2>
+      
+    </div>
+
+  <div class="coq">
+
+    <div class="content">
+      <p><a href="./index.html">Top</a></p>
+      <h1 class="title">Module mathcomp.analysis.topology_theory.num_topology</h1>
+<span class="vernacular">From</span><span class="id"> HB</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> structures</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> all_ssreflect</span><span class="id"> all_algebra</span><span class="id"> archimedean</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> all_classical</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> signed</span><span class="id"> reals</span><span class="id"> topology_structure</span><span class="id"> uniform_structure</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> pseudometric_structure</span><span class="id"> order_topology</span>.<br/>
+<br/>
+<div class="ssrdoc md">
+# Topological notions for numerical types
+
+We endow `numFieldType` with the types of topological notions (accessible
+with `Import numFieldTopology.Exports.
+
+</div>
+<br/>
+<span class="vernacular">Import</span><span class="id"> Order</span>.<span class="id">TTheory</span><span class="id"> GRing</span>.<span class="id">Theory</span><span class="id"> Num</span>.<span class="id">Theory</span>.<br/>
+<br/>
+<span class="gallina-kwd">Set</span><span class="vernacular"> Implicit</span><span class="vernacular"> Arguments</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Strict</span><span class="vernacular"> Implicit</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Printing</span><span class="vernacular"> Implicit</span><span class="vernacular"> Defensive</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> classical_set_scope</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ring_scope</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> numDomainType</span>)<span class="id"> :=</span><span class="id"> hasNbhs</span>.<span class="id">Build</span><span class="id"> R^o</span><br/>
+&nbsp;&nbsp;(<span class="id">nbhs_ball_</span> (<span class="id">ball_</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> `|x|</span>))).<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> numFieldType</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">Nbhs_isPseudoMetric</span>.<span class="id">Build</span><span class="id"> R</span><span class="id"> R^o</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">nbhs_ball_normE</span><span class="id"> ball_norm_center</span><span class="id"> ball_norm_symmetric</span><span class="id"> ball_norm_triangle</span><span class="id"> erefl</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> real_order_nbhsE</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realFieldType</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> R^o</span>)<span class="id"> :</span><span class="id"> nbhs</span><span class="id"> x</span><span class="id"> =</span><br/>
+&nbsp;&nbsp;<span class="id">filter_from</span> (<span class="gallina-kwd">fun</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> itv_open_ends</span><span class="id"> i</span><span class="id"> /\</span><span class="id"> x</span><span class="id"> \in</span><span class="id"> i</span>) (<span class="gallina-kwd">fun</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> [set`</span><span class="id"> i]</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> eqEsubset;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> U</span>.<br/>
+&nbsp;&nbsp;<span class="id">case</span><span class="id"> =&gt;</span><span class="id"> _</span><span class="id"> /posnumP[e]</span><span class="id"> xeU</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists</span> (<span class="id">`]x</span><span class="id"> -</span><span class="id"> e%:num,</span><span class="id"> x</span><span class="id"> +</span><span class="id"> e%:num[</span>)<span class="id">;</span><span class="id"> first</span><span class="id"> split;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> right</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> in_itv</span><span class="id"> /=</span><span class="id"> -real_lter_distl</span><span class="id"> subrr</span><span class="id"> //</span><span class="id"> normr0</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span> (<span class="id">subset_trans</span><span class="id"> _</span><span class="id"> xeU</span>)<span class="id"> =&gt;</span><span class="id"> z</span><span class="id"> /=</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> in_itv</span><span class="id"> /=</span><span class="id"> -real_lter_distl</span><span class="id"> //=</span><span class="id"> distrC</span>.<br/>
+<span class="id">case</span><span class="id"> =&gt;</span><span class="id"> [][[[]l|[]]]</span><span class="id"> [[]r|[]]</span><span class="id"> [[]]//=</span><span class="id"> _</span>.<br/>
+<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> xlr</span><span class="id"> lrU;</span><span class="gallina-kwd"> exists</span> (<span class="id">Order</span>.<span class="id">min</span> (<span class="id">x</span><span class="id"> -</span><span class="id"> l</span>) (<span class="id">r</span><span class="id"> -</span><span class="id"> x</span>)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> lt_min</span><span class="id"> ?lterBDr</span><span class="id"> ?add0r</span><span class="id"> ?</span>(<span class="id">itvP</span><span class="id"> xlr</span>).<br/>
+&nbsp;&nbsp;<span class="id">apply/</span>(<span class="id">subset_trans</span><span class="id"> _</span><span class="id"> lrU</span>)<span class="id">/subset_ball_prop_in_itv</span>.<br/>
+&nbsp;&nbsp;<span class="id">suff</span><span class="id"> :</span> (<span class="id">`]x</span><span class="id"> -</span><span class="id"> Order</span>.<span class="id">min</span> (<span class="id">x</span><span class="id"> -</span><span class="id"> l</span>) (<span class="id">r</span><span class="id"> -</span><span class="id"> x</span>)<span class="id">,</span><span class="id"> x</span><span class="id"> +</span><span class="id"> Order</span>.<span class="id">min</span> (<span class="id">x</span><span class="id"> -</span><span class="id"> l</span>) (<span class="id">r</span><span class="id"> -</span><span class="id"> x</span>)<span class="id">[</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">&lt;=</span><span class="id"> `]l,</span><span class="id"> r[</span>)<span class="id">%O</span><span class="gallina-kwd"> by</span><span class="id"> move/subitvP</span><span class="id"> =&gt;</span><span class="id"> H</span><span class="id"> ?</span><span class="id"> ?;</span><span class="id"> exact:</span><span class="id"> H</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> subitvE</span><span class="id"> 2!lteBSide/=</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> lerBrDl</span><span class="id"> [_</span><span class="id"> +</span><span class="id"> l]addrC</span><span class="id"> -2!lerBrDl</span><span class="id"> 2!ge_min</span><span class="id"> 2!lexx</span><span class="id"> orbT</span>.<br/>
+<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> xl</span><span class="id"> lU;</span><span class="gallina-kwd"> exists</span> (<span class="id">x</span><span class="id"> -</span><span class="id"> l</span>)<span class="id"> =&gt;</span><span class="id"> /=;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> lterBDr</span><span class="id"> add0r</span> (<span class="id">itvP</span><span class="id"> xl</span>).<br/>
+&nbsp;&nbsp;<span class="id">apply/</span>(<span class="id">subset_trans</span><span class="id"> _</span><span class="id"> lU</span>)<span class="id">/subset_ball_prop_in_itv</span>.<br/>
+&nbsp;&nbsp;<span class="id">suff</span><span class="id"> :</span> (<span class="id">`]x</span><span class="id"> -</span> (<span class="id">x</span><span class="id"> -</span><span class="id"> l</span>)<span class="id">,</span><span class="id"> x</span><span class="id"> +</span> (<span class="id">x</span><span class="id"> -</span><span class="id"> l</span>)<span class="id">[</span><span class="id"> &lt;=</span><span class="id"> `]l,</span><span class="id"> +oo[</span>)<span class="id">%O</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move/subitvP</span><span class="id"> =&gt;</span><span class="id"> H</span><span class="id"> ?;</span><span class="id"> exact:</span><span class="id"> H</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> subitvE</span><span class="id"> lteBSide/=</span><span class="id"> subKr</span><span class="id"> lexx</span>.<br/>
+<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> xr</span><span class="id"> rU;</span><span class="gallina-kwd"> exists</span> (<span class="id">r</span><span class="id"> -</span><span class="id"> x</span>)<span class="id"> =&gt;</span><span class="id"> /=;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> lterBDr</span><span class="id"> add0r</span> (<span class="id">itvP</span><span class="id"> xr</span>).<br/>
+&nbsp;&nbsp;<span class="id">apply/</span>(<span class="id">subset_trans</span><span class="id"> _</span><span class="id"> rU</span>)<span class="id">/subset_ball_prop_in_itv</span>.<br/>
+&nbsp;&nbsp;<span class="id">suff</span><span class="id"> :</span> (<span class="id">`]x</span><span class="id"> -</span> (<span class="id">r</span><span class="id"> -</span><span class="id"> x</span>)<span class="id">,</span><span class="id"> x</span><span class="id"> +</span> (<span class="id">r</span><span class="id"> -</span><span class="id"> x</span>)<span class="id">[</span><span class="id"> &lt;=</span><span class="id"> `]-oo,</span><span class="id"> r[</span>)<span class="id">%O</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move/subitvP</span><span class="id"> =&gt;</span><span class="id"> H</span><span class="id"> ?;</span><span class="id"> exact:</span><span class="id"> H</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> subitvE</span><span class="id"> lteBSide/=</span><span class="id"> addrC</span><span class="id"> subrK</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> _;</span><span class="id"> rewrite</span><span class="id"> set_itvE</span><span class="id"> subTset</span><span class="id"> =&gt;</span><span class="id"> -&gt;;</span><span class="gallina-kwd"> exists</span><span class="id"> 1</span><span class="id"> =&gt;</span><span class="id"> /=</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Module</span><span class="id"> numFieldTopology</span>.<br/>
+<br/>
+<span class="id">#[export,</span><span class="id"> non_forgetful_inheritance]</span><br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>)<span class="id"> :=</span><span class="id"> PseudoPointedMetric</span>.<span class="id">copy</span><span class="id"> R</span><span class="id"> R^o</span>.<br/>
+<br/>
+<span class="id">#[export,</span><span class="id"> non_forgetful_inheritance]</span><br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> rcfType</span>)<span class="id"> :=</span><span class="id"> PseudoPointedMetric</span>.<span class="id">copy</span><span class="id"> R</span><span class="id"> R^o</span>.<br/>
+<br/>
+<span class="id">#[export,</span><span class="id"> non_forgetful_inheritance]</span><br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> archiFieldType</span>)<span class="id"> :=</span><span class="id"> PseudoPointedMetric</span>.<span class="id">copy</span><span class="id"> R</span><span class="id"> R^o</span>.<br/>
+<br/>
+<span class="id">#[export,</span><span class="id"> non_forgetful_inheritance]</span><br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realFieldType</span>)<span class="id"> :=</span><span class="id"> PseudoPointedMetric</span>.<span class="id">copy</span><span class="id"> R</span><span class="id"> R^o</span>.<br/>
+<br/>
+<span class="id">#[export,</span><span class="id"> non_forgetful_inheritance]</span><br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> numClosedFieldType</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">PseudoPointedMetric</span>.<span class="id">copy</span><span class="id"> R</span><span class="id"> R^o</span>.<br/>
+<br/>
+<span class="id">#[export,</span><span class="id"> non_forgetful_inheritance]</span><br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realFieldType</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">Order_isNbhs</span>.<span class="id">Build</span><span class="id"> _</span><span class="id"> R</span> (<span class="id">@real_order_nbhsE</span><span class="id"> R</span>).<br/>
+<br/>
+<span class="id">#[export,</span><span class="id"> non_forgetful_inheritance]</span><br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> numFieldType</span>)<span class="id"> :=</span><span class="id"> PseudoPointedMetric</span>.<span class="id">copy</span><span class="id"> R</span><span class="id"> R^o</span>.<br/>
+<br/>
+<span class="vernacular">Module</span><span class="vernacular"> Exports</span>.<span class="id"> HB</span>.<span class="id">reexport</span>.<span class="vernacular"> End</span><span class="vernacular"> Exports</span>.<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> numFieldTopology</span>.<br/>
+<br/>
+<span class="vernacular">Import</span><span class="id"> numFieldTopology</span>.<span class="vernacular">Exports</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> nbhs0_ltW</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realFieldType</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span> (<span class="id">0</span><span class="id"> &lt;</span><span class="id"> x</span>)<span class="id">%R</span><span class="id"> -&gt;</span><br/>
+&nbsp;<span class="id">\forall</span><span class="id"> r</span><span class="id"> \near</span><span class="id"> nbhs</span> (<span class="id">0%R:R</span>)<span class="id">,</span> (<span class="id">r</span><span class="id"> &lt;=</span><span class="id"> x</span>)<span class="id">%R</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">exists</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> y;</span><span class="id"> rewrite</span><span class="id"> /ball/=</span><span class="id"> sub0r</span><span class="id"> normrN</span><span class="id"> =&gt;</span><span class="id"> /ltW</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> le_trans;</span><span class="id"> rewrite</span><span class="id"> ler_norm</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> nbhs0_lt</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realFieldType</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span> (<span class="id">0</span><span class="id"> &lt;</span><span class="id"> x</span>)<span class="id">%R</span><span class="id"> -&gt;</span><br/>
+&nbsp;<span class="id">\forall</span><span class="id"> r</span><span class="id"> \near</span><span class="id"> nbhs</span> (<span class="id">0%R:R</span>)<span class="id">,</span> (<span class="id">r</span><span class="id"> &lt;</span><span class="id"> x</span>)<span class="id">%R</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">exists</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> z</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> sub0r</span><span class="id"> normrN</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> le_lt_trans;</span><span class="id"> rewrite</span><span class="id"> ler_norm</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">Global</span><span class="vernacular"> Instance</span><span class="id"> Proper_dnbhs_regular_numFieldType</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> numFieldType</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> R^o</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">ProperFilter</span><span class="id"> x^'</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">apply:</span><span class="id"> Build_ProperFilter_ex</span><span class="id"> =&gt;</span><span class="id"> A</span><span class="id"> /nbhs_ballP[_/posnumP[e]</span><span class="id"> Ae]</span>.<br/>
+<span class="gallina-kwd">exists</span> (<span class="id">x</span><span class="id"> +</span><span class="id"> e%:num</span><span class="id"> /</span><span class="id"> 2</span>)<span class="id">%R;</span><span class="id"> apply:</span><span class="id"> Ae;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> eq_sym</span><span class="id"> addrC</span><span class="id"> -subr_eq</span><span class="id"> subrr</span><span class="id"> eq_sym</span>.<br/>
+<span class="id">rewrite</span><span class="id"> /ball</span><span class="id"> /=</span><span class="id"> opprD</span><span class="id"> addrA</span><span class="id"> subrr</span><span class="id"> distrC</span><span class="id"> subr0</span><span class="id"> ger0_norm</span><span class="id"> //</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> {2}</span>(<span class="id">splitr</span><span class="id"> e%:num</span>)<span class="id"> ltr_pwDl</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">Global</span><span class="vernacular"> Instance</span><span class="id"> Proper_dnbhs_numFieldType</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> numFieldType</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">ProperFilter</span><span class="id"> x^'</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">apply:</span><span class="id"> Build_ProperFilter_ex</span><span class="id"> =&gt;</span><span class="id"> A</span><span class="id"> /nbhs_ballP[_/posnumP[e]</span><span class="id"> Ae]</span>.<br/>
+<span class="gallina-kwd">exists</span> (<span class="id">x</span><span class="id"> +</span><span class="id"> e%:num</span><span class="id"> /</span><span class="id"> 2</span>)<span class="id">%R;</span><span class="id"> apply:</span><span class="id"> Ae;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> eq_sym</span><span class="id"> addrC</span><span class="id"> -subr_eq</span><span class="id"> subrr</span><span class="id"> eq_sym</span>.<br/>
+<span class="id">rewrite</span><span class="id"> /ball</span><span class="id"> /=</span><span class="id"> opprD</span><span class="id"> addrA</span><span class="id"> subrr</span><span class="id"> distrC</span><span class="id"> subr0</span><span class="id"> ger0_norm</span><span class="id"> //</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> {2}</span>(<span class="id">splitr</span><span class="id"> e%:num</span>)<span class="id"> ltr_pwDl</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> dense_rat</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>)<span class="id"> :</span><span class="id"> dense</span> (<span class="id">@ratr</span><span class="id"> R</span><span class="id"> @`</span><span class="id"> setT</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> A</span><span class="id"> [r</span><span class="id"> Ar];</span><span class="id"> rewrite</span><span class="id"> openE</span><span class="id"> =&gt;</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> Ar</span>)<span class="id">/nbhs_ballP[_/posnumP[e]</span><span class="id"> reA]</span>.<br/>
+<span class="id">have</span><span class="id"> /rat_in_itvoo[q</span><span class="id"> /itvP</span><span class="id"> qre]</span><span class="id"> :</span><span class="id"> r</span><span class="id"> &lt;</span><span class="id"> r</span><span class="id"> +</span><span class="id"> e%:num</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> ltrDl</span>.<br/>
+<span class="gallina-kwd">exists</span> (<span class="id">ratr</span><span class="id"> q</span>)<span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> split;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="gallina-kwd"> exists</span><span class="id"> q</span>.<br/>
+<span class="id">apply:</span><span class="id"> reA;</span><span class="id"> rewrite</span><span class="id"> /ball</span><span class="id"> /=</span><span class="id"> distrC</span><span class="id"> ltr_distl</span><span class="id"> qre</span><span class="id"> andbT</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span> (<span class="id">@le_lt_trans</span><span class="id"> _</span><span class="id"> _</span><span class="id"> r</span>)<span class="id">//</span><span class="id"> ?qre//</span><span class="id"> lerBlDl</span><span class="id"> lerDr</span><span class="id"> ltW</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> separated_open_countable</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">{R</span><span class="id"> :</span><span class="id"> realType}</span> (<span class="id">I</span><span class="id"> :</span><span class="gallina-kwd"> Type</span>) (<span class="id">B</span><span class="id"> :</span><span class="id"> I</span><span class="id"> -&gt;</span><span class="id"> set</span><span class="id"> R</span>) (<span class="id">D</span><span class="id"> :</span><span class="id"> set</span><span class="id"> I</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="gallina-kwd">forall</span><span class="id"> i,</span><span class="id"> open</span> (<span class="id">B</span><span class="id"> i</span>))<span class="id"> -&gt;</span> (<span class="gallina-kwd">forall</span><span class="id"> i,</span><span class="id"> B</span><span class="id"> i</span><span class="id"> !=set0</span>)<span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">trivIset</span><span class="id"> D</span><span class="id"> B</span><span class="id"> -&gt;</span><span class="id"> countable</span><span class="id"> D</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> oB</span><span class="id"> B0</span><span class="id"> tB;</span><span class="id"> have</span><span class="id"> [f</span><span class="id"> fB]</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">{f</span><span class="id"> :</span><span class="id"> I</span><span class="id"> -&gt;</span><span class="id"> rat</span><span class="id"> &amp;</span><span class="gallina-kwd"> forall</span><span class="id"> i,</span><span class="id"> D</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> B</span><span class="id"> i</span> (<span class="id">ratr</span> (<span class="id">f</span><span class="id"> i</span>))<span class="id">}</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span> (<span class="id">@choice</span><span class="id"> _</span><span class="id"> _</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> y</span><span class="id"> =&gt;</span><span class="id"> D</span><span class="id"> x</span><span class="id"> -&gt;</span><span class="id"> B</span><span class="id"> x</span> (<span class="id">ratr</span><span class="id"> y</span>)))<span class="id"> =&gt;</span><span class="id"> i</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> [r</span><span class="id"> [Bir</span><span class="id"> [q</span><span class="id"> _</span><span class="id"> qr]]]</span><span class="id"> :=</span><span class="id"> dense_rat</span> (<span class="id">B0</span><span class="id"> _</span>) (<span class="id">oB</span><span class="id"> i</span>).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span><span class="id"> q</span><span class="id"> =&gt;</span><span class="id"> Di;</span><span class="id"> rewrite</span><span class="id"> qr</span>.<br/>
+<span class="id">have</span><span class="id"> inj_f</span><span class="id"> :</span><span class="id"> {in</span><span class="id"> D</span><span class="id"> &amp;,</span><span class="id"> injective</span><span class="id"> f}</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> i</span><span class="id"> j</span><span class="id"> /[!inE]</span><span class="id"> Di</span><span class="id"> Dj</span><span class="id"> /</span>(<span class="id">congr1</span><span class="id"> ratr</span>)<span class="id"> ratrij</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> ?</span><span class="id"> :</span> (<span class="id">B</span><span class="id"> i</span><span class="id"> `&amp;`</span><span class="id"> B</span><span class="id"> j</span>) (<span class="id">ratr</span> (<span class="id">f</span><span class="id"> i</span>)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> [exact:</span><span class="id"> fB|rewrite</span><span class="id"> ratrij;</span><span class="id"> exact:</span><span class="id"> fB]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply/</span>(<span class="id">tB</span><span class="id"> _</span><span class="id"> _</span><span class="id"> Di</span><span class="id"> Dj</span>)<span class="id">;</span><span class="gallina-kwd"> exists</span> (<span class="id">ratr</span> (<span class="id">f</span><span class="id"> i</span>)).<br/>
+<span class="id">apply/pcard_injP;</span><span class="id"> have</span><span class="id"> /card_bijP/cid[g</span><span class="id"> bijg]</span><span class="id"> :=</span><span class="id"> card_rat</span>.<br/>
+<span class="id">pose</span><span class="id"> nat_of_rat</span> (<span class="id">q</span><span class="id"> :</span><span class="id"> rat</span>)<span class="id"> :</span><span class="id"> nat</span><span class="id"> :=</span><span class="id"> set_val</span> (<span class="id">g</span> (<span class="id">to_setT</span><span class="id"> q</span>)).<br/>
+<span class="id">have</span><span class="id"> inj_nat_of_rat</span><span class="id"> :</span><span class="id"> injective</span><span class="id"> nat_of_rat</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> /nat_of_rat;</span><span class="id"> apply:</span><span class="id"> inj_comp</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> apply:</span><span class="id"> inj_comp</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;<span class="id">exact/bij_inj</span>.<br/>
+<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span> (<span class="id">nat_of_rat</span><span class="id"> \o</span><span class="id"> f</span>)<span class="id"> =&gt;</span><span class="id"> i</span><span class="id"> j</span><span class="id"> Di</span><span class="id"> Dj</span><span class="id"> /inj_nat_of_rat/inj_f;</span><span class="id"> exact</span>.<br/>
+Qed.</div></details>
+
+      <div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/">a fork of coq2html</a></div>
+    </div>
+  </div>
+    </main>
+</body>
+</html>

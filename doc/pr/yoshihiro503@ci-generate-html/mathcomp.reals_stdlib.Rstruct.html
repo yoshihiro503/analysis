@@ -1,0 +1,876 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module mathcomp.reals_stdlib.Rstruct</title>
+<meta name="description" content="Documentation of Coq module mathcomp.reals_stdlib.Rstruct" />
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="init()">
+
+  <main>
+    <div class="sidebar">
+      <h2>Files</h2>
+      
+    </div>
+
+  <div class="coq">
+
+    <div class="content">
+      <p><a href="./index.html">Top</a></p>
+      <h1 class="title">Module mathcomp.reals_stdlib.Rstruct</h1>
+<br/>
+<div class="ssrdoc md">
+# Compatibility with the real numbers of Coq
+</div>
+<br/>
+<span class="vernacular">From</span><span class="id"> Coq</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> Rdefinitions</span><span class="id"> Raxioms</span><span class="id"> RIneq</span><span class="id"> Rbasic_fun</span><span class="id"> Zwf</span>.<br/>
+<span class="vernacular">From</span><span class="id"> Coq</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> Epsilon</span><span class="vernacular"> FunctionalExtensionality</span><span class="id"> Ranalysis1</span><span class="id"> Rsqrt_def</span>.<br/>
+<span class="vernacular">From</span><span class="id"> Coq</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> Rtrigo1</span><span class="id"> Reals</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> all_ssreflect</span><span class="id"> ssralg</span><span class="id"> poly</span><span class="id"> mxpoly</span><span class="id"> ssrnum</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> archimedean</span>.<br/>
+<span class="vernacular">From</span><span class="id"> HB</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> structures</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> mathcomp_extra</span>.<br/>
+<br/>
+<span class="gallina-kwd">Set</span><span class="vernacular"> Implicit</span><span class="vernacular"> Arguments</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Strict</span><span class="vernacular"> Implicit</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Printing</span><span class="vernacular"> Implicit</span><span class="vernacular"> Defensive</span>.<br/>
+<span class="vernacular">Import</span><span class="id"> Order</span>.<span class="id">TTheory</span><span class="id"> GRing</span>.<span class="id">Theory</span><span class="id"> Num</span>.<span class="id">Theory</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> R_scope</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> Req_EM_T</span> (<span class="id">r1</span><span class="id"> r2</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> {r1</span><span class="id"> =</span><span class="id"> r2}</span><span class="id"> +</span><span class="id"> {r1</span><span class="id"> &lt;&gt;</span><span class="id"> r2}</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">case:</span> (<span class="id">total_order_T</span><span class="id"> r1</span><span class="id"> r2</span>)<span class="id"> =&gt;</span><span class="id"> [[r1Lr2</span><span class="id"> |</span><span class="id"> &lt;-]</span><span class="id"> |</span><span class="id"> r1Gr2]</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> right=&gt;</span><span class="id"> r1Er2;</span><span class="id"> case:</span> (<span class="id">Rlt_irrefl</span><span class="id"> r1</span>)<span class="id">;</span><span class="id"> rewrite</span><span class="id"> {2}r1Er2</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> left</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> right=&gt;</span><span class="id"> r1Er2;</span><span class="id"> case:</span> (<span class="id">Rlt_irrefl</span><span class="id"> r1</span>)<span class="id">;</span><span class="id"> rewrite</span><span class="id"> {1}r1Er2</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> eqr</span> (<span class="id">r1</span><span class="id"> r2</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> bool</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">if</span><span class="id"> Req_EM_T</span><span class="id"> r1</span><span class="id"> r2</span><span class="id"> is</span><span class="id"> left</span><span class="id"> _</span><span class="gallina-kwd"> then</span><span class="id"> true</span><span class="gallina-kwd"> else</span><span class="id"> false</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> eqrP</span><span class="id"> :</span><span class="id"> Equality</span>.<span class="id">axiom</span><span class="id"> eqr</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> r1</span><span class="id"> r2;</span><span class="id"> rewrite</span><span class="id"> /eqr;</span><span class="id"> case:</span><span class="id"> Req_EM_T=&gt;</span><span class="id"> H;</span><span class="id"> apply:</span> (<span class="id">iffP</span><span class="id"> idP</span>).<br/>
+Qed.</div></details>
+<br/>
+<span class="id">#[hnf]</span><span class="id"> HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> hasDecEq</span>.<span class="id">Build</span><span class="id"> R</span><span class="id"> eqrP</span>.<br/>
+<br/>
+<span class="vernacular">Fact</span><span class="id"> inhR</span><span class="id"> :</span><span class="id"> inhabited</span><span class="id"> R</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact:</span> (<span class="id">inhabits</span><span class="id"> 0</span>). Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> pickR</span> (<span class="id">P</span><span class="id"> :</span><span class="id"> pred</span><span class="id"> R</span>) (<span class="id">n</span><span class="id"> :</span><span class="id"> nat</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">let</span><span class="id"> x</span><span class="id"> :=</span><span class="id"> epsilon</span><span class="id"> inhR</span><span class="id"> P</span><span class="gallina-kwd"> in</span><span class="gallina-kwd"> if</span><span class="id"> P</span><span class="id"> x</span><span class="gallina-kwd"> then</span><span class="id"> Some</span><span class="id"> x</span><span class="gallina-kwd"> else</span><span class="id"> None</span>.<br/>
+<br/>
+<span class="vernacular">Fact</span><span class="id"> pickR_some</span><span class="id"> P</span><span class="id"> n</span><span class="id"> x</span><span class="id"> :</span><span class="id"> pickR</span><span class="id"> P</span><span class="id"> n</span><span class="id"> =</span><span class="id"> Some</span><span class="id"> x</span><span class="id"> -&gt;</span><span class="id"> P</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /pickR;</span><span class="id"> case:</span> (<span class="id">boolP</span> (<span class="id">P</span><span class="id"> _</span>))<span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> Px</span><span class="id"> [&lt;-]</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Fact</span><span class="id"> pickR_ex</span> (<span class="id">P</span><span class="id"> :</span><span class="id"> pred</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="gallina-kwd">exists</span><span class="id"> x</span><span class="id"> :</span><span class="id"> R,</span><span class="id"> P</span><span class="id"> x</span>)<span class="id"> -&gt;</span><span class="gallina-kwd"> exists</span><span class="id"> n,</span><span class="id"> pickR</span><span class="id"> P</span><span class="id"> n</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /pickR;</span><span class="id"> move=&gt;</span><span class="id"> /</span>(<span class="id">epsilon_spec</span><span class="id"> inhR</span>)<span class="id">-&gt;;</span><span class="gallina-kwd"> exists</span><span class="id"> 0%N</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Fact</span><span class="id"> pickR_ext</span> (<span class="id">P</span><span class="id"> Q</span><span class="id"> :</span><span class="id"> pred</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> P</span><span class="id"> =1</span><span class="id"> Q</span><span class="id"> -&gt;</span><span class="id"> pickR</span><span class="id"> P</span><span class="id"> =1</span><span class="id"> pickR</span><span class="id"> Q</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> PEQ</span><span class="id"> n;</span><span class="id"> rewrite</span><span class="id"> /pickR;</span><span class="id"> set</span><span class="id"> u</span><span class="id"> :=</span><span class="id"> epsilon</span><span class="id"> _</span><span class="id"> _;</span><span class="id"> set</span><span class="id"> v</span><span class="id"> :=</span><span class="id"> epsilon</span><span class="id"> _</span><span class="id"> _</span>.<br/>
+<span class="id">suff-&gt;:</span><span class="id"> u</span><span class="id"> =</span><span class="id"> v</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> PEQ</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> congr</span><span class="id"> epsilon;</span><span class="id"> apply:</span><span class="id"> functional_extensionality=&gt;</span><span class="id"> x;</span><span class="id"> rewrite</span><span class="id"> PEQ</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">#[hnf]</span><br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> hasChoice</span>.<span class="id">Build</span><span class="id"> R</span><span class="id"> pickR_some</span><span class="id"> pickR_ex</span><span class="id"> pickR_ext</span>.<br/>
+<br/>
+<span class="vernacular">Fact</span><span class="id"> RplusA</span><span class="id"> :</span><span class="id"> associative</span> (<span class="id">Rplus</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> *;</span><span class="id"> rewrite</span><span class="id"> Rplus_assoc</span>. Qed.</div></details>
+<br/>
+<span class="id">#[hnf]</span><br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> GRing</span>.<span class="id">isZmodule</span>.<span class="id">Build</span><span class="id"> R</span><br/>
+&nbsp;&nbsp;<span class="id">RplusA</span><span class="id"> Rplus_comm</span><span class="id"> Rplus_0_l</span><span class="id"> Rplus_opp_l</span>.<br/>
+<br/>
+<span class="vernacular">Fact</span><span class="id"> RmultA</span><span class="id"> :</span><span class="id"> associative</span><span class="id"> Rmult</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> *;</span><span class="id"> rewrite</span><span class="id"> Rmult_assoc</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Fact</span><span class="id"> R1_neq_0</span><span class="id"> :</span><span class="id"> R1</span><span class="id"> !=</span><span class="id"> R0</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> apply/eqP/R1_neq_R0</span>. Qed.</div></details>
+<br/>
+<span class="id">#[hnf]</span><br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> GRing</span>.<span class="id">Zmodule_isRing</span>.<span class="id">Build</span><span class="id"> R</span><br/>
+&nbsp;&nbsp;<span class="id">RmultA</span><span class="id"> Rmult_1_l</span><span class="id"> Rmult_1_r</span><span class="id"> Rmult_plus_distr_r</span><span class="id"> Rmult_plus_distr_l</span><span class="id"> R1_neq_0</span>.<br/>
+<br/>
+<span class="id">#[hnf]</span><br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> GRing</span>.<span class="id">Ring_hasCommutativeMul</span>.<span class="id">Build</span><span class="id"> R</span><span class="id"> Rmult_comm</span>.<br/>
+<br/>
+<span class="vernacular">Import</span><span class="id"> Monoid</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> isComLaw</span>.<span class="id">Build</span><span class="id"> R</span><span class="id"> 0</span><span class="id"> Rplus</span><br/>
+&nbsp;&nbsp;<span class="id">RplusA</span><span class="id"> Rplus_comm</span><span class="id"> Rplus_0_l</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> isComLaw</span>.<span class="id">Build</span><span class="id"> R</span><span class="id"> 1</span><span class="id"> Rmult</span><br/>
+&nbsp;&nbsp;<span class="id">RmultA</span><span class="id"> Rmult_comm</span><span class="id"> Rmult_1_l</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> isMulLaw</span>.<span class="id">Build</span><span class="id"> R</span><span class="id"> 0</span><span class="id"> Rmult</span><span class="id"> Rmult_0_l</span><span class="id"> Rmult_0_r</span>.<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> isAddLaw</span>.<span class="id">Build</span><span class="id"> R</span><span class="id"> Rmult</span><span class="id"> Rplus</span><br/>
+&nbsp;&nbsp;<span class="id">Rmult_plus_distr_r</span><span class="id"> Rmult_plus_distr_l</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> Rinvx</span><span class="id"> r</span><span class="id"> :=</span><span class="gallina-kwd"> if</span> (<span class="id">r</span><span class="id"> !=</span><span class="id"> 0</span>)<span class="gallina-kwd"> then</span><span class="id"> /</span><span class="id"> r</span><span class="gallina-kwd"> else</span><span class="id"> r</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> unit_R</span><span class="id"> r</span><span class="id"> :=</span><span class="id"> r</span><span class="id"> !=</span><span class="id"> 0</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> RmultRinvx</span><span class="id"> :</span><span class="id"> {in</span><span class="id"> unit_R,</span><span class="id"> left_inverse</span><span class="id"> 1</span><span class="id"> Rinvx</span><span class="id"> Rmult}</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> r;</span><span class="id"> rewrite</span><span class="id"> -topredE</span><span class="id"> /unit_R</span><span class="id"> /Rinvx</span><span class="id"> =&gt;</span><span class="id"> /=</span><span class="id"> rNZ</span><span class="id"> /=</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> rNZ</span><span class="id"> Rinv_l</span><span class="id"> //;</span><span class="id"> apply/eqP</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> RinvxRmult</span><span class="id"> :</span><span class="id"> {in</span><span class="id"> unit_R,</span><span class="id"> right_inverse</span><span class="id"> 1</span><span class="id"> Rinvx</span><span class="id"> Rmult}</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> r;</span><span class="id"> rewrite</span><span class="id"> -topredE</span><span class="id"> /unit_R</span><span class="id"> /Rinvx</span><span class="id"> =&gt;</span><span class="id"> /=</span><span class="id"> rNZ</span><span class="id"> /=</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> rNZ</span><span class="id"> Rinv_r</span><span class="id"> //;</span><span class="id"> apply/eqP</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> intro_unit_R</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> y</span><span class="id"> *</span><span class="id"> x</span><span class="id"> =</span><span class="id"> 1</span><span class="id"> /\</span><span class="id"> x</span><span class="id"> *</span><span class="id"> y</span><span class="id"> =</span><span class="id"> 1</span><span class="id"> -&gt;</span><span class="id"> unit_R</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> [yx_eq1</span><span class="id"> _];</span><span class="id"> apply:</span><span class="id"> contra_eqN</span><span class="id"> yx_eq1</span><span class="id"> =&gt;</span><span class="id"> /eqP-&gt;</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> Rmult_0_r</span><span class="id"> eq_sym</span><span class="id"> R1_neq_0</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> Rinvx_out</span><span class="id"> :</span><span class="id"> {in</span><span class="id"> predC</span><span class="id"> unit_R,</span><span class="id"> Rinvx</span><span class="id"> =1</span><span class="id"> id}</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> x;</span><span class="id"> rewrite</span><span class="id"> inE/=</span><span class="id"> /Rinvx</span><span class="id"> -if_neg</span><span class="id"> =&gt;</span><span class="id"> -&gt;</span>. Qed.</div></details>
+<br/>
+<span class="id">#[hnf]</span><br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> GRing</span>.<span class="id">Ring_hasMulInverse</span>.<span class="id">Build</span><span class="id"> R</span><br/>
+&nbsp;&nbsp;<span class="id">RmultRinvx</span><span class="id"> RinvxRmult</span><span class="id"> intro_unit_R</span><span class="id"> Rinvx_out</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> R_idomainMixin</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> x</span><span class="id"> *</span><span class="id"> y</span><span class="id"> =</span><span class="id"> 0</span><span class="id"> -&gt;</span> (<span class="id">x</span><span class="id"> ==</span><span class="id"> 0</span>)<span class="id"> ||</span> (<span class="id">y</span><span class="id"> ==</span><span class="id"> 0</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> /Rmult_integral</span><span class="id"> []-&gt;;</span><span class="id"> rewrite</span><span class="id"> eqxx</span><span class="id"> ?orbT</span>. Qed.</div></details>
+<br/>
+<span class="id">#[hnf]</span><br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> GRing</span>.<span class="id">ComUnitRing_isIntegral</span>.<span class="id">Build</span><span class="id"> R</span><br/>
+&nbsp;&nbsp;<span class="id">R_idomainMixin</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> R_fieldMixin</span><span class="id"> :</span><span class="id"> GRing</span>.<span class="id">field_axiom</span><span class="id"> R</span><br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> GRing</span>.<span class="id">UnitRing_isField</span>.<span class="id">Build</span><span class="id"> R</span><span class="id"> R_fieldMixin</span>.<br/>
+<br/>
+<div class="doc">Reflect the order on the reals to bool </div>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> Rleb</span><span class="id"> r1</span><span class="id"> r2</span><span class="id"> :=</span><span class="gallina-kwd"> if</span><span class="id"> Rle_dec</span><span class="id"> r1</span><span class="id"> r2</span><span class="id"> is</span><span class="id"> left</span><span class="id"> _</span><span class="gallina-kwd"> then</span><span class="id"> true</span><span class="gallina-kwd"> else</span><span class="id"> false</span>.<br/>
+<span class="vernacular">Definition</span><span class="id"> Rltb</span><span class="id"> r1</span><span class="id"> r2</span><span class="id"> :=</span><span class="id"> Rleb</span><span class="id"> r1</span><span class="id"> r2</span><span class="id"> &amp;&amp;</span> (<span class="id">r1</span><span class="id"> !=</span><span class="id"> r2</span>).<br/>
+<span class="vernacular">Definition</span><span class="id"> Rgeb</span><span class="id"> r1</span><span class="id"> r2</span><span class="id"> :=</span><span class="id"> Rleb</span><span class="id"> r2</span><span class="id"> r1</span>.<br/>
+<span class="vernacular">Definition</span><span class="id"> Rgtb</span><span class="id"> r1</span><span class="id"> r2</span><span class="id"> :=</span><span class="id"> Rltb</span><span class="id"> r2</span><span class="id"> r1</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> RlebP</span><span class="id"> r1</span><span class="id"> r2</span><span class="id"> :</span><span class="id"> reflect</span> (<span class="id">r1</span><span class="id"> &lt;=</span><span class="id"> r2</span>) (<span class="id">Rleb</span><span class="id"> r1</span><span class="id"> r2</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /Rleb;</span><span class="id"> apply:</span> (<span class="id">iffP</span><span class="id"> idP</span>)<span class="id">;</span><span class="id"> case:</span><span class="id"> Rle_dec</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> RltbP</span><span class="id"> r1</span><span class="id"> r2</span><span class="id"> :</span><span class="id"> reflect</span> (<span class="id">r1</span><span class="id"> &lt;</span><span class="id"> r2</span>) (<span class="id">Rltb</span><span class="id"> r1</span><span class="id"> r2</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> /Rltb</span><span class="id"> /Rleb;</span><span class="id"> apply:</span> (<span class="id">iffP</span><span class="id"> idP</span>)<span class="id">;</span><span class="id"> case:</span><span class="id"> Rle_dec=&gt;</span><span class="id"> //=</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> case=&gt;</span><span class="id"> //</span><span class="id"> r1Er2</span><span class="id"> /eqP[]</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> _</span><span class="id"> r1Lr2;</span><span class="id"> apply/eqP/Rlt_not_eq</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> Nr1Lr2</span><span class="id"> r1Lr2;</span><span class="id"> case:</span><span class="id"> Nr1Lr2;</span><span class="id"> left</span>.<br/>
+Qed.</div></details>
+<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> ssreal_struct</span>.<br/>
+<br/>
+<span class="vernacular">Import</span><span class="id"> GRing</span>.<span class="id">Theory</span>.<br/>
+<span class="vernacular">Import</span><span class="id"> Num</span>.<span class="id">Theory</span>.<br/>
+<span class="vernacular">Import</span><span class="id"> Num</span>.<span class="id">Def</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> R_scope</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> Rleb_norm_add</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> Rleb</span> (<span class="id">Rabs</span> (<span class="id">x</span><span class="id"> +</span><span class="id"> y</span>)) (<span class="id">Rabs</span><span class="id"> x</span><span class="id"> +</span><span class="id"> Rabs</span><span class="id"> y</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> apply/RlebP/Rabs_triang</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> addr_Rgtb0</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> Rltb</span><span class="id"> 0</span><span class="id"> x</span><span class="id"> -&gt;</span><span class="id"> Rltb</span><span class="id"> 0</span><span class="id"> y</span><span class="id"> -&gt;</span><span class="id"> Rltb</span><span class="id"> 0</span> (<span class="id">x</span><span class="id"> +</span><span class="id"> y</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move/RltbP=&gt;</span><span class="id"> Hx</span><span class="id"> /RltbP</span><span class="id"> Hy;</span><span class="id"> apply/RltbP/Rplus_lt_0_compat</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> Rnorm0_eq0</span><span class="id"> x</span><span class="id"> :</span><span class="id"> Rabs</span><span class="id"> x</span><span class="id"> =</span><span class="id"> 0</span><span class="id"> -&gt;</span><span class="id"> x</span><span class="id"> =</span><span class="id"> 0</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> H;</span><span class="id"> case:</span> (<span class="id">x</span><span class="id"> ==</span><span class="id"> 0</span>)<span class="id"> /eqP=&gt;</span><span class="id"> //</span><span class="id"> /Rabs_no_R0</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> Rleb_leVge</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> Rleb</span><span class="id"> 0</span><span class="id"> x</span><span class="id"> -&gt;</span><span class="id"> Rleb</span><span class="id"> 0</span><span class="id"> y</span><span class="id"> -&gt;</span> (<span class="id">Rleb</span><span class="id"> x</span><span class="id"> y</span>)<span class="id"> ||</span> (<span class="id">Rleb</span><span class="id"> y</span><span class="id"> x</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move/RlebP=&gt;</span><span class="id"> Hx</span><span class="id"> /RlebP</span><span class="id"> Hy;</span><span class="id"> case:</span> (<span class="id">Rlt_le_dec</span><span class="id"> x</span><span class="id"> y</span>).<br/>
+<span class="gallina-kwd">by</span><span class="id"> move/Rlt_le/RlebP=&gt;</span><span class="id"> -&gt;</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move/RlebP=&gt;</span><span class="id"> -&gt;;</span><span class="id"> rewrite</span><span class="id"> orbT</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> RnormM</span><span class="id"> :</span><span class="id"> {morph</span><span class="id"> Rabs</span><span class="id"> :</span><span class="id"> x</span><span class="id"> y</span><span class="id"> /</span><span class="id"> x</span><span class="id"> *</span><span class="id"> y}</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact:</span><span class="id"> Rabs_mult</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> Rleb_def</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span> (<span class="id">Rleb</span><span class="id"> x</span><span class="id"> y</span>)<span class="id"> =</span> (<span class="id">Rabs</span> (<span class="id">y</span><span class="id"> -</span><span class="id"> x</span>)<span class="id"> ==</span><span class="id"> y</span><span class="id"> -</span><span class="id"> x</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">apply/</span>(<span class="id">sameP</span> (<span class="id">RlebP</span><span class="id"> x</span><span class="id"> y</span>))<span class="id">/</span>(<span class="id">iffP</span><span class="id"> idP</span>)<span class="id">=&gt;</span><span class="id"> [/eqP</span><span class="id"> H|</span><span class="id"> /Rle_minus</span><span class="id"> H]</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> Rminus_le;</span><span class="id"> rewrite</span><span class="id"> -Ropp_minus_distr</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply/Rge_le/Ropp_0_le_ge_contravar</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -H;</span><span class="id"> apply:</span><span class="id"> Rabs_pos</span>.<br/>
+<span class="id">apply/eqP/Rabs_pos_eq</span>.<br/>
+<span class="id">rewrite</span><span class="id"> -Ropp_minus_distr</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply/Ropp_0_ge_le_contravar/Rle_ge</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> Rltb_def</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span> (<span class="id">Rltb</span><span class="id"> x</span><span class="id"> y</span>)<span class="id"> =</span> (<span class="id">y</span><span class="id"> !=</span><span class="id"> x</span>)<span class="id"> &amp;&amp;</span> (<span class="id">Rleb</span><span class="id"> x</span><span class="id"> y</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">apply/</span>(<span class="id">sameP</span> (<span class="id">RltbP</span><span class="id"> x</span><span class="id"> y</span>))<span class="id">/</span>(<span class="id">iffP</span><span class="id"> idP</span>).<br/>
+&nbsp;&nbsp;<span class="id">case/andP=&gt;</span><span class="id"> /eqP</span><span class="id"> H</span><span class="id"> /RlebP/Rle_not_gt</span><span class="id"> H2</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> case:</span> (<span class="id">Rtotal_order</span><span class="id"> x</span><span class="id"> y</span>)<span class="id">=&gt;</span><span class="id"> //</span><span class="id"> [][]</span><span class="id"> //</span><span class="id"> /esym</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> H;</span><span class="id"> apply/andP;</span><span class="id"> split;</span><span class="id"> [apply/eqP|apply/RlebP]</span>.<br/>
+&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> Rgt_not_eq</span>.<br/>
+<span class="id">exact:</span><span class="id"> Rlt_le</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Num</span>.<span class="id">IntegralDomain_isNumRing</span>.<span class="id">Build</span><span class="id"> R</span><br/>
+&nbsp;&nbsp;<span class="id">Rleb_norm_add</span><span class="id"> addr_Rgtb0</span><span class="id"> Rnorm0_eq0</span><span class="id"> Rleb_leVge</span><span class="id"> RnormM</span><span class="id"> Rleb_def</span><span class="id"> Rltb_def</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> RleP</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> x</span><span class="id"> y,</span><span class="id"> reflect</span> (<span class="id">Rle</span><span class="id"> x</span><span class="id"> y</span>) (<span class="id">x</span><span class="id"> &lt;=</span><span class="id"> y</span>)<span class="id">%R</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact:</span><span class="id"> RlebP</span>. Qed.</div></details>
+<span class="vernacular">Lemma</span><span class="id"> RltP</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> x</span><span class="id"> y,</span><span class="id"> reflect</span> (<span class="id">Rlt</span><span class="id"> x</span><span class="id"> y</span>) (<span class="id">x</span><span class="id"> &lt;</span><span class="id"> y</span>)<span class="id">%R</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact:</span><span class="id"> RltbP</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> Rreal_axiom</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span> (<span class="id">0</span><span class="id"> &lt;=</span><span class="id"> x</span>)<span class="id">%R</span><span class="id"> ||</span> (<span class="id">x</span><span class="id"> &lt;=</span><span class="id"> 0</span>)<span class="id">%R</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">case:</span> (<span class="id">Rle_dec</span><span class="id"> 0</span><span class="id"> x</span>)<span class="id">=&gt;</span><span class="id"> [/RleP</span><span class="id"> -&gt;|]</span><span class="id"> //</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move/Rnot_le_lt/Rlt_le/RleP=&gt;</span><span class="id"> -&gt;;</span><span class="id"> rewrite</span><span class="id"> orbT</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> R_total</span><span class="id"> :</span><span class="id"> total</span> (<span class="id">&lt;=%O</span><span class="id"> :</span><span class="id"> rel</span><span class="id"> R</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> x</span><span class="id"> y;</span><span class="id"> case:</span> (<span class="id">Rle_lt_dec</span><span class="id"> x</span><span class="id"> y</span>)<span class="id"> =&gt;</span><span class="id"> [/RleP</span><span class="id"> -&gt;</span><span class="id"> //|/Rlt_le/RleP</span><span class="id"> -&gt;];</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> orbT</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Order</span>.<span class="id">POrder_isTotal</span>.<span class="id">Build</span><span class="id"> _</span><span class="id"> R</span><span class="id"> R_total</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> Rarchimedean_axiom</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">Num</span>.<span class="id">archimedean_axiom</span><span class="id"> [the</span><span class="id"> numDomainType</span><span class="id"> of</span><span class="id"> R</span><span class="id"> :</span><span class="id"> Type]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> x;</span><span class="gallina-kwd"> exists</span> (<span class="id">Z</span>.<span class="id">abs_nat</span> (<span class="id">up</span><span class="id"> x</span>)<span class="id"> +</span><span class="id"> 2</span>)<span class="id">%N</span>.<br/>
+<span class="id">have</span><span class="id"> [Hx1</span><span class="id"> Hx2]:=</span> (<span class="id">archimed</span><span class="id"> x</span>).<br/>
+<span class="id">have</span><span class="id"> Hz</span> (<span class="id">z</span><span class="id"> :</span><span class="id"> Z</span>)<span class="id">:</span><span class="id"> z</span><span class="id"> =</span> (<span class="id">z</span><span class="id"> -</span><span class="id"> 1</span><span class="id"> +</span><span class="id"> 1</span>)<span class="id">%Z</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> Zplus_comm</span><span class="id"> Zplus_minus</span>.<br/>
+<span class="id">have</span><span class="id"> Zabs_nat_Zopp</span><span class="id"> z</span><span class="id"> :</span><span class="id"> Z</span>.<span class="id">abs_nat</span> (<span class="id">-</span><span class="id"> z</span>)<span class="id">%Z</span><span class="id"> =</span><span class="id"> Z</span>.<span class="id">abs_nat</span><span class="id"> z</span><span class="gallina-kwd"> by</span><span class="id"> case:</span><span class="id"> z</span>.<br/>
+<span class="id">apply/RltbP/Rabs_def1</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span> (<span class="id">Rlt_trans</span><span class="id"> _</span> ((<span class="id">Z</span>.<span class="id">abs_nat</span> (<span class="id">up</span><span class="id"> x</span>))<span class="id">%:R</span>)<span class="id">%R</span>)<span class="id">;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[</span>((<span class="id">Z</span>.<span class="id">abs_nat</span><span class="id"> _</span>)<span class="id">%:R</span>)<span class="id">%R]Rplus_0_r</span><span class="id"> mulrnDr</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply/Rplus_lt_compat_l/Rlt_0_2</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span> (<span class="id">Rlt_le_trans</span><span class="id"> _</span> (<span class="id">IZR</span> (<span class="id">up</span><span class="id"> x</span>)))<span class="id">=&gt;</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;<span class="id">elim/</span>(<span class="id">well_founded_ind</span> (<span class="id">Zwf_well_founded</span><span class="id"> 0</span>))<span class="id">:</span> (<span class="id">up</span><span class="id"> x</span>)<span class="id"> =&gt;</span><span class="id"> z</span><span class="id"> IHz</span>.<br/>
+&nbsp;&nbsp;<span class="id">case:</span> (<span class="id">Z_lt_le_dec</span><span class="id"> 0</span><span class="id"> z</span>)<span class="id"> =&gt;</span><span class="id"> [zp</span><span class="id"> |</span><span class="id"> zn]</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> [z]Hz</span><span class="id"> plus_IZR</span><span class="id"> Zabs_nat_Zplus</span><span class="id"> //;</span><span class="id"> last</span><span class="id"> exact:</span><span class="id"> Zlt_0_le_0_pred</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> plusE</span><span class="id"> mulrnDr</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply/Rplus_le_compat_r/IHz;</span><span class="id"> split;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> Zlt_le_weak</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> Zlt_pred</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span> (<span class="id">Rle_trans</span><span class="id"> _</span> (<span class="id">IZR</span><span class="id"> 0</span>))<span class="id">;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> IZR_le</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply/RlebP/</span>(<span class="id">ler0n</span><span class="id"> [the</span><span class="id"> numDomainType</span><span class="id"> of</span><span class="id"> R</span><span class="id"> :</span><span class="id"> Type]</span> (<span class="id">Z</span>.<span class="id">abs_nat</span><span class="id"> z</span>)).<br/>
+<span class="id">apply:</span> (<span class="id">Rlt_le_trans</span><span class="id"> _</span> (<span class="id">IZR</span> (<span class="id">up</span><span class="id"> x</span>)<span class="id"> -</span><span class="id"> 1</span>)).<br/>
+&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> Ropp_lt_cancel;</span><span class="id"> rewrite</span><span class="id"> Ropp_involutive</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> Ropp_minus_distr</span><span class="id"> /Rminus</span><span class="id"> -opp_IZR</span><span class="id"> -{2}</span>(<span class="id">Z</span>.<span class="id">opp_involutive</span> (<span class="id">up</span><span class="id"> x</span>)).<br/>
+&nbsp;&nbsp;<span class="id">elim/</span>(<span class="id">well_founded_ind</span> (<span class="id">Zwf_well_founded</span><span class="id"> 0</span>))<span class="id">:</span> (<span class="id">-</span><span class="id"> up</span><span class="id"> x</span>)<span class="id">%Z</span><span class="id"> =&gt;</span><span class="id"> z</span><span class="id"> IHz</span> .<br/>
+&nbsp;&nbsp;<span class="id">case:</span> (<span class="id">Z_lt_le_dec</span><span class="id"> 0</span><span class="id"> z</span>)<span class="id"> =&gt;</span><span class="id"> [zp</span><span class="id"> |</span><span class="id"> zn]</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> [z]Hz</span><span class="id"> Zabs_nat_Zopp</span><span class="id"> plus_IZR</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> Zabs_nat_Zplus</span><span class="id"> //;</span><span class="id"> last</span><span class="id"> exact:</span><span class="id"> Zlt_0_le_0_pred</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> plusE</span><span class="id"> -Rplus_assoc</span><span class="id"> -addnA</span><span class="id"> [</span>(_<span class="id"> +</span><span class="id"> 2</span>)<span class="id">%N]addnC</span><span class="id"> addnA</span><span class="id"> mulrnDr</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> Rplus_lt_compat_r;</span><span class="id"> rewrite</span><span class="id"> -Zabs_nat_Zopp</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> IHz;</span><span class="id"> split;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> Zlt_le_weak</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> Zlt_pred</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span> (<span class="id">Rle_lt_trans</span><span class="id"> _</span><span class="id"> 1</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -{2}[1]Rplus_0_r;</span><span class="id"> apply:</span><span class="id"> Rplus_le_compat_l</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -/</span>(<span class="id">IZR</span><span class="id"> 0</span>)<span class="id">;</span><span class="id"> apply:</span><span class="id"> IZR_le</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> mulrnDr;</span><span class="id"> apply:</span> (<span class="id">Rlt_le_trans</span><span class="id"> _</span><span class="id"> 2</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -{1}[1]Rplus_0_r;</span><span class="id"> apply/Rplus_lt_compat_l/Rlt_0_1</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[2]Rplus_0_l;</span><span class="id"> apply:</span><span class="id"> Rplus_le_compat_r</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply/RlebP/</span>(<span class="id">ler0n</span><span class="id"> [the</span><span class="id"> numDomainType</span><span class="id"> of</span><span class="id"> R</span><span class="id"> :</span><span class="id"> Type]</span> (<span class="id">Z</span>.<span class="id">abs_nat</span><span class="id"> _</span>)).<br/>
+<span class="id">apply:</span><span class="id"> Rminus_le</span>.<br/>
+<span class="id">rewrite</span><span class="id"> /Rminus</span><span class="id"> Rplus_assoc</span><span class="id"> [-</span><span class="id"> _</span><span class="id"> +</span><span class="id"> _]Rplus_comm</span><span class="id"> -Rplus_assoc</span><span class="id"> -!/</span>(<span class="id">Rminus</span><span class="id"> _</span><span class="id"> _</span>).<br/>
+<span class="id">exact:</span><span class="id"> Rle_minus</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Num</span>.<span class="id">NumDomain_bounded_isArchimedean</span>.<span class="id">Build</span><span class="id"> R</span><br/>
+&nbsp;&nbsp;<span class="id">Rarchimedean_axiom</span>.<br/>
+<br/>
+<div class="doc">Here are the lemmas that we will use to prove that R has
+the rcfType structure. </div>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> continuity_eq</span><span class="id"> f</span><span class="id"> g</span><span class="id"> :</span><span class="id"> f</span><span class="id"> =1</span><span class="id"> g</span><span class="id"> -&gt;</span><span class="id"> continuity</span><span class="id"> f</span><span class="id"> -&gt;</span><span class="id"> continuity</span><span class="id"> g</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> Hfg</span><span class="id"> Hf</span><span class="id"> x</span><span class="id"> eps</span><span class="id"> Heps</span>.<br/>
+<span class="id">have</span><span class="id"> [y</span><span class="id"> [Hy1</span><span class="id"> Hy2]]:=</span><span class="id"> Hf</span><span class="id"> x</span><span class="id"> eps</span><span class="id"> Heps</span>.<br/>
+<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span><span class="id"> y;</span><span class="id"> split=&gt;</span><span class="id"> //</span><span class="id"> z;</span><span class="id"> rewrite</span><span class="id"> -!Hfg;</span><span class="id"> exact:</span><span class="id"> Hy2</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> continuity_sum</span> (<span class="id">I</span><span class="id"> :</span><span class="id"> finType</span>)<span class="id"> F</span> (<span class="id">P</span><span class="id"> :</span><span class="id"> pred</span><span class="id"> I</span>)<span class="id">:</span><br/>
+(<span class="gallina-kwd">forall</span><span class="id"> i,</span><span class="id"> P</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> continuity</span> (<span class="id">F</span><span class="id"> i</span>))<span class="id"> -&gt;</span><br/>
+<span class="id">continuity</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span> (<span class="id">\sum_</span>(<span class="id">i</span><span class="id"> |</span><span class="id"> P</span><span class="id"> i</span>) ((<span class="id">F</span><span class="id"> i</span>)<span class="id"> x</span>)))<span class="id">%R</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> H;</span><span class="id"> elim:</span> (<span class="id">index_enum</span><span class="id"> I</span>)<span class="id">=&gt;</span><span class="id"> [|a</span><span class="id"> l</span><span class="id"> IHl]</span>.<br/>
+&nbsp;&nbsp;<span class="id">set</span><span class="id"> f:=</span><span class="gallina-kwd"> fun</span><span class="id"> _</span><span class="id"> =&gt;</span><span class="id"> _</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> Hf:</span> (<span class="gallina-kwd">fun</span><span class="id"> x=&gt;</span><span class="id"> 0</span>)<span class="id"> =1</span><span class="id"> f</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> x;</span><span class="id"> rewrite</span><span class="id"> /f</span><span class="id"> big_nil</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span> (<span class="id">continuity_eq</span><span class="id"> Hf</span>)<span class="id">;</span><span class="id"> exact:</span><span class="id"> continuity_const</span>.<br/>
+<span class="id">set</span><span class="id"> f</span><span class="id"> :=</span><span class="gallina-kwd"> fun</span><span class="id"> _</span><span class="id"> =&gt;</span><span class="id"> _</span>.<br/>
+<span class="id">case</span><span class="id"> Hpa:</span> (<span class="id">P</span><span class="id"> a</span>).<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> Hf:</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> F</span><span class="id"> a</span><span class="id"> x</span><span class="id"> +</span><span class="id"> \sum_</span>(<span class="id">i</span><span class="id"> &lt;-</span><span class="id"> l</span><span class="id"> |</span><span class="id"> P</span><span class="id"> i</span>)<span class="id"> F</span><span class="id"> i</span><span class="id"> x</span>)<span class="id">%R</span><span class="id"> =1</span><span class="id"> f</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> x;</span><span class="id"> rewrite</span><span class="id"> /f</span><span class="id"> big_cons</span><span class="id"> Hpa</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span> (<span class="id">continuity_eq</span><span class="id"> Hf</span>)<span class="id">;</span><span class="id"> apply:</span><span class="id"> continuity_plus=&gt;</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> H</span>.<br/>
+<span class="id">have</span><span class="id"> Hf:</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> \sum_</span>(<span class="id">i</span><span class="id"> &lt;-</span><span class="id"> l</span><span class="id"> |</span><span class="id"> P</span><span class="id"> i</span>)<span class="id"> F</span><span class="id"> i</span><span class="id"> x</span>)<span class="id">%R</span><span class="id"> =1</span><span class="id"> f</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> x;</span><span class="id"> rewrite</span><span class="id"> /f</span><span class="id"> big_cons</span><span class="id"> Hpa</span>.<br/>
+<span class="id">exact:</span> (<span class="id">continuity_eq</span><span class="id"> Hf</span>).<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> continuity_exp</span><span class="id"> f</span><span class="id"> n:</span><span class="id"> continuity</span><span class="id"> f</span><span class="id"> -&gt;</span><span class="id"> continuity</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span> (<span class="id">f</span><span class="id"> x</span>)<span class="id">^+</span><span class="id"> n</span>)<span class="id">%R</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> Hf;</span><span class="id"> elim:</span><span class="id"> n=&gt;</span><span class="id"> [|n</span><span class="id"> IHn];</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> continuity_const</span>.<br/>
+<span class="id">set</span><span class="id"> g:=</span><span class="gallina-kwd"> fun</span><span class="id"> _</span><span class="id"> =&gt;</span><span class="id"> _</span>.<br/>
+<span class="id">have</span><span class="id"> Hg:</span> (<span class="gallina-kwd">fun</span><span class="id"> x=&gt;</span><span class="id"> f</span><span class="id"> x</span><span class="id"> *</span><span class="id"> f</span><span class="id"> x</span><span class="id"> ^+</span><span class="id"> n</span>)<span class="id">%R</span><span class="id"> =1</span><span class="id"> g</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> x;</span><span class="id"> rewrite</span><span class="id"> /g</span><span class="id"> exprS</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply:</span> (<span class="id">continuity_eq</span><span class="id"> Hg</span>)<span class="id">;</span><span class="id"> exact:</span><span class="id"> continuity_mult</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> Rreal_closed_axiom</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">Num</span>.<span class="id">real_closed_axiom</span><span class="id"> [the</span><span class="id"> numDomainType</span><span class="id"> of</span><span class="id"> R</span><span class="id"> :</span><span class="id"> Type]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> p</span><span class="id"> a</span><span class="id"> b;</span><span class="id"> rewrite</span><span class="id"> !le_eqVlt</span>.<br/>
+<span class="id">case</span><span class="id"> Hpa:</span> ((<span class="id">p</span>.<span class="id">[a]</span>)<span class="id">%R</span><span class="id"> ==</span><span class="id"> 0%R</span>).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> _</span><span class="id"> ;</span><span class="gallina-kwd"> exists</span><span class="id"> a=&gt;</span><span class="id"> //;</span><span class="id"> rewrite</span><span class="id"> lexx</span><span class="id"> le_eqVlt</span>.<br/>
+<span class="id">case</span><span class="id"> Hpb:</span> ((<span class="id">p</span>.<span class="id">[b]</span>)<span class="id">%R</span><span class="id"> ==</span><span class="id"> 0%R</span>).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> _;</span><span class="gallina-kwd"> exists</span><span class="id"> b=&gt;</span><span class="id"> //;</span><span class="id"> rewrite</span><span class="id"> lexx</span><span class="id"> le_eqVlt</span><span class="id"> andbT</span>.<br/>
+<span class="id">case</span><span class="id"> Hab:</span> (<span class="id">a</span><span class="id"> ==</span><span class="id"> b</span>).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> _;</span><span class="id"> rewrite</span> (<span class="id">eqP</span><span class="id"> Hab</span>)<span class="id"> eq_sym</span><span class="id"> Hpb</span> (<span class="id">ltNge</span><span class="id"> 0</span>)<span class="id"> /=;</span><span class="id"> case/andP=&gt;</span><span class="id"> /ltW</span><span class="id"> -&gt;</span>.<br/>
+<span class="id">rewrite</span><span class="id"> eq_sym</span><span class="id"> Hpb</span><span class="id"> /=;</span><span class="id"> clear=&gt;</span><span class="id"> /RltbP</span><span class="id"> Hab</span><span class="id"> /andP</span><span class="id"> []</span><span class="id"> /RltbP</span><span class="id"> Hpa</span><span class="id"> /RltbP</span><span class="id"> Hpb</span>.<br/>
+<span class="id">suff</span><span class="id"> Hcp:</span><span class="id"> continuity</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span> (<span class="id">p</span>.<span class="id">[x]</span>)<span class="id">%R</span>).<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> [z</span><span class="id"> [[Hza</span><span class="id"> Hzb]</span><span class="id"> /eqP</span><span class="id"> Hz2]]:=</span><span class="id"> IVT</span><span class="id"> _</span><span class="id"> a</span><span class="id"> b</span><span class="id"> Hcp</span><span class="id"> Hab</span><span class="id"> Hpa</span><span class="id"> Hpb</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span><span class="id"> z=&gt;</span><span class="id"> //;</span><span class="id"> apply/andP;</span><span class="id"> split;</span><span class="id"> apply/RlebP</span>.<br/>
+<span class="id">rewrite</span><span class="id"> -[p]coefK</span><span class="id"> poly_def</span>.<br/>
+<span class="id">set</span><span class="id"> f</span><span class="id"> :=</span><span class="gallina-kwd"> fun</span><span class="id"> _</span><span class="id"> =&gt;</span><span class="id"> _</span>.<br/>
+<span class="id">have</span><span class="id"> Hf:</span> (<span class="gallina-kwd">fun</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> =&gt;</span><span class="id"> \sum_</span>(<span class="id">i</span><span class="id"> &lt;</span><span class="id"> size</span><span class="id"> p</span>) (<span class="id">p`_i</span><span class="id"> *</span><span class="id"> x^+i</span>))<span class="id">%R</span><span class="id"> =1</span><span class="id"> f</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> x;</span><span class="id"> rewrite</span><span class="id"> /f</span><span class="id"> horner_sum</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> eq_bigr=&gt;</span><span class="id"> i</span><span class="id"> _;</span><span class="id"> rewrite</span><span class="id"> hornerZ</span><span class="id"> hornerXn</span>.<br/>
+<span class="id">apply:</span> (<span class="id">continuity_eq</span><span class="id"> Hf</span>)<span class="id">;</span><span class="id"> apply:</span><span class="id"> continuity_sum=&gt;</span><span class="id"> i</span><span class="id"> _</span>.<br/>
+<span class="id">apply:continuity_scal;</span><span class="id"> apply:</span><span class="id"> continuity_exp=&gt;</span><span class="id"> x</span><span class="id"> esp</span><span class="id"> Hesp</span>.<br/>
+<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span><span class="id"> esp;</span><span class="id"> split=&gt;</span><span class="id"> //</span><span class="id"> y</span><span class="id"> []</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Num</span>.<span class="id">RealField_isClosed</span>.<span class="id">Build</span><span class="id"> R</span><span class="id"> Rreal_closed_axiom</span>.<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> ssreal_struct</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ring_scope</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> boolp</span><span class="id"> classical_sets</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> reals</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> ssreal_struct_contd</span>.<br/>
+<span class="vernacular">Implicit</span><span class="gallina-kwd"> Type</span><span class="id"> E</span><span class="id"> :</span><span class="id"> set</span><span class="id"> R</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> is_upper_boundE</span><span class="id"> E</span><span class="id"> x</span><span class="id"> :</span><span class="id"> is_upper_bound</span><span class="id"> E</span><span class="id"> x</span><span class="id"> =</span> (<span class="id">ubound</span><span class="id"> E</span>)<span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> propeqE;</span><span class="id"> split;</span><span class="id"> [move=&gt;</span><span class="id"> h|move=&gt;</span><span class="id"> /ubP</span><span class="id"> h</span><span class="id"> y</span><span class="id"> Ey;</span><span class="id"> exact/RleP/h]</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply/ubP</span><span class="id"> =&gt;</span><span class="id"> y</span><span class="id"> Ey;</span><span class="id"> apply/RleP/h</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> boundE</span><span class="id"> E</span><span class="id"> :</span><span class="id"> bound</span><span class="id"> E</span><span class="id"> =</span><span class="id"> has_ubound</span><span class="id"> E</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> apply/eq_exists=&gt;</span><span class="id"> x;</span><span class="id"> rewrite</span><span class="id"> is_upper_boundE</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> Rcondcomplete</span><span class="id"> E</span><span class="id"> :</span><span class="id"> has_sup</span><span class="id"> E</span><span class="id"> -&gt;</span><span class="id"> {m</span><span class="id"> |</span><span class="id"> isLub</span><span class="id"> E</span><span class="id"> m}</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> [E0</span><span class="id"> uE];</span><span class="id"> have</span><span class="id"> :=</span><span class="id"> completeness</span><span class="id"> E;</span><span class="id"> rewrite</span><span class="id"> boundE</span><span class="id"> =&gt;</span><span class="id"> /</span>(_<span class="id"> uE</span><span class="id"> E0</span>)<span class="id">[x</span><span class="id"> [E1</span><span class="id"> E2]]</span>.<br/>
+<span class="gallina-kwd">exists</span><span class="id"> x;</span><span class="id"> split;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -is_upper_boundE;</span><span class="id"> apply:</span><span class="id"> E1</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> y;</span><span class="id"> rewrite</span><span class="id"> -is_upper_boundE</span><span class="id"> =&gt;</span><span class="id"> /E2/RleP</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> Rsupremums_neq0</span><span class="id"> E</span><span class="id"> :</span><span class="id"> has_sup</span><span class="id"> E</span><span class="id"> -&gt;</span> (<span class="id">supremums</span><span class="id"> E</span><span class="id"> !=set0</span>)<span class="id">%classic</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> /Rcondcomplete[x</span><span class="id"> [?</span><span class="id"> ?]];</span><span class="gallina-kwd"> exists</span><span class="id"> x</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> Rsup_isLub</span><span class="id"> x0</span><span class="id"> E</span><span class="id"> :</span><span class="id"> has_sup</span><span class="id"> E</span><span class="id"> -&gt;</span><span class="id"> isLub</span><span class="id"> E</span> (<span class="id">supremum</span><span class="id"> x0</span><span class="id"> E</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">have</span><span class="id"> [-&gt;</span><span class="id"> [/set0P]|E0</span><span class="id"> hsE]</span><span class="id"> :=</span><span class="id"> eqVneq</span><span class="id"> E</span><span class="id"> set0;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> eqxx</span>.<br/>
+<span class="id">have</span><span class="id"> [s</span><span class="id"> [Es</span><span class="id"> sE]]</span><span class="id"> :=</span><span class="id"> Rcondcomplete</span><span class="id"> hsE</span>.<br/>
+<span class="id">split</span><span class="id"> =&gt;</span><span class="id"> x</span><span class="id"> Ex;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> apply/ge_supremum_Nmem=&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> Rsupremums_neq0</span>.<br/>
+<span class="id">rewrite</span><span class="id"> /supremum</span> (<span class="id">negbTE</span><span class="id"> E0</span>)<span class="id">;</span><span class="id"> case:</span><span class="id"> xgetP</span><span class="id"> =&gt;</span><span class="id"> /=</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> _</span><span class="id"> -&gt;</span><span class="id"> [_</span><span class="id"> EsE];</span><span class="id"> apply/EsE</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> have</span><span class="id"> [y</span><span class="id"> Ey</span><span class="id"> /</span>(_<span class="id"> y</span>)<span class="id">]</span><span class="id"> :=</span><span class="id"> Rsupremums_neq0</span><span class="id"> hsE</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> real_sup_adherent</span><span class="id"> x0</span><span class="id"> E</span> (<span class="id">eps</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span> (<span class="id">0</span><span class="id"> &lt;</span><span class="id"> eps</span>)<span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">has_sup</span><span class="id"> E</span><span class="id"> -&gt;</span><span class="gallina-kwd"> exists2</span><span class="id"> e,</span><span class="id"> E</span><span class="id"> e</span><span class="id"> &amp;</span> (<span class="id">supremum</span><span class="id"> x0</span><span class="id"> E</span><span class="id"> -</span><span class="id"> eps</span>)<span class="id"> &lt;</span><span class="id"> e</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> eps_gt0</span><span class="id"> supE;</span><span class="id"> set</span><span class="id"> m</span><span class="id"> :=</span><span class="id"> _</span><span class="id"> -</span><span class="id"> eps;</span><span class="id"> apply:</span><span class="id"> contrapT=&gt;</span><span class="id"> mNsmall</span>.<br/>
+<span class="id">have</span><span class="id"> :</span> (<span class="id">ubound</span><span class="id"> E</span>)<span class="id"> m</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply/ubP</span><span class="id"> =&gt;</span><span class="id"> y</span><span class="id"> Ey</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> have</span><span class="id"> /negP</span><span class="id"> :=</span><span class="id"> mNsmall</span> (<span class="id">ex_intro2</span><span class="id"> _</span><span class="id"> _</span><span class="id"> y</span><span class="id"> Ey</span><span class="id"> _</span>)<span class="id">;</span><span class="id"> rewrite</span><span class="id"> -leNgt</span>.<br/>
+<span class="id">have</span><span class="id"> [_</span><span class="id"> /</span>(_<span class="id"> m</span>)<span class="id">]</span><span class="id"> :=</span><span class="id"> Rsup_isLub</span><span class="id"> x0</span><span class="id"> supE</span>.<br/>
+<span class="id">move</span><span class="id"> =&gt;</span><span class="id"> m_big</span><span class="id"> /m_big</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -subr_ge0</span><span class="id"> addrC</span><span class="id"> addKr</span><span class="id"> oppr_ge0</span><span class="id"> leNgt</span><span class="id"> eps_gt0</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> Rsup_ub</span><span class="id"> x0</span><span class="id"> E</span><span class="id"> :</span><span class="id"> has_sup</span><span class="id"> E</span><span class="id"> -&gt;</span> (<span class="id">ubound</span><span class="id"> E</span>) (<span class="id">supremum</span><span class="id"> x0</span><span class="id"> E</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> supE</span><span class="id"> x</span><span class="id"> Ex;</span><span class="id"> apply/ge_supremum_Nmem</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> Rsupremums_neq0</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> ArchimedeanField_isReal</span>.<span class="id">Build</span><span class="id"> R</span><br/>
+&nbsp;&nbsp;(<span class="id">@Rsup_ub</span> (<span class="id">0</span><span class="id"> :</span><span class="id"> R</span>)) (<span class="id">real_sup_adherent</span><span class="id"> 0</span>).<br/>
+<br/>
+<span class="vernacular">Implicit</span><span class="id"> Types</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> R</span>) (<span class="id">m</span><span class="id"> n</span><span class="id"> :</span><span class="id"> nat</span>).<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> expR0</span><span class="id"> :</span><span class="id"> exp</span> (<span class="id">0</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> =</span><span class="id"> 1</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> exp_0</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> expRD</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> exp</span><span class="id"> x</span><span class="id"> *</span><span class="id"> exp</span><span class="id"> y</span><span class="id"> =</span><span class="id"> exp</span> (<span class="id">x</span><span class="id"> +</span><span class="id"> y</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> exp_plus</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> expRX</span><span class="id"> x</span><span class="id"> n</span><span class="id"> :</span><span class="id"> exp</span><span class="id"> x</span><span class="id"> ^+</span><span class="id"> n</span><span class="id"> =</span><span class="id"> exp</span> (<span class="id">x</span><span class="id"> *+</span><span class="id"> n</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">elim:</span><span class="id"> n</span><span class="id"> =&gt;</span><span class="id"> [|n</span><span class="id"> Ihn];</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> expr0</span><span class="id"> mulr0n</span><span class="id"> exp_0</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> exprS</span><span class="id"> Ihn</span><span class="id"> mulrS</span><span class="id"> expRD</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> sinD</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> sin</span> (<span class="id">x</span><span class="id"> +</span><span class="id"> y</span>)<span class="id"> =</span><span class="id"> sin</span><span class="id"> x</span><span class="id"> *</span><span class="id"> cos</span><span class="id"> y</span><span class="id"> +</span><span class="id"> cos</span><span class="id"> x</span><span class="id"> *</span><span class="id"> sin</span><span class="id"> y</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> sin_plus</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> cosD</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> cos</span> (<span class="id">x</span><span class="id"> +</span><span class="id"> y</span>)<span class="id"> =</span> (<span class="id">cos</span><span class="id"> x</span><span class="id"> *</span><span class="id"> cos</span><span class="id"> y</span><span class="id"> -</span><span class="id"> sin</span><span class="id"> x</span><span class="id"> *</span><span class="id"> sin</span><span class="id"> y</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> cos_plus</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> RplusE</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> Rplus</span><span class="id"> x</span><span class="id"> y</span><span class="id"> =</span><span class="id"> x</span><span class="id"> +</span><span class="id"> y</span><br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> RminusE</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> Rminus</span><span class="id"> x</span><span class="id"> y</span><span class="id"> =</span><span class="id"> x</span><span class="id"> -</span><span class="id"> y</span><br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> RmultE</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> Rmult</span><span class="id"> x</span><span class="id"> y</span><span class="id"> =</span><span class="id"> x</span><span class="id"> *</span><span class="id"> y</span><br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> RoppE</span><span class="id"> x</span><span class="id"> :</span><span class="id"> Ropp</span><span class="id"> x</span><span class="id"> =</span><span class="id"> -</span><span class="id"> x</span><br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> neq0_RinvE</span><span class="id"> x</span><span class="id"> :</span><span class="id"> x</span><span class="id"> !=</span><span class="id"> 0</span><span class="id"> -&gt;</span><span class="id"> Rinv</span><span class="id"> x</span><span class="id"> =</span><span class="id"> x^-1</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> x_neq0;</span><span class="id"> rewrite</span><span class="id"> -[RHS]/</span>(<span class="gallina-kwd">if</span><span class="id"> _</span><span class="gallina-kwd"> then</span><span class="id"> _</span><span class="gallina-kwd"> else</span><span class="id"> _</span>)<span class="id"> x_neq0</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> RinvE</span><span class="id"> x</span><span class="id"> :</span><span class="id"> Rinv</span><span class="id"> x</span><span class="id"> =</span><span class="id"> x^-1</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">have</span><span class="id"> [-&gt;|</span><span class="id"> ]</span><span class="id"> :=</span><span class="id"> eqVneq</span><span class="id"> x</span><span class="id"> R0;</span><span class="id"> last</span><span class="id"> exact:</span><span class="id"> neq0_RinvE</span>.<br/>
+<span class="id">rewrite</span><span class="id"> /GRing</span>.<span class="id">inv</span><span class="id"> /GRing</span>.<span class="id">mul</span><span class="id"> /=</span><span class="id"> /Rinvx</span><span class="id"> eqxx</span><span class="id"> /=</span>.<br/>
+<span class="id">rewrite</span><span class="id"> RinvImpl</span>.<span class="id">Rinv_def;</span><span class="id"> case:</span><span class="id"> Req_appart_dec</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> /[dup]</span><span class="id"> -[]</span><span class="id"> /RltP;</span><span class="id"> rewrite</span><span class="id"> Order</span>.<span class="id">POrderTheory</span>.<span class="id">ltxx</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> RdivE</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> Rdiv</span><span class="id"> x</span><span class="id"> y</span><span class="id"> =</span><span class="id"> x</span><span class="id"> /</span><span class="id"> y</span><br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /Rdiv</span><span class="id"> RinvE</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> INRE</span><span class="id"> n</span><span class="id"> :</span><span class="id"> INR</span><span class="id"> n</span><span class="id"> =</span><span class="id"> n%:R</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> elim:</span><span class="id"> n</span><span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> n</span><span class="id"> IH;</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> S_INR</span><span class="id"> IH</span><span class="id"> RplusE</span><span class="id"> -addn1</span><span class="id"> natrD</span>. Qed.</div></details>
+<br/>
+<div class="doc md"> Note that rewrites using the following lemma `IZRposE` are
+  systematically followed by a rewrite using the lemma `INRE`.</div>
+<span class="vernacular">Lemma</span><span class="id"> IZRposE</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> positive</span>)<span class="id"> :</span><span class="id"> IZR</span> (<span class="id">Z</span>.<span class="id">pos</span><span class="id"> p</span>)<span class="id"> =</span><span class="id"> INR</span> (<span class="id">nat_of_pos</span><span class="id"> p</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -Pos_to_natE</span><span class="id"> INR_IPR</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> RsqrtE</span><span class="id"> x</span><span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;=</span><span class="id"> x</span><span class="id"> -&gt;</span><span class="id"> sqrt</span><span class="id"> x</span><span class="id"> =</span><span class="id"> Num</span>.<span class="id">sqrt</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move</span><span class="id"> =&gt;</span><span class="id"> x0;</span><span class="id"> apply/eqP;</span><span class="id"> have</span><span class="id"> [t1</span><span class="id"> t2]</span><span class="id"> :=</span><span class="id"> conj</span> (<span class="id">sqrtr_ge0</span><span class="id"> x</span>) (<span class="id">sqrt_pos</span><span class="id"> x</span>).<br/>
+<span class="id">rewrite</span><span class="id"> eq_sym</span><span class="id"> -</span>(<span class="id">eqrXn2</span> (<span class="id">_:</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> 2</span>)<span class="id">%N</span><span class="id"> t1</span>)<span class="id"> //;</span><span class="id"> last</span><span class="id"> exact/RleP</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> sqr_sqrtr</span><span class="id"> //</span><span class="id"> !exprS</span><span class="id"> expr0</span><span class="id"> mulr1</span><span class="id"> -RmultE</span><span class="id"> ?sqrt_sqrt</span><span class="id"> //;</span><span class="id"> exact/RleP</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> RpowE</span><span class="id"> x</span><span class="id"> n</span><span class="id"> :</span><span class="id"> pow</span><span class="id"> x</span><span class="id"> n</span><span class="id"> =</span><span class="id"> x</span><span class="id"> ^+</span><span class="id"> n</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> elim:</span><span class="id"> n</span><span class="id"> =&gt;</span><span class="id"> [</span><span class="id"> |</span><span class="id"> n</span><span class="id"> In]</span><span class="id"> //=;</span><span class="id"> rewrite</span><span class="id"> exprS</span><span class="id"> In</span><span class="id"> RmultE</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> RmaxE</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> Rmax</span><span class="id"> x</span><span class="id"> y</span><span class="id"> =</span><span class="id"> Num</span>.<span class="id">max</span><span class="id"> x</span><span class="id"> y</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">case:</span> (<span class="id">lerP</span><span class="id"> x</span><span class="id"> y</span>)<span class="id"> =&gt;</span><span class="id"> H;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> Rmax_right</span><span class="id"> //;</span><span class="id"> apply:</span><span class="id"> RlebP</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> ?ltW</span><span class="id"> //</span><span class="id"> Rmax_left</span><span class="id"> //;</span> <span class="id"> apply/RlebP;</span><span class="id"> move/ltW</span><span class="id"> :</span><span class="id"> H</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> RminE</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> Rmin</span><span class="id"> x</span><span class="id"> y</span><span class="id"> =</span><span class="id"> Num</span>.<span class="id">min</span><span class="id"> x</span><span class="id"> y</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">case:</span> (<span class="id">lerP</span><span class="id"> x</span><span class="id"> y</span>)<span class="id"> =&gt;</span><span class="id"> H;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> Rmin_left</span><span class="id"> //;</span><span class="id"> apply:</span><span class="id"> RlebP</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> ?ltW</span><span class="id"> //</span><span class="id"> Rmin_right</span><span class="id"> //;</span> <span class="id"> apply/RlebP;</span><span class="id"> move/ltW</span><span class="id"> :</span><span class="id"> H</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Section</span><span class="id"> bigmaxr</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realDomainType}</span>.<br/>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Definition</span><span class="id"> bigmaxr</span> (<span class="id">r</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> s</span><span class="id"> :=</span><span class="id"> \big[Num</span>.<span class="id">max/head</span><span class="id"> r</span><span class="id"> s]_</span>(<span class="id">i</span><span class="id"> &lt;-</span><span class="id"> s</span>)<span class="id"> i</span>.<br/>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> bigmaxr_nil</span> (<span class="id">x0</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> bigmaxr</span><span class="id"> x0</span><span class="id"> [::]</span><span class="id"> =</span><span class="id"> x0</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /bigmaxr</span><span class="id"> /=</span><span class="id"> big_nil</span>. Qed.</div></details>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> bigmaxr_un</span> (<span class="id">x0</span><span class="id"> x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> bigmaxr</span><span class="id"> x0</span><span class="id"> [::</span><span class="id"> x]</span><span class="id"> =</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /bigmaxr</span><span class="id"> /=</span><span class="id"> big_cons</span><span class="id"> big_nil</span><span class="id"> maxxx</span>. Qed.</div></details>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> bigmaxrE</span> (<span class="id">r</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> s</span><span class="id"> :</span><span class="id"> bigmaxr</span><span class="id"> r</span><span class="id"> s</span><span class="id"> =</span><span class="id"> foldr</span><span class="id"> Num</span>.<span class="id">max</span> (<span class="id">head</span><span class="id"> r</span><span class="id"> s</span>) (<span class="id">behead</span><span class="id"> s</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span> (_<span class="id"> :</span><span class="id"> bigmaxr</span><span class="id"> _</span><span class="id"> _</span><span class="id"> =</span><span class="gallina-kwd"> if</span><span class="id"> s</span><span class="id"> isn't</span><span class="id"> h</span><span class="id"> ::</span><span class="id"> t</span><span class="gallina-kwd"> then</span><span class="id"> r</span><span class="gallina-kwd"> else</span><span class="id"> \big[Num</span>.<span class="id">max/h]_</span>(<span class="id">i</span><span class="id"> &lt;-</span><span class="id"> s</span>)<span class="id"> i</span>).<br/>
+&nbsp;&nbsp;<span class="id">case:</span><span class="id"> s</span><span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> ?</span><span class="id"> t;</span><span class="id"> rewrite</span><span class="id"> big_cons</span><span class="id"> /bigmaxr</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> elim:</span><span class="id"> t</span><span class="id"> =&gt;</span><span class="id"> //=</span><span class="id"> [|?</span><span class="id"> ?</span><span class="id"> &lt;-];</span><span class="id"> [rewrite</span><span class="id"> big_nil</span><span class="id"> maxxx</span><span class="id"> |</span><span class="id"> rewrite</span><span class="id"> big_cons</span><span class="id"> maxCA]</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> case:</span><span class="id"> s</span><span class="id"> =&gt;</span><span class="id"> //=;</span><span class="id"> rewrite</span><span class="id"> /bigmaxr</span><span class="id"> big_nil</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> bigrmax_dflt</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> s</span><span class="id"> :</span><span class="id"> Num</span>.<span class="id">max</span><span class="id"> x</span> (<span class="id">\big[Num</span>.<span class="id">max/x]_</span>(<span class="id">j</span><span class="id"> &lt;-</span><span class="id"> y</span><span class="id"> ::</span><span class="id"> s</span>)<span class="id"> j</span>)<span class="id"> =</span><br/>
+&nbsp;&nbsp;<span class="id">Num</span>.<span class="id">max</span><span class="id"> x</span> (<span class="id">\big[Num</span>.<span class="id">max/y]_</span>(<span class="id">i</span><span class="id"> &lt;-</span><span class="id"> y</span><span class="id"> ::</span><span class="id"> s</span>)<span class="id"> i</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">elim:</span><span class="id"> s</span><span class="id"> =&gt;</span><span class="id"> /=</span><span class="id"> [|h</span><span class="id"> t</span><span class="id"> IH]</span><span class="gallina-kwd"> in</span><span class="id"> x</span><span class="id"> y</span><span class="id"> *</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> !big_cons</span><span class="id"> !big_nil</span><span class="id"> maxxx</span><span class="id"> maxCA</span><span class="id"> maxxx</span><span class="id"> maxC</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> big_cons</span><span class="id"> maxCA</span><span class="id"> IH</span><span class="id"> maxCA</span><span class="id"> [in</span><span class="id"> RHS]big_cons</span><span class="id"> IH</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> bigmaxr_cons</span> (<span class="id">x0</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> lr</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">bigmaxr</span><span class="id"> x0</span> (<span class="id">x</span><span class="id"> ::</span><span class="id"> y</span><span class="id"> ::</span><span class="id"> lr</span>)<span class="id"> =</span><span class="id"> Num</span>.<span class="id">max</span><span class="id"> x</span> (<span class="id">bigmaxr</span><span class="id"> x0</span> (<span class="id">y</span><span class="id"> ::</span><span class="id"> lr</span>)).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> [y</span><span class="id"> ::</span><span class="id"> lr]lock</span><span class="id"> /bigmaxr</span><span class="id"> /=</span><span class="id"> -lock</span><span class="id"> big_cons</span><span class="id"> bigrmax_dflt</span>. Qed.</div></details>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> bigmaxr_ler</span> (<span class="id">x0</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> s</span><span class="id"> i</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="id">i</span><span class="id"> &lt;</span><span class="id"> size</span><span class="id"> s</span>)<span class="id">%N</span><span class="id"> -&gt;</span> (<span class="id">nth</span><span class="id"> x0</span><span class="id"> s</span><span class="id"> i</span>)<span class="id"> &lt;=</span> (<span class="id">bigmaxr</span><span class="id"> x0</span><span class="id"> s</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> /bigmaxr;</span><span class="id"> elim:</span><span class="id"> s</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> h</span><span class="id"> t</span><span class="id"> IH</span><span class="id"> [_|i]</span><span class="id"> /=</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> big_cons</span><span class="id"> /=</span><span class="id"> le_max</span><span class="id"> lexx</span>.<br/>
+<span class="id">rewrite</span><span class="id"> ltnS</span><span class="id"> =&gt;</span><span class="id"> ti;</span><span class="id"> case:</span><span class="id"> t</span><span class="id"> =&gt;</span><span class="id"> [|h'</span><span class="id"> t]</span><span class="id"> //</span><span class="gallina-kwd"> in</span><span class="id"> IH</span><span class="id"> ti</span><span class="id"> *</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> big_cons</span><span class="id"> bigrmax_dflt</span><span class="id"> le_max</span><span class="id"> orbC</span><span class="id"> IH</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> bigmaxr_addr</span> (<span class="id">x0</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> lr</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">bigmaxr</span> (<span class="id">x0</span><span class="id"> +</span><span class="id"> x</span>) (<span class="id">map</span> (<span class="gallina-kwd">fun</span><span class="id"> y</span><span class="id"> :</span><span class="id"> R</span><span class="id"> =&gt;</span><span class="id"> y</span><span class="id"> +</span><span class="id"> x</span>)<span class="id"> lr</span>)<span class="id"> =</span> (<span class="id">bigmaxr</span><span class="id"> x0</span><span class="id"> lr</span>)<span class="id"> +</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> /bigmaxr;</span><span class="id"> case:</span><span class="id"> lr</span><span class="id"> =&gt;</span><span class="id"> [|h</span><span class="id"> t];</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> !big_nil</span>.<br/>
+<span class="id">elim:</span><span class="id"> t</span><span class="id"> h</span><span class="id"> =&gt;</span><span class="id"> /=</span><span class="id"> [|h'</span><span class="id"> t</span><span class="id"> IH]</span><span class="id"> h;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> ?</span>(<span class="id">big_cons,big_nil</span>)<span class="id"> -addr_maxl</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> [in</span><span class="id"> RHS]big_cons</span><span class="id"> bigrmax_dflt</span><span class="id"> addr_maxl</span><span class="id"> -IH</span><span class="id"> big_cons</span><span class="id"> bigrmax_dflt</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> bigmaxr_mem</span> (<span class="id">x0</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> lr</span><span class="id"> :</span> (<span class="id">0</span><span class="id"> &lt;</span><span class="id"> size</span><span class="id"> lr</span>)<span class="id">%N</span><span class="id"> -&gt;</span><span class="id"> bigmaxr</span><span class="id"> x0</span><span class="id"> lr</span><span class="id"> \in</span><span class="id"> lr</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> /bigmaxr;</span><span class="id"> case:</span><span class="id"> lr</span><span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> h</span><span class="id"> t</span><span class="id"> _</span>.<br/>
+<span class="id">elim:</span><span class="id"> t</span><span class="id"> =&gt;</span><span class="id"> //=</span><span class="id"> [|h'</span><span class="id"> t</span><span class="id"> IH]</span><span class="gallina-kwd"> in</span><span class="id"> h</span><span class="id"> *;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> big_cons</span><span class="id"> big_nil</span><span class="id"> inE</span><span class="id"> maxxx</span>.<br/>
+<span class="id">rewrite</span><span class="id"> big_cons</span><span class="id"> bigrmax_dflt</span><span class="id"> inE</span><span class="id"> eq_le;</span><span class="id"> case:</span><span class="id"> lerP</span><span class="id"> =&gt;</span><span class="id"> /=</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> le_max</span><span class="id"> lexx</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> lt_max</span><span class="id"> ltxx</span><span class="id"> =&gt;</span><span class="id"> ?;</span><span class="id"> rewrite</span><span class="id"> max_r</span><span class="id"> ?IH</span><span class="id"> //</span><span class="id"> ltW</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> bigmaxr_mulr</span> (<span class="id">A</span><span class="id"> :</span><span class="id"> finType</span>) (<span class="id">s</span><span class="id"> :</span><span class="id"> seq</span><span class="id"> A</span>) (<span class="id">k</span><span class="id"> :</span><span class="id"> R</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">0</span><span class="id"> &lt;=</span><span class="id"> k</span><span class="id"> -&gt;</span><span class="id"> bigmaxr</span><span class="id"> 0</span> (<span class="id">map</span> (<span class="gallina-kwd">fun</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> k</span><span class="id"> *</span><span class="id"> x</span><span class="id"> i</span>)<span class="id"> s</span>)<span class="id"> =</span><span class="id"> k</span><span class="id"> *</span><span class="id"> bigmaxr</span><span class="id"> 0</span> (<span class="id">map</span><span class="id"> x</span><span class="id"> s</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> k0;</span><span class="id"> elim:</span><span class="id"> s</span><span class="id"> =&gt;</span><span class="id"> /=</span><span class="id"> [|h</span><span class="id"> [/=|h'</span><span class="id"> t</span><span class="id"> ih]]</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> bigmaxr_nil</span><span class="id"> mulr0</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> !bigmaxr_un</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> bigmaxr_cons</span><span class="id"> {}ih</span><span class="id"> bigmaxr_cons</span><span class="id"> maxr_pMr</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> bigmaxr_index</span> (<span class="id">x0</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> lr</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="id">0</span><span class="id"> &lt;</span><span class="id"> size</span><span class="id"> lr</span>)<span class="id">%N</span><span class="id"> -&gt;</span> (<span class="id">index</span> (<span class="id">bigmaxr</span><span class="id"> x0</span><span class="id"> lr</span>)<span class="id"> lr</span><span class="id"> &lt;</span><span class="id"> size</span><span class="id"> lr</span>)<span class="id">%N</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> /bigmaxr;</span><span class="id"> case:</span><span class="id"> lr</span><span class="id"> =&gt;</span><span class="id"> //=</span><span class="id"> h</span><span class="id"> t</span><span class="id"> _;</span><span class="id"> case:</span><span class="id"> ifPn</span><span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> /negbTE</span><span class="id"> H</span>.<br/>
+<span class="id">move:</span> (<span class="id">@bigmaxr_mem</span><span class="id"> x0</span> (<span class="id">h</span><span class="id"> ::</span><span class="id"> t</span>)<span class="id"> isT</span>).<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> ltnS</span><span class="id"> index_mem</span><span class="id"> inE</span><span class="id"> /=</span><span class="id"> eq_sym</span><span class="id"> H</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> bigmaxr_lerP</span> (<span class="id">x0</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> lr</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="id">0</span><span class="id"> &lt;</span><span class="id"> size</span><span class="id"> lr</span>)<span class="id">%N</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">reflect</span> (<span class="gallina-kwd">forall</span><span class="id"> i,</span> (<span class="id">i</span><span class="id"> &lt;</span><span class="id"> size</span><span class="id"> lr</span>)<span class="id">%N</span><span class="id"> -&gt;</span> (<span class="id">nth</span><span class="id"> x0</span><span class="id"> lr</span><span class="id"> i</span>)<span class="id"> &lt;=</span><span class="id"> x</span>) ((<span class="id">bigmaxr</span><span class="id"> x0</span><span class="id"> lr</span>)<span class="id"> &lt;=</span><span class="id"> x</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> lr_size;</span><span class="id"> apply:</span> (<span class="id">iffP</span><span class="id"> idP</span>)<span class="id"> =&gt;</span><span class="id"> [le_x</span><span class="id"> i</span><span class="id"> i_size</span><span class="id"> |</span><span class="id"> H]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span> (<span class="id">le_trans</span><span class="id"> _</span><span class="id"> le_x</span>)<span class="id">;</span><span class="id"> apply:</span><span class="id"> bigmaxr_ler</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move/</span>(<span class="id">nthP</span><span class="id"> x0</span>)<span class="id">:</span> (<span class="id">bigmaxr_mem</span><span class="id"> x0</span><span class="id"> lr_size</span>)<span class="id"> =&gt;</span><span class="id"> [i</span><span class="id"> i_size</span><span class="id"> &lt;-];</span><span class="id"> apply:</span><span class="id"> H</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> bigmaxr_ltrP</span> (<span class="id">x0</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> lr</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="id">0</span><span class="id"> &lt;</span><span class="id"> size</span><span class="id"> lr</span>)<span class="id">%N</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">reflect</span> (<span class="gallina-kwd">forall</span><span class="id"> i,</span> (<span class="id">i</span><span class="id"> &lt;</span><span class="id"> size</span><span class="id"> lr</span>)<span class="id">%N</span><span class="id"> -&gt;</span> (<span class="id">nth</span><span class="id"> x0</span><span class="id"> lr</span><span class="id"> i</span>)<span class="id"> &lt;</span><span class="id"> x</span>) ((<span class="id">bigmaxr</span><span class="id"> x0</span><span class="id"> lr</span>)<span class="id"> &lt;</span><span class="id"> x</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> lr_size;</span><span class="id"> apply:</span> (<span class="id">iffP</span><span class="id"> idP</span>)<span class="id"> =&gt;</span><span class="id"> [lt_x</span><span class="id"> i</span><span class="id"> i_size</span><span class="id"> |</span><span class="id"> H]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> le_lt_trans</span><span class="id"> lt_x;</span><span class="id"> apply:</span><span class="id"> bigmaxr_ler</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move/</span>(<span class="id">nthP</span><span class="id"> x0</span>)<span class="id">:</span> (<span class="id">bigmaxr_mem</span><span class="id"> x0</span><span class="id"> lr_size</span>)<span class="id"> =&gt;</span><span class="id"> [i</span><span class="id"> i_size</span><span class="id"> &lt;-];</span><span class="id"> apply:</span><span class="id"> H</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> bigmaxrP</span> (<span class="id">x0</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> lr</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="id">x</span><span class="id"> \in</span><span class="id"> lr</span><span class="id"> /\</span><span class="gallina-kwd"> forall</span><span class="id"> i,</span> (<span class="id">i</span><span class="id"> &lt;</span><span class="id"> size</span><span class="id"> lr</span>)<span class="id"> %N</span><span class="id"> -&gt;</span> (<span class="id">nth</span><span class="id"> x0</span><span class="id"> lr</span><span class="id"> i</span>)<span class="id"> &lt;=</span><span class="id"> x</span>)<span class="id"> -&gt;</span> (<span class="id">bigmaxr</span><span class="id"> x0</span><span class="id"> lr</span><span class="id"> =</span><span class="id"> x</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> []</span><span class="id"> /</span>(<span class="id">nthP</span><span class="id"> x0</span>)<span class="id"> []</span><span class="id"> j</span><span class="id"> j_size</span><span class="id"> j_nth</span><span class="id"> x_ler;</span><span class="id"> apply:</span><span class="id"> le_anti;</span><span class="id"> apply/andP;</span><span class="id"> split</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply/bigmaxr_lerP</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> apply:</span> (<span class="id">leq_trans</span><span class="id"> _</span><span class="id"> j_size</span>).<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -j_nth</span> (<span class="id">bigmaxr_ler</span><span class="id"> _</span><span class="id"> j_size</span>).<br/>
+Qed.</div></details>
+<br/>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> bigmaxr_lerif</span> (<span class="id">x0</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> lr</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">uniq</span><span class="id"> lr</span><span class="id"> -&gt;</span><span class="gallina-kwd"> forall</span><span class="id"> i,</span> (<span class="id">i</span><span class="id"> &lt;</span><span class="id"> size</span><span class="id"> lr</span>)<span class="id">%N</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">nth</span><span class="id"> x0</span><span class="id"> lr</span><span class="id"> i</span>)<span class="id"> &lt;=</span> (<span class="id">bigmaxr</span><span class="id"> x0</span><span class="id"> lr</span>)<span class="id"> ?=</span><span class="id"> iff</span> (<span class="id">i</span><span class="id"> ==</span><span class="id"> index</span> (<span class="id">bigmaxr</span><span class="id"> x0</span><span class="id"> lr</span>)<span class="id"> lr</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> lr_uniq</span><span class="id"> i</span><span class="id"> i_size;</span><span class="id"> rewrite</span><span class="id"> /Num</span>.<span class="id">leif</span> (<span class="id">bigmaxr_ler</span><span class="id"> _</span><span class="id"> i_size</span>).<br/>
+<span class="id">rewrite</span><span class="id"> -</span>(<span class="id">nth_uniq</span><span class="id"> x0</span><span class="id"> i_size</span> (<span class="id">bigmaxr_index</span><span class="id"> _</span> (<span class="id">leq_trans</span><span class="id"> _</span><span class="id"> i_size</span>))<span class="id"> lr_uniq</span>)<span class="id"> //</span>.<br/>
+<span class="id">rewrite</span><span class="id"> nth_index</span><span class="id"> //</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> bigmaxr_mem;</span><span class="id"> apply:</span> (<span class="id">leq_trans</span><span class="id"> _</span><span class="id"> i_size</span>).<br/>
+Qed.</div></details>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Definition</span><span class="id"> bmaxrf</span><span class="id"> n</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> {ffun</span><span class="id"> 'I_n</span>.<span class="id">+1</span><span class="id"> -&gt;</span><span class="id"> R}</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">bigmaxr</span> (<span class="id">f</span><span class="id"> ord0</span>) (<span class="id">codom</span><span class="id"> f</span>).<br/>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> bmaxrf_ler</span><span class="id"> n</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> {ffun</span><span class="id"> 'I_n</span>.<span class="id">+1</span><span class="id"> -&gt;</span><span class="id"> R}</span>)<span class="id"> i</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="id">f</span><span class="id"> i</span>)<span class="id"> &lt;=</span> (<span class="id">bmaxrf</span><span class="id"> f</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move:</span> (<span class="id">@bigmaxr_ler</span> (<span class="id">f</span><span class="id"> ord0</span>) (<span class="id">codom</span><span class="id"> f</span>) (<span class="id">nat_of_ord</span><span class="id"> i</span>)).<br/>
+<span class="id">rewrite</span><span class="id"> /bmaxrf</span><span class="id"> size_codom</span><span class="id"> card_ord</span><span class="id"> =&gt;</span><span class="id"> H;</span><span class="id"> move:</span> (<span class="id">ltn_ord</span><span class="id"> i</span>)<span class="id">;</span><span class="id"> move/H</span>.<br/>
+<span class="id">suff</span><span class="id"> -&gt;</span><span class="id"> :</span><span class="id"> nth</span> (<span class="id">f</span><span class="id"> ord0</span>) (<span class="id">codom</span><span class="id"> f</span>)<span class="id"> i</span><span class="id"> =</span><span class="id"> f</span><span class="id"> i;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> []</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /codom</span> (<span class="id">nth_map</span><span class="id"> ord0</span>)<span class="id"> ?size_enum_ord</span><span class="id"> //</span><span class="id"> nth_ord_enum</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> bmaxrf_index</span><span class="id"> n</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> {ffun</span><span class="id"> 'I_n</span>.<span class="id">+1</span><span class="id"> -&gt;</span><span class="id"> R}</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="id">index</span> (<span class="id">bmaxrf</span><span class="id"> f</span>) (<span class="id">codom</span><span class="id"> f</span>)<span class="id"> &lt;</span><span class="id"> n</span>.<span class="id">+1</span>)<span class="id">%N</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> /bmaxrf</span>.<br/>
+<span class="id">rewrite</span><span class="id"> [in</span><span class="id"> X</span><span class="gallina-kwd"> in</span> (_<span class="id"> &lt;</span><span class="id"> X</span>)<span class="id">%N]</span>(_<span class="id"> :</span><span class="id"> n</span>.<span class="id">+1</span><span class="id"> =</span><span class="id"> size</span> (<span class="id">codom</span><span class="id"> f</span>))<span class="id">;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> size_codom</span><span class="id"> card_ord</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> bigmaxr_index;</span><span class="id"> rewrite</span><span class="id"> size_codom</span><span class="id"> card_ord</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Definition</span><span class="id"> index_bmaxrf</span><span class="id"> n</span><span class="id"> f</span><span class="id"> :=</span><span class="id"> Ordinal</span> (<span class="id">@bmaxrf_index</span><span class="id"> n</span><span class="id"> f</span>).<br/>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> ordnat</span><span class="id"> i</span><span class="id"> n</span> (<span class="id">ord_i</span><span class="id"> :</span> (<span class="id">i</span><span class="id"> &lt;</span><span class="id"> n</span>)<span class="id">%N</span>)<span class="id"> :</span><span class="id"> i</span><span class="id"> =</span><span class="id"> Ordinal</span><span class="id"> ord_i</span><span class="id"> :&gt;</span><span class="id"> nat</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> eq_index_bmaxrf</span><span class="id"> n</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> {ffun</span><span class="id"> 'I_n</span>.<span class="id">+1</span><span class="id"> -&gt;</span><span class="id"> R}</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">f</span> (<span class="id">index_bmaxrf</span><span class="id"> f</span>)<span class="id"> =</span><span class="id"> bmaxrf</span><span class="id"> f</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move:</span> (<span class="id">bmaxrf_index</span><span class="id"> f</span>).<br/>
+<span class="id">rewrite</span><span class="id"> -[X</span><span class="gallina-kwd"> in</span><span class="id"> _</span> (_<span class="id"> &lt;</span><span class="id"> X</span>)<span class="id">%N]card_ord</span><span class="id"> -</span>(<span class="id">size_codom</span><span class="id"> f</span>)<span class="id"> index_mem</span>.<br/>
+<span class="id">move/</span>(<span class="id">nth_index</span> (<span class="id">f</span><span class="id"> ord0</span>))<span class="id"> =&gt;</span><span class="id"> &lt;-;</span><span class="id"> rewrite</span> (<span class="id">nth_map</span><span class="id"> ord0</span>).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span> (<span class="id">ordnat</span> (<span class="id">bmaxrf_index</span><span class="id"> _</span>))<span class="id"> /index_bmaxrf</span><span class="id"> nth_ord_enum</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> size_enum_ord;</span><span class="id"> apply:</span><span class="id"> bmaxrf_index</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">note=</span><span class="id">&quot;To be removed. Use topology.v's bigmax/min lemmas instead.&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> bmaxrf_lerif</span><span class="id"> n</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> {ffun</span><span class="id"> 'I_n</span>.<span class="id">+1</span><span class="id"> -&gt;</span><span class="id"> R}</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">injective</span><span class="id"> f</span><span class="id"> -&gt;</span><span class="gallina-kwd"> forall</span><span class="id"> i,</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">f</span><span class="id"> i</span>)<span class="id"> &lt;=</span> (<span class="id">bmaxrf</span><span class="id"> f</span>)<span class="id"> ?=</span><span class="id"> iff</span> (<span class="id">i</span><span class="id"> ==</span><span class="id"> index_bmaxrf</span><span class="id"> f</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> inj_f</span><span class="id"> i;</span><span class="id"> rewrite</span><span class="id"> /Num</span>.<span class="id">leif</span><span class="id"> bmaxrf_ler</span><span class="id"> -</span>(<span class="id">inj_eq</span><span class="id"> inj_f</span>)<span class="id"> eq_index_bmaxrf</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> bigmaxr</span>.<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> ssreal_struct_contd</span>.<br/>
+
+      <div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/">a fork of coq2html</a></div>
+    </div>
+  </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module mathcomp.reals.nsatz_realtype</title>
+<meta name="description" content="Documentation of Coq module mathcomp.reals.nsatz_realtype" />
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="init()">
+
+  <main>
+    <div class="sidebar">
+      <h2>Files</h2>
+      
+    </div>
+
+  <div class="coq">
+
+    <div class="content">
+      <p><a href="./index.html">Top</a></p>
+      <h1 class="title">Module mathcomp.reals.nsatz_realtype</h1>
+<span class="vernacular">From</span><span class="id"> Coq</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> Nsatz</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> all_ssreflect</span><span class="id"> ssralg</span><span class="id"> ssrint</span><span class="id"> ssrnum</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> boolp</span><span class="id"> reals</span><span class="id"> constructive_ereal</span>.<br/>
+<br/>
+<div class="ssrdoc md">
+# nsatz for realType
+
+This file registers the ring corresponding to the MathComp-Analysis type
+realType to the tactic nsatz of Coq. This enables some automation used for
+example in the file trigo.v.
+
+Reference:
+- https://coq.inria.fr/refman/addendum/nsatz.html
+
+</div>
+<br/>
+<span class="vernacular">Import</span><span class="id"> GRing</span>.<span class="id">Theory</span><span class="id"> Num</span>.<span class="id">Theory</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ring_scope</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> Nsatz_realType</span>.<br/>
+<span class="vernacular">Variable</span><span class="id"> T</span><span class="id"> :</span><span class="id"> realType</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> Nsatz_realType_Setoid_Theory</span><span class="id"> :</span><span class="id"> Setoid</span>.<span class="id">Setoid_Theory</span><span class="id"> T</span> (<span class="id">@eq</span><span class="id"> T</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> constructor</span><span class="id"> =&gt;</span><span class="id"> [x</span><span class="id"> //|x</span><span class="id"> y</span><span class="id"> //|x</span><span class="id"> y</span><span class="id"> z</span><span class="id"> -&gt;]</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> Nsatz_realType0</span><span class="id"> :=</span> (<span class="id">0%:R</span><span class="id"> :</span><span class="id"> T</span>).<br/>
+<span class="vernacular">Definition</span><span class="id"> Nsatz_realType1</span><span class="id"> :=</span> (<span class="id">1%:R</span><span class="id"> :</span><span class="id"> T</span>).<br/>
+<span class="vernacular">Definition</span><span class="id"> Nsatz_realType_add</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> T</span>)<span class="id"> :=</span> (<span class="id">x</span><span class="id"> +</span><span class="id"> y</span>)<span class="id">%R</span>.<br/>
+<span class="vernacular">Definition</span><span class="id"> Nsatz_realType_mul</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> T</span>)<span class="id"> :=</span> (<span class="id">x</span><span class="id"> *</span><span class="id"> y</span>)<span class="id">%R</span>.<br/>
+<span class="vernacular">Definition</span><span class="id"> Nsatz_realType_sub</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> T</span>)<span class="id"> :=</span> (<span class="id">x</span><span class="id"> -</span><span class="id"> y</span>)<span class="id">%R</span>.<br/>
+<span class="vernacular">Definition</span><span class="id"> Nsatz_realType_opp</span> (<span class="id">x</span> <span class="id"> :</span><span class="id"> T</span>)<span class="id"> :=</span> (<span class="id">-</span><span class="id"> x</span>)<span class="id">%R</span>.<br/>
+<br/>
+<span class="id">#[global]</span><br/>
+<span class="vernacular">Instance</span><span class="id"> Nsatz_realType_Ring_ops:</span><br/>
+&nbsp;&nbsp;&nbsp;(<span class="id">@Ncring</span>.<span class="id">Ring_ops</span><span class="id"> T</span><span class="id"> Nsatz_realType0</span><span class="id"> Nsatz_realType1</span><br/>
+&nbsp;&nbsp;<span class="id">Nsatz_realType_add</span><br/>
+&nbsp;&nbsp;<span class="id">Nsatz_realType_mul</span><br/>
+&nbsp;&nbsp;<span class="id">Nsatz_realType_sub</span><br/>
+&nbsp;&nbsp;<span class="id">Nsatz_realType_opp</span> (<span class="id">@eq</span><span class="id"> T</span>)).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+Defined.</div></details>
+<br/>
+<span class="id">#[global]</span><br/>
+<span class="vernacular">Instance</span><span class="id"> Nsatz_realType_Ring</span><span class="id"> :</span> (<span class="id">Ncring</span>.<span class="id">Ring</span> (<span class="id">Ro:=Nsatz_realType_Ring_ops</span>)).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">constructor</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+<span class="id">-</span><span class="id"> exact:</span><span class="id"> Nsatz_realType_Setoid_Theory</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> x</span><span class="id"> y</span><span class="id"> -&gt;</span><span class="id"> x1</span><span class="id"> y1</span><span class="id"> -&gt;</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> x</span><span class="id"> y</span><span class="id"> -&gt;</span><span class="id"> x1</span><span class="id"> y1</span><span class="id"> -&gt;</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> x</span><span class="id"> y</span><span class="id"> -&gt;</span><span class="id"> x1</span><span class="id"> y1</span><span class="id"> -&gt;</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> x</span><span class="id"> y</span><span class="id"> -&gt;</span>.<br/>
+<span class="id">-</span><span class="id"> exact:</span><span class="id"> add0r</span>.<br/>
+<span class="id">-</span><span class="id"> exact:</span><span class="id"> addrC</span>.<br/>
+<span class="id">-</span><span class="id"> exact:</span><span class="id"> addrA</span>.<br/>
+<span class="id">-</span><span class="id"> exact:</span><span class="id"> mul1r</span>.<br/>
+<span class="id">-</span><span class="id"> exact:</span><span class="id"> mulr1</span>.<br/>
+<span class="id">-</span><span class="id"> exact:</span><span class="id"> mulrA</span>.<br/>
+<span class="id">-</span><span class="id"> exact:</span><span class="id"> mulrDl</span>.<br/>
+<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> x</span><span class="id"> y</span><span class="id"> z;</span><span class="id"> exact:</span><span class="id"> mulrDr</span>.<br/>
+<span class="id">-</span><span class="id"> exact:</span><span class="id"> subrr</span>.<br/>
+Defined.</div></details>
+<br/>
+<span class="id">#[global]</span><br/>
+<span class="vernacular">Instance</span><span class="id"> Nsatz_realType_Cring:</span> (<span class="id">Cring</span>.<span class="id">Cring</span> (<span class="id">Rr:=Nsatz_realType_Ring</span>)).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact:</span><span class="id"> mulrC</span>. Defined.</div></details>
+<br/>
+<span class="id">#[global]</span><br/>
+<span class="vernacular">Instance</span><span class="id"> Nsatz_realType_Integral_domain</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;&nbsp;(<span class="id">Integral_domain</span>.<span class="id">Integral_domain</span> (<span class="id">Rcr:=Nsatz_realType_Cring</span>)).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">constructor</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> x</span><span class="id"> y</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[_</span><span class="id"> _</span><span class="id"> Algebra_syntax</span>.<span class="id">zero]/</span>(<span class="id">x</span><span class="id"> *</span><span class="id"> y</span><span class="id"> =</span><span class="id"> 0</span>)<span class="id">%R</span><span class="id"> =&gt;</span><span class="id"> /eqP</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> mulf_eq0</span><span class="id"> =&gt;</span><span class="id"> /orP[]</span><span class="id"> /eqP-&gt;;</span><span class="id"> [left</span><span class="id"> |</span><span class="id"> right]</span>.<br/>
+<span class="id">rewrite</span><span class="id"> -[_</span><span class="id"> _</span><span class="id"> Algebra_syntax</span>.<span class="id">zero]/</span>(<span class="id">1</span><span class="id"> =</span><span class="id"> 0</span>)<span class="id">%R;</span><span class="id"> apply/eqP</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span> (<span class="id">eqr_nat</span><span class="id"> T</span><span class="id"> 1</span><span class="id"> 0</span>).<br/>
+Defined.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> Nsatz_realType</span>.<br/>
+<br/>
+<span class="vernacular">Tactic</span><span class="vernacular"> Notation</span> <span class="id">&quot;nsatz&quot;</span><span class="id"> :=</span><span class="id"> nsatz_default</span>.<br/>
+
+      <div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/">a fork of coq2html</a></div>
+    </div>
+  </div>
+    </main>
+</body>
+</html>

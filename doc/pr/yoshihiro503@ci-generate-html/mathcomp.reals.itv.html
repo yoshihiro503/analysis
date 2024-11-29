@@ -1,0 +1,1039 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module mathcomp.reals.itv</title>
+<meta name="description" content="Documentation of Coq module mathcomp.reals.itv" />
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="init()">
+
+  <main>
+    <div class="sidebar">
+      <h2>Files</h2>
+      
+    </div>
+
+  <div class="coq">
+
+    <div class="content">
+      <p><a href="./index.html">Top</a></p>
+      <h1 class="title">Module mathcomp.reals.itv</h1>
+<span class="vernacular">From</span><span class="id"> HB</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> structures</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> ssreflect</span><span class="id"> ssrfun</span><span class="id"> ssrbool</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> ssrnat</span><span class="id"> eqtype</span><span class="id"> choice</span><span class="id"> order</span><span class="id"> ssralg</span><span class="id"> ssrnum</span><span class="id"> ssrint</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> interval</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> mathcomp_extra</span><span class="id"> boolp</span><span class="id"> signed</span>.<br/>
+<br/>
+<div class="ssrdoc md">
+# Numbers within an interval
+
+This file develops tools to make the manipulation of numbers within
+a known interval easier, thanks to canonical structures. This adds types
+like {itv R &amp; `[a, b]}, a notation e%:itv that infers an enclosing
+interval for expression e according to existing canonical instances and
+%:inum to cast back from type {itv R &amp; i} to R.
+For instance, x : {i01 R}, we have (1 - x%:inum)%:itv : {i01 R}
+automatically inferred.
+
+## types for values within known interval
+```
+      {i01 R} == interface type for elements in R that live in `[0, 1];
+                 R must have a numDomainType structure.
+                 Allows to solve automatically goals of the form x &gt;= 0
+                 and x &lt;= 1 if x is canonically a {i01 R}. {i01 R} is
+                 canonically stable by common operations.
+  {itv R &amp; i} == more generic type of values in interval i : interval int
+                 R must have a numDomainType structure. This type is shown
+                 to be a porderType.
+```
+
+## casts from/to values within known interval
+```
+       x%:itv == explicitly casts x to the most precise known {itv R &amp; i}
+                 according to existing canonical instances.
+       x%:i01 == explicitly casts x to {i01 R} according to existing
+                 canonical instances.
+      x%:inum == explicit cast from {itv R &amp; i} to R.
+```
+
+## sign proofs
+```
+   [itv of x] == proof that x is in interval inferred by x%:itv
+    [lb of x] == proof that lb &lt; x or lb &lt;= x with lb the lower bound
+                 inferred by x%:itv
+    [ub of x] == proof that x &lt; ub or x &lt;= ub with ub the upper bound
+                 inferred by x%:itv
+   [lbe of x] == proof that lb &lt;= x
+   [ube of x] == proof that x &lt;= ub
+```
+
+## constructors
+```
+   ItvNum xin == builds a {itv R &amp; i} from a proof xin : x \in i
+                 where x : R
+```
+
+A number of canonical instances are provided for common operations, if
+your favorite operator is missing, look below for examples on how to add
+the appropriate Canonical.
+Canonical instances are also provided according to types, as a
+fallback when no known operator appears in the expression. Look to
+itv_top_typ below for an example on how to add your favorite type.
+</div>
+<br/>
+<span class="vernacular">Reserved</span><span class="vernacular"> Notation</span> <span class="id">&quot;{ 'itv' R &amp; i }&quot;</span><br/>
+&nbsp;&nbsp;(<span class="gallina-kwd">at</span><span class="id"> level</span><span class="id"> 0,</span><span class="id"> R</span><span class="gallina-kwd"> at</span><span class="id"> level</span><span class="id"> 200,</span><span class="id"> i</span><span class="gallina-kwd"> at</span><span class="id"> level</span><span class="id"> 200,</span><span class="id"> format</span> <span class="id">&quot;{ 'itv'  R  &amp;  i }&quot;</span>).<br/>
+<span class="vernacular">Reserved</span><span class="vernacular"> Notation</span> <span class="id">&quot;{ 'i01' R }&quot;</span><br/>
+&nbsp;&nbsp;(<span class="gallina-kwd">at</span><span class="id"> level</span><span class="id"> 0,</span><span class="id"> R</span><span class="gallina-kwd"> at</span><span class="id"> level</span><span class="id"> 200,</span><span class="id"> format</span> <span class="id">&quot;{ 'i01'  R }&quot;</span>).<br/>
+<br/>
+<span class="vernacular">Reserved</span><span class="vernacular"> Notation</span> <span class="id">&quot;x %:itv&quot;</span> (<span class="gallina-kwd">at</span><span class="id"> level</span><span class="id"> 2,</span><span class="id"> format</span> <span class="id">&quot;x %:itv&quot;</span>).<br/>
+<span class="vernacular">Reserved</span><span class="vernacular"> Notation</span> <span class="id">&quot;x %:i01&quot;</span> (<span class="gallina-kwd">at</span><span class="id"> level</span><span class="id"> 2,</span><span class="id"> format</span> <span class="id">&quot;x %:i01&quot;</span>).<br/>
+<span class="vernacular">Reserved</span><span class="vernacular"> Notation</span> <span class="id">&quot;x %:inum&quot;</span> (<span class="gallina-kwd">at</span><span class="id"> level</span><span class="id"> 2,</span><span class="id"> format</span> <span class="id">&quot;x %:inum&quot;</span>).<br/>
+<span class="vernacular">Reserved</span><span class="vernacular"> Notation</span> <span class="id">&quot;[ 'itv' 'of' x ]&quot;</span> (<span class="id">format</span> <span class="id">&quot;[ 'itv' 'of'  x ]&quot;</span>).<br/>
+<span class="vernacular">Reserved</span><span class="vernacular"> Notation</span> <span class="id">&quot;[ 'lb' 'of' x ]&quot;</span> (<span class="id">format</span> <span class="id">&quot;[ 'lb' 'of'  x ]&quot;</span>).<br/>
+<span class="vernacular">Reserved</span><span class="vernacular"> Notation</span> <span class="id">&quot;[ 'ub' 'of' x ]&quot;</span> (<span class="id">format</span> <span class="id">&quot;[ 'ub' 'of'  x ]&quot;</span>).<br/>
+<span class="vernacular">Reserved</span><span class="vernacular"> Notation</span> <span class="id">&quot;[ 'lbe' 'of' x ]&quot;</span> (<span class="id">format</span> <span class="id">&quot;[ 'lbe' 'of'  x ]&quot;</span>).<br/>
+<span class="vernacular">Reserved</span><span class="vernacular"> Notation</span> <span class="id">&quot;[ 'ube' 'of' x ]&quot;</span> (<span class="id">format</span> <span class="id">&quot;[ 'ube' 'of'  x ]&quot;</span>).<br/>
+<br/>
+<span class="gallina-kwd">Set</span><span class="vernacular"> Implicit</span><span class="vernacular"> Arguments</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Strict</span><span class="vernacular"> Implicit</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Printing</span><span class="vernacular"> Implicit</span><span class="vernacular"> Defensive</span>.<br/>
+<span class="vernacular">Import</span><span class="id"> Order</span>.<span class="id">TTheory</span><span class="id"> Order</span>.<span class="id">Syntax</span>.<br/>
+<span class="vernacular">Import</span><span class="id"> GRing</span>.<span class="id">Theory</span><span class="id"> Num</span>.<span class="id">Theory</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ring_scope</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> order_scope</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> wider_itv</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> int</span>)<span class="id"> :=</span><span class="id"> subitv</span><span class="id"> y</span><span class="id"> x</span>.<br/>
+<br/>
+<span class="vernacular">Module</span><span class="id"> Itv</span>.<br/>
+<span class="vernacular">Section</span><span class="id"> Itv</span>.<br/>
+<span class="vernacular">Context</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> numDomainType</span>).<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> map_itv_bound</span><span class="id"> S</span><span class="id"> T</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> S</span><span class="id"> -&gt;</span><span class="id"> T</span>) (<span class="id">b</span><span class="id"> :</span><span class="id"> itv_bound</span><span class="id"> S</span>)<span class="id"> :</span><span class="id"> itv_bound</span><span class="id"> T</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">match</span><span class="id"> b</span><span class="gallina-kwd"> with</span><br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> BSide</span><span class="id"> b</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> BSide</span><span class="id"> b</span> (<span class="id">f</span><span class="id"> x</span>)<br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> BInfty</span><span class="id"> b</span><span class="id"> =&gt;</span><span class="id"> BInfty</span><span class="id"> _</span><span class="id"> b</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">end</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> map_itv</span><span class="id"> S</span><span class="id"> T</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> S</span><span class="id"> -&gt;</span><span class="id"> T</span>) (<span class="id">i</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> S</span>)<span class="id"> :</span><span class="id"> interval</span><span class="id"> T</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">let</span><span class="id"> 'Interval</span><span class="id"> l</span><span class="id"> u</span><span class="id"> :=</span><span class="id"> i</span><span class="gallina-kwd"> in</span><span class="id"> Interval</span> (<span class="id">map_itv_bound</span><span class="id"> f</span><span class="id"> l</span>) (<span class="id">map_itv_bound</span><span class="id"> f</span><span class="id"> u</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> le_map_itv_bound</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> itv_bound</span><span class="id"> int</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">x</span><span class="id"> &lt;=</span><span class="id"> y</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">map_itv_bound</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> x%:~R</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> x</span><span class="id"> &lt;=</span><span class="id"> map_itv_bound</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> x%:~R</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> y</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move:</span><span class="id"> x</span><span class="id"> y</span><span class="id"> =&gt;</span><span class="id"> [xb</span><span class="id"> x</span><span class="id"> |</span><span class="id"> []xb</span><span class="id"> //=];</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> case:</span><span class="id"> xb</span>.<br/>
+<span class="id">case=&gt;</span><span class="id"> [yb</span><span class="id"> y</span><span class="id"> /=|//]</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /Order</span>.<span class="id">le/=;</span><span class="id"> case:</span> (_<span class="id"> ==&gt;</span><span class="id"> _</span>)<span class="id"> =&gt;</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> ?ler_int//</span><span class="id"> ltr_int</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> subitv_map_itv</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> int</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">x</span><span class="id"> &lt;=</span><span class="id"> y</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">map_itv</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> x%:~R</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> x</span><span class="id"> &lt;=</span><span class="id"> map_itv</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> x%:~R</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> y</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move:</span><span class="id"> x</span><span class="id"> y</span><span class="id"> =&gt;</span><span class="id"> [lx</span><span class="id"> ux]</span><span class="id"> [ly</span><span class="id"> uy]</span><span class="id"> /andP[lel</span><span class="id"> leu]</span>.<br/>
+<span class="id">apply/andP;</span><span class="id"> split;</span><span class="id"> exact:</span><span class="id"> le_map_itv_bound</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> itv_cond</span> (<span class="id">i</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> int</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">x</span><span class="id"> \in</span><span class="id"> map_itv</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> x%:~R</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> i</span>.<br/>
+<br/>
+<span class="vernacular">Record</span><span class="id"> def</span> (<span class="id">i</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> int</span>)<span class="id"> :=</span><span class="id"> Def</span><span class="id"> {</span><br/>
+&nbsp;&nbsp;<span class="id">r</span><span class="id"> :&gt;</span><span class="id"> R;</span><br/>
+&nbsp;&nbsp;<span class="id">#[canonical=no]</span><br/>
+&nbsp;&nbsp;<span class="id">P</span><span class="id"> :</span><span class="id"> itv_cond</span><span class="id"> i</span><span class="id"> r</span><br/>
+<span class="id">}</span>.<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> Itv</span>.<br/>
+<br/>
+<span class="vernacular">Notation</span><span class="id"> spec</span><span class="id"> i</span><span class="id"> x</span><span class="id"> :=</span> (<span class="id">itv_cond</span><span class="id"> i%Z%R</span><span class="id"> x</span>).<br/>
+<br/>
+<span class="vernacular">Record</span><span class="id"> typ</span><span class="id"> :=</span><span class="id"> Typ</span><span class="id"> {</span><br/>
+&nbsp;&nbsp;<span class="id">sort</span><span class="id"> :</span><span class="id"> numDomainType;</span><br/>
+&nbsp;&nbsp;<span class="id">#[canonical=no]</span><br/>
+&nbsp;&nbsp;<span class="id">sort_itv</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> int;</span><br/>
+&nbsp;&nbsp;<span class="id">#[canonical=no]</span><br/>
+&nbsp;&nbsp;<span class="id">allP</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> x</span><span class="id"> :</span><span class="id"> sort,</span><span class="id"> spec</span><span class="id"> sort_itv</span><span class="id"> x</span><br/>
+<span class="id">}</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> mk</span><span class="id"> {R}</span><span class="id"> i</span><span class="id"> r</span><span class="id"> P</span><span class="id"> :</span><span class="id"> @def</span><span class="id"> R</span><span class="id"> i</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">@Def</span><span class="id"> R</span><span class="id"> i</span><span class="id"> r</span><span class="id"> P</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> from</span><span class="id"> {R</span><span class="id"> i}</span><br/>
+&nbsp;&nbsp;<span class="id">{x</span><span class="id"> :</span><span class="id"> @def</span><span class="id"> R</span><span class="id"> i}</span> (<span class="id">phx</span><span class="id"> :</span><span class="id"> phantom</span><span class="id"> R</span><span class="id"> x</span>)<span class="id"> :=</span><span class="id"> x</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> fromP</span><span class="id"> {R</span><span class="id"> i}</span><br/>
+&nbsp;&nbsp;<span class="id">{x</span><span class="id"> :</span><span class="id"> @def</span><span class="id"> R</span><span class="id"> i}</span> (<span class="id">phx</span><span class="id"> :</span><span class="id"> phantom</span><span class="id"> R</span><span class="id"> x</span>)<span class="id"> :=</span><span class="id"> P</span><span class="id"> x</span>.<br/>
+<br/>
+<span class="vernacular">Module</span><span class="vernacular"> Exports</span>.<br/>
+<span class="vernacular">Notation</span> <span class="id">&quot;{ 'itv' R &amp; i }&quot;</span><span class="id"> :=</span> (<span class="id">def</span><span class="id"> R</span><span class="id"> i%Z</span>)<span class="id"> :</span><span class="id"> type_scope</span>.<br/>
+<span class="vernacular">Notation</span> <span class="id">&quot;{ 'i01' R }&quot;</span><span class="id"> :=</span> (<span class="id">def</span><span class="id"> R</span><span class="id"> `[Posz</span><span class="id"> 0,</span><span class="id"> Posz</span><span class="id"> 1]</span>)<span class="id"> :</span><span class="id"> type_scope</span>.<br/>
+<span class="vernacular">Notation</span> <span class="id">&quot;x %:itv&quot;</span><span class="id"> :=</span> (<span class="id">from</span> (<span class="id">Phantom</span><span class="id"> _</span><span class="id"> x</span>))<span class="id"> :</span><span class="id"> ring_scope</span>.<br/>
+<span class="vernacular">Notation</span> <span class="id">&quot;[ 'itv' 'of' x ]&quot;</span><span class="id"> :=</span> (<span class="id">fromP</span> (<span class="id">Phantom</span><span class="id"> _</span><span class="id"> x</span>))<span class="id"> :</span><span class="id"> ring_scope</span>.<br/>
+<span class="vernacular">Notation</span><span class="id"> inum</span><span class="id"> :=</span><span class="id"> r</span>.<br/>
+<span class="vernacular">Notation</span> <span class="id">&quot;x %:inum&quot;</span><span class="id"> :=</span> (<span class="id">r</span><span class="id"> x</span>)<span class="id"> :</span><span class="id"> ring_scope</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> r</span><span class="id"> {R</span><span class="id"> i}</span>.<br/>
+<span class="vernacular">End</span><span class="vernacular"> Exports</span>.<br/>
+<span class="vernacular">End</span><span class="id"> Itv</span>.<br/>
+<span class="vernacular">Export</span><span class="id"> Itv</span>.<span class="vernacular">Exports</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> POrder</span>.<br/>
+<span class="vernacular">Variables</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> numDomainType</span>) (<span class="id">i</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> int</span>).<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Notation</span><span class="id"> nR</span><span class="id"> :=</span><span class="id"> {itv</span><span class="id"> R</span><span class="id"> &amp;</span><span class="id"> i}</span>.<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> [isSub</span><span class="gallina-kwd"> for</span><span class="id"> @Itv</span>.<span class="id">r</span><span class="id"> R</span><span class="id"> i]</span>.<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> [Choice</span><span class="id"> of</span><span class="id"> nR</span><span class="gallina-kwd"> by</span><span class="id"> &lt;:]</span>.<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> [SubChoice_isSubPOrder</span><span class="id"> of</span><span class="id"> nR</span><span class="gallina-kwd"> by</span><span class="id"> &lt;:</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">with</span><span class="id"> ring_display]</span>.<br/>
+<span class="vernacular">End</span><span class="id"> POrder</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> itv_top_typ_subproof</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> numDomainType</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">Itv</span>.<span class="id">spec</span><span class="id"> `]-oo,</span><span class="id"> +oo[</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Canonical</span><span class="id"> itv_top_typ</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> numDomainType</span>)<span class="id"> :=</span><span class="id"> Itv</span>.<span class="id">Typ</span> (<span class="id">@itv_top_typ_subproof</span><span class="id"> R</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> typ_inum_subproof</span> (<span class="id">xt</span><span class="id"> :</span><span class="id"> Itv</span>.<span class="id">typ</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> Itv</span>.<span class="id">sort</span><span class="id"> xt</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">Itv</span>.<span class="id">spec</span> (<span class="id">Itv</span>.<span class="id">sort_itv</span><span class="id"> xt</span>)<span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move:</span><span class="id"> xt</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> []</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Canonical</span><span class="id"> typ_inum</span> (<span class="id">xt</span><span class="id"> :</span><span class="id"> Itv</span>.<span class="id">typ</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> Itv</span>.<span class="id">sort</span><span class="id"> xt</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">Itv</span>.<span class="id">mk</span> (<span class="id">typ_inum_subproof</span><span class="id"> x</span>).<br/>
+<br/>
+<span class="vernacular">Notation</span><span class="id"> unify_itv</span><span class="id"> ix</span><span class="id"> iy</span><span class="id"> :=</span> (<span class="id">unify</span><span class="id"> wider_itv</span><span class="id"> ix</span><span class="id"> iy</span>).<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> Theory</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> {i</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> int}</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Notation</span><span class="id"> sT</span><span class="id"> :=</span><span class="id"> {itv</span><span class="id"> R</span><span class="id"> &amp;</span><span class="id"> i}</span>.<br/>
+<span class="vernacular">Implicit</span><span class="gallina-kwd"> Type</span><span class="id"> x</span><span class="id"> :</span><span class="id"> sT</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> itv_intro</span><span class="id"> {x}</span><span class="id"> :</span><span class="id"> x%:inum</span><span class="id"> =</span><span class="id"> x%:inum</span><span class="id"> :&gt;</span><span class="id"> R</span><br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> empty_itv</span><span class="id"> :=</span><span class="id"> `[Posz</span><span class="id"> 1,</span><span class="id"> Posz</span><span class="id"> 0]</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> itv_bottom</span><span class="id"> x</span><span class="id"> :</span><span class="id"> unify_itv</span><span class="id"> empty_itv</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> False</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move:</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> [x</span><span class="id"> /subitvP</span><span class="id"> /</span>(_<span class="id"> x</span>)<span class="id">];</span><span class="id"> rewrite</span><span class="id"> in_itv/=</span><span class="id"> lexx</span><span class="id"> =&gt;</span><span class="id"> /</span>(_<span class="id"> erefl</span>)<span class="id"> xi</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> /</span>(<span class="id">@Itv</span>.<span class="id">subitv_map_itv</span><span class="id"> R</span>)<span class="id"> /subitvP</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> xi</span>).<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> in_itv/=</span><span class="id"> =&gt;</span><span class="id"> /andP[]</span><span class="id"> /le_trans</span><span class="id"> /[apply];</span><span class="id"> rewrite</span><span class="id"> ler10</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> itv_gt0</span><span class="id"> x</span><span class="id"> :</span><span class="id"> unify_itv</span><span class="id"> `]Posz</span><span class="id"> 0,</span><span class="id"> +oo[</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> 0%R</span><span class="id"> &lt;</span><span class="id"> x%:inum</span><span class="id"> :&gt;</span><span class="id"> R</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move:</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> [x</span><span class="id"> /=</span><span class="id"> xi]</span><span class="id"> /</span>(<span class="id">@Itv</span>.<span class="id">subitv_map_itv</span><span class="id"> R</span>)<span class="id"> /subitvP</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> xi</span>).<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> in_itv/=</span><span class="id"> andbT</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> itv_le0F</span><span class="id"> x</span><span class="id"> :</span><span class="id"> unify_itv</span><span class="id"> `]Posz</span><span class="id"> 0,</span><span class="id"> +oo[</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> x%:inum</span><span class="id"> &lt;=</span><span class="id"> 0%R</span><span class="id"> :&gt;</span><span class="id"> R</span><span class="id"> =</span><span class="id"> false</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move:</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> [x</span><span class="id"> /=</span><span class="id"> xi]</span><span class="id"> /</span>(<span class="id">@Itv</span>.<span class="id">subitv_map_itv</span><span class="id"> R</span>)<span class="id"> /subitvP</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> xi</span>).<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> in_itv/=</span><span class="id"> andbT</span><span class="id"> =&gt;</span><span class="id"> /lt_geF</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> itv_lt0</span><span class="id"> x</span><span class="id"> :</span><span class="id"> unify_itv</span><span class="id"> `]-oo,</span><span class="id"> Posz</span><span class="id"> 0[</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> x%:inum</span><span class="id"> &lt;</span><span class="id"> 0%R</span><span class="id"> :&gt;</span><span class="id"> R</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move:</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> [x</span><span class="id"> /=</span><span class="id"> xi]</span><span class="id"> /</span>(<span class="id">@Itv</span>.<span class="id">subitv_map_itv</span><span class="id"> R</span>)<span class="id"> /subitvP</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> xi</span>).<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> in_itv</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> itv_ge0F</span><span class="id"> x</span><span class="id"> :</span><span class="id"> unify_itv</span><span class="id"> `]-oo,</span><span class="id"> Posz</span><span class="id"> 0[</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> 0%R</span><span class="id"> &lt;=</span><span class="id"> x%:inum</span><span class="id"> :&gt;</span><span class="id"> R</span><span class="id"> =</span><span class="id"> false</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move:</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> [x</span><span class="id"> /=</span><span class="id"> xi]</span><span class="id"> /</span>(<span class="id">@Itv</span>.<span class="id">subitv_map_itv</span><span class="id"> R</span>)<span class="id"> /subitvP</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> xi</span>).<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> in_itv/=</span><span class="id"> =&gt;</span><span class="id"> /lt_geF</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> itv_ge0</span><span class="id"> x</span><span class="id"> :</span><span class="id"> unify_itv</span><span class="id"> `[Posz</span><span class="id"> 0,</span><span class="id"> +oo[</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> 0%R</span><span class="id"> &lt;=</span><span class="id"> x%:inum</span><span class="id"> :&gt;</span><span class="id"> R</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move:</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> [x</span><span class="id"> /=</span><span class="id"> xi]</span><span class="id"> /</span>(<span class="id">@Itv</span>.<span class="id">subitv_map_itv</span><span class="id"> R</span>)<span class="id"> /subitvP</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> xi</span>).<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> in_itv/=</span><span class="id"> andbT</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> itv_lt0F</span><span class="id"> x</span><span class="id"> :</span><span class="id"> unify_itv</span><span class="id"> `[Posz</span><span class="id"> 0,</span><span class="id"> +oo[</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> x%:inum</span><span class="id"> &lt;</span><span class="id"> 0%R</span><span class="id"> :&gt;</span><span class="id"> R</span><span class="id"> =</span><span class="id"> false</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move:</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> [x</span><span class="id"> /=</span><span class="id"> xi]</span><span class="id"> /</span>(<span class="id">@Itv</span>.<span class="id">subitv_map_itv</span><span class="id"> R</span>)<span class="id"> /subitvP</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> xi</span>).<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> in_itv/=</span><span class="id"> andbT</span><span class="id"> =&gt;</span><span class="id"> /le_gtF</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> itv_le0</span><span class="id"> x</span><span class="id"> :</span><span class="id"> unify_itv</span><span class="id"> `]-oo,</span><span class="id"> Posz</span><span class="id"> 0]</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> x%:inum</span><span class="id"> &lt;=</span><span class="id"> 0%R</span><span class="id"> :&gt;</span><span class="id"> R</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move:</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> [x</span><span class="id"> /=</span><span class="id"> xi]</span><span class="id"> /</span>(<span class="id">@Itv</span>.<span class="id">subitv_map_itv</span><span class="id"> R</span>)<span class="id"> /subitvP</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> xi</span>).<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> in_itv/=</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> itv_gt0F</span><span class="id"> x</span><span class="id"> :</span><span class="id"> unify_itv</span><span class="id"> `]-oo,</span><span class="id"> Posz</span><span class="id"> 0]</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> 0%R</span><span class="id"> &lt;</span><span class="id"> x%:inum</span><span class="id"> :&gt;</span><span class="id"> R</span><span class="id"> =</span><span class="id"> false</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move:</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> [x</span><span class="id"> /=</span><span class="id"> xi]</span><span class="id"> /</span>(<span class="id">@Itv</span>.<span class="id">subitv_map_itv</span><span class="id"> R</span>)<span class="id"> /subitvP</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> xi</span>).<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> in_itv/=</span><span class="id"> =&gt;</span><span class="id"> /le_gtF</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> lt1</span><span class="id"> x</span><span class="id"> :</span><span class="id"> unify_itv</span><span class="id"> `]-oo,</span><span class="id"> Posz</span><span class="id"> 1[</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> x%:inum</span><span class="id"> &lt;</span><span class="id"> 1%R</span><span class="id"> :&gt;</span><span class="id"> R</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move:</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> [x</span><span class="id"> /=</span><span class="id"> xi]</span><span class="id"> /</span>(<span class="id">@Itv</span>.<span class="id">subitv_map_itv</span><span class="id"> R</span>)<span class="id"> /subitvP</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> xi</span>).<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> in_itv</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> ge1F</span><span class="id"> x</span><span class="id"> :</span><span class="id"> unify_itv</span><span class="id"> `]-oo,</span><span class="id"> Posz</span><span class="id"> 1[</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> 1%R</span><span class="id"> &lt;=</span><span class="id"> x%:inum</span><span class="id"> :&gt;</span><span class="id"> R</span><span class="id"> =</span><span class="id"> false</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move:</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> [x</span><span class="id"> /=</span><span class="id"> xi]</span><span class="id"> /</span>(<span class="id">@Itv</span>.<span class="id">subitv_map_itv</span><span class="id"> R</span>)<span class="id"> /subitvP</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> xi</span>).<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> in_itv/=</span><span class="id"> =&gt;</span><span class="id"> /lt_geF</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> le1</span><span class="id"> x</span><span class="id"> :</span><span class="id"> unify_itv</span><span class="id"> `]-oo,</span><span class="id"> Posz</span><span class="id"> 1]</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> x%:inum</span><span class="id"> &lt;=</span><span class="id"> 1%R</span><span class="id"> :&gt;</span><span class="id"> R</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move:</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> [x</span><span class="id"> /=</span><span class="id"> xi]</span><span class="id"> /</span>(<span class="id">@Itv</span>.<span class="id">subitv_map_itv</span><span class="id"> R</span>)<span class="id"> /subitvP</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> xi</span>).<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> in_itv/=</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> gt1F</span><span class="id"> x</span><span class="id"> :</span><span class="id"> unify_itv</span><span class="id"> `]-oo,</span><span class="id"> Posz</span><span class="id"> 1]</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> 1%R</span><span class="id"> &lt;</span><span class="id"> x%:inum</span><span class="id"> :&gt;</span><span class="id"> R</span><span class="id"> =</span><span class="id"> false</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move:</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> [x</span><span class="id"> /=</span><span class="id"> xi]</span><span class="id"> /</span>(<span class="id">@Itv</span>.<span class="id">subitv_map_itv</span><span class="id"> R</span>)<span class="id"> /subitvP</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> xi</span>).<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> in_itv/=</span><span class="id"> =&gt;</span><span class="id"> /le_gtF</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> widen_itv_subproof</span><span class="id"> x</span><span class="id"> i'</span><span class="id"> :</span><span class="id"> unify_itv</span><span class="id"> i'</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> Itv</span>.<span class="id">spec</span><span class="id"> i'</span><span class="id"> x%:inum</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> move:</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> [x</span><span class="id"> /=</span><span class="id"> xi]</span><span class="id"> /</span>(<span class="id">@Itv</span>.<span class="id">subitv_map_itv</span><span class="id"> R</span>)<span class="id"> /subitvP</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> xi</span>).<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> widen_itv</span><span class="id"> x</span><span class="id"> i'</span> (<span class="id">uni</span><span class="id"> :</span><span class="id"> unify_itv</span><span class="id"> i'</span><span class="id"> i</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">Itv</span>.<span class="id">mk</span> (<span class="id">widen_itv_subproof</span><span class="id"> x</span><span class="id"> uni</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> widen_itvE</span><span class="id"> x</span> (<span class="id">uni</span><span class="id"> :</span><span class="id"> unify_itv</span><span class="id"> i</span><span class="id"> i</span>)<span class="id"> :</span><span class="id"> @widen_itv</span><span class="id"> x</span><span class="id"> i</span><span class="id"> uni</span><span class="id"> =</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact/val_inj</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> Theory</span>.<br/>
+<br/>
+<span class="vernacular">Arguments</span><span class="id"> itv_bottom</span><span class="id"> {R</span><span class="id"> i}</span><span class="id"> _</span><span class="id"> {_}</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> itv_gt0</span><span class="id"> {R</span><span class="id"> i}</span><span class="id"> _</span><span class="id"> {_}</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> itv_le0F</span><span class="id"> {R</span><span class="id"> i}</span><span class="id"> _</span><span class="id"> {_}</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> itv_lt0</span><span class="id"> {R</span><span class="id"> i}</span><span class="id"> _</span><span class="id"> {_}</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> itv_ge0F</span><span class="id"> {R</span><span class="id"> i}</span><span class="id"> _</span><span class="id"> {_}</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> itv_ge0</span><span class="id"> {R</span><span class="id"> i}</span><span class="id"> _</span><span class="id"> {_}</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> itv_lt0F</span><span class="id"> {R</span><span class="id"> i}</span><span class="id"> _</span><span class="id"> {_}</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> itv_le0</span><span class="id"> {R</span><span class="id"> i}</span><span class="id"> _</span><span class="id"> {_}</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> itv_gt0F</span><span class="id"> {R</span><span class="id"> i}</span><span class="id"> _</span><span class="id"> {_}</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> lt1</span><span class="id"> {R</span><span class="id"> i}</span><span class="id"> _</span><span class="id"> {_}</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> ge1F</span><span class="id"> {R</span><span class="id"> i}</span><span class="id"> _</span><span class="id"> {_}</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> le1</span><span class="id"> {R</span><span class="id"> i}</span><span class="id"> _</span><span class="id"> {_}</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> gt1F</span><span class="id"> {R</span><span class="id"> i}</span><span class="id"> _</span><span class="id"> {_}</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> widen_itv</span><span class="id"> {R</span><span class="id"> i}</span><span class="id"> _</span><span class="id"> {_</span><span class="id"> _}</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> widen_itvE</span><span class="id"> {R</span><span class="id"> i}</span><span class="id"> _</span><span class="id"> {_}</span>.<br/>
+<br/>
+<span class="id">#[global]</span><span class="vernacular"> Hint</span><span class="id"> Extern</span><span class="id"> 0</span> (<span class="id">is_true</span> (<span class="id">0%R</span><span class="id"> &lt;</span><span class="id"> _</span>)<span class="id">%O</span>)<span class="id"> =&gt;</span><span class="id"> solve</span><span class="id"> [apply:</span><span class="id"> itv_gt0]</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<span class="id">#[global]</span><span class="vernacular"> Hint</span><span class="id"> Extern</span><span class="id"> 0</span> (<span class="id">is_true</span> (_<span class="id"> &lt;</span><span class="id"> 0%R</span>)<span class="id">%O</span>)<span class="id"> =&gt;</span><span class="id"> solve</span><span class="id"> [apply:</span><span class="id"> itv_lt0]</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<span class="id">#[global]</span><span class="vernacular"> Hint</span><span class="id"> Extern</span><span class="id"> 0</span> (<span class="id">is_true</span> (<span class="id">0%R</span><span class="id"> &lt;=</span><span class="id"> _</span>)<span class="id">%O</span>)<span class="id"> =&gt;</span><span class="id"> solve</span><span class="id"> [apply:</span><span class="id"> itv_ge0]</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<span class="id">#[global]</span><span class="vernacular"> Hint</span><span class="id"> Extern</span><span class="id"> 0</span> (<span class="id">is_true</span> (_<span class="id"> &lt;=</span><span class="id"> 0%R</span>)<span class="id">%O</span>)<span class="id"> =&gt;</span><span class="id"> solve</span><span class="id"> [apply:</span><span class="id"> itv_le0]</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<span class="id">#[global]</span><span class="vernacular"> Hint</span><span class="id"> Extern</span><span class="id"> 0</span> (<span class="id">is_true</span> (_<span class="id"> &lt;</span><span class="id"> 1%R</span>)<span class="id">%O</span>)<span class="id"> =&gt;</span><span class="id"> solve</span><span class="id"> [apply:</span><span class="id"> lt1]</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<span class="id">#[global]</span><span class="vernacular"> Hint</span><span class="id"> Extern</span><span class="id"> 0</span> (<span class="id">is_true</span> (_<span class="id"> &lt;=</span><span class="id"> 1%R</span>)<span class="id">%O</span>)<span class="id"> =&gt;</span><span class="id"> solve</span><span class="id"> [apply:</span><span class="id"> le1]</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<br/>
+<span class="vernacular">Notation</span> <span class="id">&quot;x %:i01&quot;</span><span class="id"> :=</span> (<span class="id">widen_itv</span><span class="id"> x%:itv</span><span class="id"> :</span><span class="id"> {i01</span><span class="id"> _}</span>) (<span class="id">only</span><span class="id"> parsing</span>)<span class="id"> :</span><span class="id"> ring_scope</span>.<br/>
+<span class="vernacular">Notation</span> <span class="id">&quot;x %:i01&quot;</span><span class="id"> :=</span> (<span class="id">@widen_itv</span><span class="id"> _</span><span class="id"> _</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">@Itv</span>.<span class="id">from</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span> (<span class="id">Phantom</span><span class="id"> _</span><span class="id"> x</span>))<span class="id"> `[Posz</span><span class="id"> 0,</span><span class="id"> Posz</span><span class="id"> 1]</span><span class="id"> _</span>)<br/>
+&nbsp;&nbsp;(<span class="id">only</span><span class="id"> printing</span>)<span class="id"> :</span><span class="id"> ring_scope</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ring_scope</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> NumDomainStability</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> zero_inum_subproof</span><span class="id"> :</span><span class="id"> Itv</span>.<span class="id">spec</span><span class="id"> `[0,</span><span class="id"> 0]</span> (<span class="id">0</span><span class="id"> :</span><span class="id"> R</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /Itv</span>.<span class="id">itv_cond/=</span><span class="id"> inE</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Canonical</span><span class="id"> zero_inum</span><span class="id"> :=</span><span class="id"> Itv</span>.<span class="id">mk</span><span class="id"> zero_inum_subproof</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> one_inum_subproof</span><span class="id"> :</span><span class="id"> Itv</span>.<span class="id">spec</span><span class="id"> `[1,</span><span class="id"> 1]</span> (<span class="id">1</span><span class="id"> :</span><span class="id"> R</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /Itv</span>.<span class="id">itv_cond/=</span><span class="id"> inE</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Canonical</span><span class="id"> one_inum</span><span class="id"> :=</span><span class="id"> Itv</span>.<span class="id">mk</span><span class="id"> one_inum_subproof</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> opp_itv_bound_subdef</span> (<span class="id">b</span><span class="id"> :</span><span class="id"> itv_bound</span><span class="id"> int</span>)<span class="id"> :</span><span class="id"> itv_bound</span><span class="id"> int</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">match</span><span class="id"> b</span><span class="gallina-kwd"> with</span><br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> BSide</span><span class="id"> b</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> BSide</span> (<span class="id">~~</span><span class="id"> b</span>) (<span class="id">intZmod</span>.<span class="id">oppz</span><span class="id"> x</span>)<br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> BInfty</span><span class="id"> b</span><span class="id"> =&gt;</span><span class="id"> BInfty</span><span class="id"> _</span> (<span class="id">~~</span><span class="id"> b</span>)<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">end</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> opp_itv_bound_subdef</span><span class="id"> /</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> opp_itv_ge0_subproof</span><span class="id"> b</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="id">BLeft</span><span class="id"> 0%R</span><span class="id"> &lt;=</span><span class="id"> opp_itv_bound_subdef</span><span class="id"> b</span>)<span class="id">%O</span><span class="id"> =</span> (<span class="id">b</span><span class="id"> &lt;=</span><span class="id"> BRight</span><span class="id"> 0%R</span>)<span class="id">%O</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> case:</span><span class="id"> b</span><span class="id"> =&gt;</span><span class="id"> [[]</span><span class="id"> b</span><span class="id"> |</span><span class="id"> []//];</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> !bnd_simp</span><span class="id"> oppr_ge0</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> opp_itv_gt0_subproof</span><span class="id"> b</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="id">BLeft</span><span class="id"> 0%R</span><span class="id"> &lt;</span><span class="id"> opp_itv_bound_subdef</span><span class="id"> b</span>)<span class="id">%O</span><span class="id"> =</span> (<span class="id">b</span><span class="id"> &lt;</span><span class="id"> BRight</span><span class="id"> 0%R</span>)<span class="id">%O</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> case:</span><span class="id"> b</span><span class="id"> =&gt;</span><span class="id"> [[]</span><span class="id"> b</span><span class="id"> |</span><span class="id"> []//];</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> !bnd_simp</span><span class="id"> ?oppr_ge0</span><span class="id"> //</span><span class="id"> oppr_gt0</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> opp_itv_boundr_subproof</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> b</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="id">BRight</span> (<span class="id">-</span><span class="id"> x</span>)<span class="id">%R</span><span class="id"> &lt;=</span><span class="id"> Itv</span>.<span class="id">map_itv_bound</span><span class="id"> intr</span> (<span class="id">opp_itv_bound_subdef</span><span class="id"> b</span>))<span class="id">%O</span><br/>
+&nbsp;&nbsp;<span class="id">=</span> (<span class="id">Itv</span>.<span class="id">map_itv_bound</span><span class="id"> intr</span><span class="id"> b</span><span class="id"> &lt;=</span><span class="id"> BLeft</span><span class="id"> x</span>)<span class="id">%O</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> case:</span><span class="id"> b</span><span class="id"> =&gt;</span><span class="id"> [[]</span><span class="id"> b</span><span class="id"> |</span><span class="id"> []//];</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> !bnd_simp</span><span class="id"> mulrNz</span><span class="id"> ?lerN2</span><span class="id"> //</span><span class="id"> ltrN2</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> opp_itv_le0_subproof</span><span class="id"> b</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="id">opp_itv_bound_subdef</span><span class="id"> b</span><span class="id"> &lt;=</span><span class="id"> BRight</span><span class="id"> 0%R</span>)<span class="id">%O</span><span class="id"> =</span> (<span class="id">BLeft</span><span class="id"> 0%R</span><span class="id"> &lt;=</span><span class="id"> b</span>)<span class="id">%O</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> case:</span><span class="id"> b</span><span class="id"> =&gt;</span><span class="id"> [[]</span><span class="id"> b</span><span class="id"> |</span><span class="id"> []//];</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> !bnd_simp</span><span class="id"> oppr_le0</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> opp_itv_lt0_subproof</span><span class="id"> b</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="id">opp_itv_bound_subdef</span><span class="id"> b</span><span class="id"> &lt;</span><span class="id"> BRight</span><span class="id"> 0%R</span>)<span class="id">%O</span><span class="id"> =</span> (<span class="id">BLeft</span><span class="id"> 0%R</span><span class="id"> &lt;</span><span class="id"> b</span>)<span class="id">%O</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> case:</span><span class="id"> b</span><span class="id"> =&gt;</span><span class="id"> [[]</span><span class="id"> b</span><span class="id"> |</span><span class="id"> []//];</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> !bnd_simp</span><span class="id"> ?oppr_le0</span><span class="id"> //</span><span class="id"> oppr_lt0</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> opp_itv_boundl_subproof</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> b</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="id">Itv</span>.<span class="id">map_itv_bound</span><span class="id"> intr</span> (<span class="id">opp_itv_bound_subdef</span><span class="id"> b</span>)<span class="id"> &lt;=</span><span class="id"> BLeft</span> (<span class="id">-</span><span class="id"> x</span>)<span class="id">%R</span>)<span class="id">%O</span><br/>
+&nbsp;&nbsp;<span class="id">=</span> (<span class="id">BRight</span><span class="id"> x</span><span class="id"> &lt;=</span><span class="id"> Itv</span>.<span class="id">map_itv_bound</span><span class="id"> intr</span><span class="id"> b</span>)<span class="id">%O</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> case:</span><span class="id"> b</span><span class="id"> =&gt;</span><span class="id"> [[]</span><span class="id"> b</span><span class="id"> |</span><span class="id"> []//];</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> !bnd_simp</span><span class="id"> mulrNz</span><span class="id"> ?lerN2</span><span class="id"> //</span><span class="id"> ltrN2</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> opp_itv_subdef</span> (<span class="id">i</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> int</span>)<span class="id"> :</span><span class="id"> interval</span><span class="id"> int</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">let</span><span class="id"> 'Interval</span><span class="id"> l</span><span class="id"> u</span><span class="id"> :=</span><span class="id"> i</span><span class="gallina-kwd"> in</span><br/>
+&nbsp;&nbsp;<span class="id">Interval</span> (<span class="id">opp_itv_bound_subdef</span><span class="id"> u</span>) (<span class="id">opp_itv_bound_subdef</span><span class="id"> l</span>).<br/>
+<span class="vernacular">Arguments</span><span class="id"> opp_itv_subdef</span><span class="id"> /</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> opp_inum_subproof</span> (<span class="id">i</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> int</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">x</span><span class="id"> :</span><span class="id"> {itv</span><span class="id"> R</span><span class="id"> &amp;</span><span class="id"> i}</span>) (<span class="id">r</span><span class="id"> :=</span><span class="id"> opp_itv_subdef</span><span class="id"> i</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">Itv</span>.<span class="id">spec</span><span class="id"> r</span> (<span class="id">-</span><span class="id"> x%:inum</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> {}/r;</span><span class="id"> move:</span><span class="id"> i</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> [l</span><span class="id"> u]</span><span class="id"> [x</span><span class="id"> /=</span><span class="id"> /andP[xl</span><span class="id"> xu]];</span><span class="id"> apply/andP;</span><span class="id"> split</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> case:</span><span class="id"> u</span><span class="id"> xu</span><span class="id"> =&gt;</span><span class="id"> [[]</span><span class="id"> b</span><span class="id"> i</span><span class="id"> |</span><span class="id"> []</span><span class="id"> //]</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> /Order</span>.<span class="id">le/=</span><span class="id"> mulrNz;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">do</span><span class="id"> ?[by</span><span class="id"> rewrite</span><span class="id"> lerNl</span><span class="id"> opprK|by</span><span class="id"> rewrite</span><span class="id"> ltrNl</span><span class="id"> opprK]</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> case:</span><span class="id"> l</span><span class="id"> xl</span><span class="id"> =&gt;</span><span class="id"> [[]</span><span class="id"> b</span><span class="id"> i</span><span class="id"> |</span><span class="id"> []</span><span class="id"> //]</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> /Order</span>.<span class="id">le/=</span><span class="id"> mulrNz;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">do</span><span class="id"> ?[by</span><span class="id"> rewrite</span><span class="id"> ltrNl</span><span class="id"> opprK|by</span><span class="id"> rewrite</span><span class="id"> lerNl</span><span class="id"> opprK]</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Canonical</span><span class="id"> opp_inum</span> (<span class="id">i</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> int</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> {itv</span><span class="id"> R</span><span class="id"> &amp;</span><span class="id"> i}</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">Itv</span>.<span class="id">mk</span> (<span class="id">opp_inum_subproof</span><span class="id"> x</span>).<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> add_itv_boundl_subdef</span> (<span class="id">b1</span><span class="id"> b2</span><span class="id"> :</span><span class="id"> itv_bound</span><span class="id"> int</span>)<span class="id"> :</span><span class="id"> itv_bound</span><span class="id"> int</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">match</span><span class="id"> b1,</span><span class="id"> b2</span><span class="gallina-kwd"> with</span><br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> BSide</span><span class="id"> b1</span><span class="id"> x1,</span><span class="id"> BSide</span><span class="id"> b2</span><span class="id"> x2</span><span class="id"> =&gt;</span><span class="id"> BSide</span> (<span class="id">b1</span><span class="id"> &amp;&amp;</span><span class="id"> b2</span>) (<span class="id">intZmod</span>.<span class="id">addz</span><span class="id"> x1</span><span class="id"> x2</span>)<br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> _,</span><span class="id"> _</span><span class="id"> =&gt;</span><span class="id"> BInfty</span><span class="id"> _</span><span class="id"> true</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">end</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> add_itv_boundl_subdef</span><span class="id"> /</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> add_itv_boundr_subdef</span> (<span class="id">b1</span><span class="id"> b2</span><span class="id"> :</span><span class="id"> itv_bound</span><span class="id"> int</span>)<span class="id"> :</span><span class="id"> itv_bound</span><span class="id"> int</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">match</span><span class="id"> b1,</span><span class="id"> b2</span><span class="gallina-kwd"> with</span><br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> BSide</span><span class="id"> b1</span><span class="id"> x1,</span><span class="id"> BSide</span><span class="id"> b2</span><span class="id"> x2</span><span class="id"> =&gt;</span><span class="id"> BSide</span> (<span class="id">b1</span><span class="id"> ||</span><span class="id"> b2</span>) (<span class="id">intZmod</span>.<span class="id">addz</span><span class="id"> x1</span><span class="id"> x2</span>)<br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> _,</span><span class="id"> _</span><span class="id"> =&gt;</span><span class="id"> BInfty</span><span class="id"> _</span><span class="id"> false</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">end</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> add_itv_boundr_subdef</span><span class="id"> /</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> add_itv_subdef</span> (<span class="id">i1</span><span class="id"> i2</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> int</span>)<span class="id"> :</span><span class="id"> interval</span><span class="id"> int</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">let</span><span class="id"> 'Interval</span><span class="id"> l1</span><span class="id"> u1</span><span class="id"> :=</span><span class="id"> i1</span><span class="gallina-kwd"> in</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">let</span><span class="id"> 'Interval</span><span class="id"> l2</span><span class="id"> u2</span><span class="id"> :=</span><span class="id"> i2</span><span class="gallina-kwd"> in</span><br/>
+&nbsp;&nbsp;<span class="id">Interval</span> (<span class="id">add_itv_boundl_subdef</span><span class="id"> l1</span><span class="id"> l2</span>) (<span class="id">add_itv_boundr_subdef</span><span class="id"> u1</span><span class="id"> u2</span>).<br/>
+<span class="vernacular">Arguments</span><span class="id"> add_itv_subdef</span><span class="id"> /</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> add_inum_subproof</span> (<span class="id">xi</span><span class="id"> yi</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> int</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">x</span><span class="id"> :</span><span class="id"> {itv</span><span class="id"> R</span><span class="id"> &amp;</span><span class="id"> xi}</span>) (<span class="id">y</span><span class="id"> :</span><span class="id"> {itv</span><span class="id"> R</span><span class="id"> &amp;</span><span class="id"> yi}</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">r</span><span class="id"> :=</span><span class="id"> add_itv_subdef</span><span class="id"> xi</span><span class="id"> yi</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">Itv</span>.<span class="id">spec</span><span class="id"> r</span> (<span class="id">x%:inum</span><span class="id"> +</span><span class="id"> y%:inum</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> {}/r</span>.<br/>
+<span class="id">move:</span><span class="id"> xi</span><span class="id"> x</span><span class="id"> yi</span><span class="id"> y</span><span class="id"> =&gt;</span><span class="id"> [lx</span><span class="id"> ux]</span><span class="id"> [x</span><span class="id"> /=</span><span class="id"> /andP[xl</span><span class="id"> xu]]</span><span class="id"> [ly</span><span class="id"> uy]</span><span class="id"> [y</span><span class="id"> /=</span><span class="id"> /andP[yl</span><span class="id"> yu]]</span>.<br/>
+<span class="id">rewrite</span><span class="id"> /Itv</span>.<span class="id">itv_cond</span><span class="id"> in_itv;</span><span class="id"> apply/andP;</span><span class="id"> split</span>.<br/>
+<span class="id">-</span><span class="id"> move:</span><span class="id"> lx</span><span class="id"> ly</span><span class="id"> xl</span><span class="id"> yl</span><span class="id"> =&gt;</span><span class="id"> [xb</span><span class="id"> lx</span><span class="id"> |</span><span class="id"> //]</span><span class="id"> [yb</span><span class="id"> ly</span><span class="id"> |</span><span class="id"> //]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move:</span><span class="id"> xb</span><span class="id"> yb</span><span class="id"> =&gt;</span><span class="id"> []</span><span class="id"> [];</span><span class="id"> rewrite</span><span class="id"> /Order</span>.<span class="id">le/=</span><span class="id"> rmorphD/=;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">do</span><span class="id"> ?[exact:</span><span class="id"> lerD|exact:</span><span class="id"> ler_ltD|exact:</span><span class="id"> ltr_leD|exact:</span><span class="id"> ltrD]</span>.<br/>
+<span class="id">-</span><span class="id"> move:</span><span class="id"> ux</span><span class="id"> uy</span><span class="id"> xu</span><span class="id"> yu</span><span class="id"> =&gt;</span><span class="id"> [xb</span><span class="id"> ux</span><span class="id"> |</span><span class="id"> //]</span><span class="id"> [yb</span><span class="id"> uy</span><span class="id"> |</span><span class="id"> //]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move:</span><span class="id"> xb</span><span class="id"> yb</span><span class="id"> =&gt;</span><span class="id"> []</span><span class="id"> [];</span><span class="id"> rewrite</span><span class="id"> /Order</span>.<span class="id">le/=</span><span class="id"> rmorphD/=;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">do</span><span class="id"> ?[exact:</span><span class="id"> lerD|exact:</span><span class="id"> ler_ltD|exact:</span><span class="id"> ltr_leD|exact:</span><span class="id"> ltrD]</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Canonical</span><span class="id"> add_inum</span> (<span class="id">xi</span><span class="id"> yi</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> int</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">x</span><span class="id"> :</span><span class="id"> {itv</span><span class="id"> R</span><span class="id"> &amp;</span><span class="id"> xi}</span>) (<span class="id">y</span><span class="id"> :</span><span class="id"> {itv</span><span class="id"> R</span><span class="id"> &amp;</span><span class="id"> yi}</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">Itv</span>.<span class="id">mk</span> (<span class="id">add_inum_subproof</span><span class="id"> x</span><span class="id"> y</span>).<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> NumDomainStability</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> RealDomainStability</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realDomainType}</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> itv_bound_signl</span> (<span class="id">b</span><span class="id"> :</span><span class="id"> itv_bound</span><span class="id"> int</span>)<span class="id"> :</span><span class="id"> KnownSign</span>.<span class="id">sign</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">let</span><span class="id"> b0</span><span class="id"> :=</span><span class="id"> BLeft</span><span class="id"> 0%Z</span><span class="gallina-kwd"> in</span><br/>
+&nbsp;&nbsp;(<span class="gallina-kwd">if</span><span class="id"> b</span><span class="id"> ==</span><span class="id"> b0</span><span class="gallina-kwd"> then</span><span class="id"> =0</span><span class="gallina-kwd"> else</span><span class="gallina-kwd"> if</span> (<span class="id">b</span><span class="id"> &lt;=</span><span class="id"> b0</span>)<span class="id">%O</span><span class="gallina-kwd"> then</span><span class="id"> &lt;=0</span><span class="gallina-kwd"> else</span><span class="id"> &gt;=0</span>)<span class="id">%snum_sign</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> itv_bound_signr</span> (<span class="id">b</span><span class="id"> :</span><span class="id"> itv_bound</span><span class="id"> int</span>)<span class="id"> :</span><span class="id"> KnownSign</span>.<span class="id">sign</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">let</span><span class="id"> b0</span><span class="id"> :=</span><span class="id"> BRight</span><span class="id"> 0%Z</span><span class="gallina-kwd"> in</span><br/>
+&nbsp;&nbsp;(<span class="gallina-kwd">if</span><span class="id"> b</span><span class="id"> ==</span><span class="id"> b0</span><span class="gallina-kwd"> then</span><span class="id"> =0</span><span class="gallina-kwd"> else</span><span class="gallina-kwd"> if</span> (<span class="id">b</span><span class="id"> &lt;=</span><span class="id"> b0</span>)<span class="id">%O</span><span class="gallina-kwd"> then</span><span class="id"> &lt;=0</span><span class="gallina-kwd"> else</span><span class="id"> &gt;=0</span>)<span class="id">%snum_sign</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> interval_sign</span> (<span class="id">i</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> int</span>)<span class="id"> :</span><span class="id"> option</span><span class="id"> KnownSign</span>.<span class="id">real</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">let</span><span class="id"> 'Interval</span><span class="id"> l</span><span class="id"> u</span><span class="id"> :=</span><span class="id"> i</span><span class="gallina-kwd"> in</span><br/>
+&nbsp;&nbsp;(<span class="gallina-kwd">match</span><span class="id"> itv_bound_signl</span><span class="id"> l,</span><span class="id"> itv_bound_signr</span><span class="id"> u</span><span class="gallina-kwd"> with</span><br/>
+&nbsp;&nbsp;&nbsp;<span class="id">|</span><span class="id"> =0,</span><span class="id"> &lt;=0</span><br/>
+&nbsp;&nbsp;&nbsp;<span class="id">|</span><span class="id"> &gt;=0,</span><span class="id"> =0</span><br/>
+&nbsp;&nbsp;&nbsp;<span class="id">|</span><span class="id"> &gt;=0,</span><span class="id"> &lt;=0</span><span class="id"> =&gt;</span><span class="id"> None</span><br/>
+&nbsp;&nbsp;&nbsp;<span class="id">|</span><span class="id"> =0,</span><span class="id"> =0</span><span class="id"> =&gt;</span><span class="id"> Some</span> (<span class="id">KnownSign</span>.<span class="id">Sign</span><span class="id"> =0</span>)<br/>
+&nbsp;&nbsp;&nbsp;<span class="id">|</span><span class="id"> &lt;=0,</span><span class="id"> =0</span><br/>
+&nbsp;&nbsp;&nbsp;<span class="id">|</span><span class="id"> &lt;=0,</span><span class="id"> &lt;=0</span><span class="id"> =&gt;</span><span class="id"> Some</span> (<span class="id">KnownSign</span>.<span class="id">Sign</span><span class="id"> &lt;=0</span>)<br/>
+&nbsp;&nbsp;&nbsp;<span class="id">|</span><span class="id"> =0,</span><span class="id"> &gt;=0</span><br/>
+&nbsp;&nbsp;&nbsp;<span class="id">|</span><span class="id"> &gt;=0,</span><span class="id"> &gt;=0</span><span class="id"> =&gt;</span><span class="id"> Some</span> (<span class="id">KnownSign</span>.<span class="id">Sign</span><span class="id"> &gt;=0</span>)<br/>
+&nbsp;&nbsp;&nbsp;<span class="id">|</span><span class="id"> &lt;=0,</span><span class="id"> &gt;=0</span><span class="id"> =&gt;</span><span class="id"> Some</span><span class="id"> &gt;=&lt;0</span><br/>
+&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">end</span>)<span class="id">%snum_sign</span>.<br/>
+<br/>
+<span class="vernacular">Variant</span><span class="id"> interval_sign_spec</span> (<span class="id">l</span><span class="id"> u</span><span class="id"> :</span><span class="id"> itv_bound</span><span class="id"> int</span>)<span class="id"> :</span><span class="id"> option</span><span class="id"> KnownSign</span>.<span class="id">real</span><span class="id"> -&gt;</span><span class="gallina-kwd"> Set</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> ISignNone</span><span class="id"> :</span> (<span class="id">u</span><span class="id"> &lt;=</span><span class="id"> l</span>)<span class="id">%O</span><span class="id"> -&gt;</span><span class="id"> interval_sign_spec</span><span class="id"> l</span><span class="id"> u</span><span class="id"> None</span><br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> ISignEqZero</span><span class="id"> :</span><span class="id"> l</span><span class="id"> =</span><span class="id"> BLeft</span><span class="id"> 0</span><span class="id"> -&gt;</span><span class="id"> u</span><span class="id"> =</span><span class="id"> BRight</span><span class="id"> 0</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">interval_sign_spec</span><span class="id"> l</span><span class="id"> u</span> (<span class="id">Some</span> (<span class="id">KnownSign</span>.<span class="id">Sign</span><span class="id"> =0</span>))<br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> ISignNeg</span><span class="id"> :</span> (<span class="id">l</span><span class="id"> &lt;</span><span class="id"> BLeft</span><span class="id"> 0%:Z</span>)<span class="id">%O</span><span class="id"> -&gt;</span> (<span class="id">u</span><span class="id"> &lt;=</span><span class="id"> BRight</span><span class="id"> 0%:Z</span>)<span class="id">%O</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">interval_sign_spec</span><span class="id"> l</span><span class="id"> u</span> (<span class="id">Some</span> (<span class="id">KnownSign</span>.<span class="id">Sign</span><span class="id"> &lt;=0</span>))<br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> ISignPos</span><span class="id"> :</span> (<span class="id">BLeft</span><span class="id"> 0%:Z</span><span class="id"> &lt;=</span><span class="id"> l</span>)<span class="id">%O</span><span class="id"> -&gt;</span> (<span class="id">BRight</span><span class="id"> 0%:Z</span><span class="id"> &lt;</span><span class="id"> u</span>)<span class="id">%O</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">interval_sign_spec</span><span class="id"> l</span><span class="id"> u</span> (<span class="id">Some</span> (<span class="id">KnownSign</span>.<span class="id">Sign</span><span class="id"> &gt;=0</span>))<br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> ISignBoth</span><span class="id"> :</span> (<span class="id">l</span><span class="id"> &lt;</span><span class="id"> BLeft</span><span class="id"> 0%:Z</span>)<span class="id">%O</span><span class="id"> -&gt;</span> (<span class="id">BRight</span><span class="id"> 0%:Z</span><span class="id"> &lt;</span><span class="id"> u</span>)<span class="id">%O</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">interval_sign_spec</span><span class="id"> l</span><span class="id"> u</span> (<span class="id">Some</span><span class="id"> &gt;=&lt;0%snum_sign</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> interval_signP</span><span class="id"> l</span><span class="id"> u</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">interval_sign_spec</span><span class="id"> l</span><span class="id"> u</span> (<span class="id">interval_sign</span> (<span class="id">Interval</span><span class="id"> l</span><span class="id"> u</span>)).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> /interval_sign/itv_bound_signl/itv_bound_signr</span>.<br/>
+<span class="id">have</span><span class="id"> [lneg|lpos|-&gt;]</span><span class="id"> :=</span><span class="id"> ltgtP</span><span class="id"> l;</span><span class="id"> have</span><span class="id"> [uneg|upos|-&gt;]</span><span class="id"> :=</span><span class="id"> ltgtP</span><span class="id"> u</span>.<br/>
+<span class="id">-</span><span class="id"> apply:</span><span class="id"> ISignNeg</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> ltW</span>.<br/>
+<span class="id">-</span><span class="id"> exact:</span><span class="id"> ISignBoth</span>.<br/>
+<span class="id">-</span><span class="id"> exact:</span><span class="id"> ISignNeg</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> apply/ISignNone/ltW/</span>(<span class="id">lt_le_trans</span><span class="id"> uneg</span>)<span class="id">;</span><span class="id"> rewrite</span><span class="id"> leBRight_ltBLeft</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> apply:</span><span class="id"> ISignPos</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> ltW</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> apply:</span><span class="id"> ISignNone;</span><span class="id"> rewrite</span><span class="id"> leBRight_ltBLeft</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> apply:</span><span class="id"> ISignNone;</span><span class="id"> rewrite</span><span class="id"> -ltBRight_leBLeft</span>.<br/>
+<span class="id">-</span><span class="id"> exact:</span><span class="id"> ISignPos</span>.<br/>
+<span class="id">-</span><span class="id"> exact:</span><span class="id"> ISignEqZero</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> mul_itv_boundl_subdef</span> (<span class="id">b1</span><span class="id"> b2</span><span class="id"> :</span><span class="id"> itv_bound</span><span class="id"> int</span>)<span class="id"> :</span><span class="id"> itv_bound</span><span class="id"> int</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">match</span><span class="id"> b1,</span><span class="id"> b2</span><span class="gallina-kwd"> with</span><br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> BSide</span><span class="id"> true</span><span class="id"> 0%Z,</span><span class="id"> BSide</span><span class="id"> _</span><span class="id"> _</span><br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> BSide</span><span class="id"> _</span><span class="id"> _,</span><span class="id"> BSide</span><span class="id"> true</span><span class="id"> 0%Z</span><span class="id"> =&gt;</span><span class="id"> BSide</span><span class="id"> true</span><span class="id"> 0%Z</span><br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> BSide</span><span class="id"> b1</span><span class="id"> x1,</span><span class="id"> BSide</span><span class="id"> b2</span><span class="id"> x2</span><span class="id"> =&gt;</span><span class="id"> BSide</span> (<span class="id">b1</span><span class="id"> &amp;&amp;</span><span class="id"> b2</span>) (<span class="id">intRing</span>.<span class="id">mulz</span><span class="id"> x1</span><span class="id"> x2</span>)<br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> _,</span><span class="id"> BInfty</span><span class="id"> _</span><br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> BInfty</span><span class="id"> _,</span><span class="id"> _</span><span class="id"> =&gt;</span><span class="id"> BInfty</span><span class="id"> _</span><span class="id"> false</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">end</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> mul_itv_boundl_subdef</span><span class="id"> /</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> mul_itv_boundr_subdef</span> (<span class="id">b1</span><span class="id"> b2</span><span class="id"> :</span><span class="id"> itv_bound</span><span class="id"> int</span>)<span class="id"> :</span><span class="id"> itv_bound</span><span class="id"> int</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">match</span><span class="id"> b1,</span><span class="id"> b2</span><span class="gallina-kwd"> with</span><br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> BSide</span><span class="id"> true</span><span class="id"> 0%Z,</span><span class="id"> _</span><br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> _,</span><span class="id"> BSide</span><span class="id"> true</span><span class="id"> 0%Z</span><span class="id"> =&gt;</span><span class="id"> BSide</span><span class="id"> true</span><span class="id"> 0%Z</span><br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> BSide</span><span class="id"> false</span><span class="id"> 0%Z,</span><span class="id"> _</span><br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> _,</span><span class="id"> BSide</span><span class="id"> false</span><span class="id"> 0%Z</span><span class="id"> =&gt;</span><span class="id"> BSide</span><span class="id"> false</span><span class="id"> 0%Z</span><br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> BSide</span><span class="id"> b1</span><span class="id"> x1,</span><span class="id"> BSide</span><span class="id"> b2</span><span class="id"> x2</span><span class="id"> =&gt;</span><span class="id"> BSide</span> (<span class="id">b1</span><span class="id"> ||</span><span class="id"> b2</span>) (<span class="id">intRing</span>.<span class="id">mulz</span><span class="id"> x1</span><span class="id"> x2</span>)<br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> _,</span><span class="id"> BInfty</span><span class="id"> _</span><br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> BInfty</span><span class="id"> _,</span><span class="id"> _</span><span class="id"> =&gt;</span><span class="id"> BInfty</span><span class="id"> _</span><span class="id"> false</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">end</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> mul_itv_boundr_subdef</span><span class="id"> /</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> mul_itv_boundl_subproof</span><span class="id"> b1</span><span class="id"> b2</span> (<span class="id">x1</span><span class="id"> x2</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="id">BLeft</span><span class="id"> 0%:Z</span><span class="id"> &lt;=</span><span class="id"> b1</span><span class="id"> -&gt;</span><span class="id"> BLeft</span><span class="id"> 0%:Z</span><span class="id"> &lt;=</span><span class="id"> b2</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;&nbsp;<span class="id">Itv</span>.<span class="id">map_itv_bound</span><span class="id"> intr</span><span class="id"> b1</span><span class="id"> &lt;=</span><span class="id"> BLeft</span><span class="id"> x1</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;&nbsp;<span class="id">Itv</span>.<span class="id">map_itv_bound</span><span class="id"> intr</span><span class="id"> b2</span><span class="id"> &lt;=</span><span class="id"> BLeft</span><span class="id"> x2</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;&nbsp;<span class="id">Itv</span>.<span class="id">map_itv_bound</span><span class="id"> intr</span> (<span class="id">mul_itv_boundl_subdef</span><span class="id"> b1</span><span class="id"> b2</span>)<span class="id"> &lt;=</span><span class="id"> BLeft</span> (<span class="id">x1</span><span class="id"> *</span><span class="id"> x2</span>))<span class="id">%O</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move:</span><span class="id"> b1</span><span class="id"> b2</span><span class="id"> =&gt;</span><span class="id"> [[]</span><span class="id"> b1</span><span class="id"> |</span><span class="id"> []//]</span><span class="id"> [[]</span><span class="id"> b2</span><span class="id"> |</span><span class="id"> []//]</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> 4!bnd_simp</span>.<br/>
+<span class="id">-</span><span class="id"> set</span><span class="id"> bl</span><span class="id"> :=</span><span class="gallina-kwd"> match</span><span class="id"> b1</span><span class="gallina-kwd"> with</span><span class="id"> 0%Z</span><span class="id"> =&gt;</span><span class="id"> _</span><span class="id"> |</span><span class="id"> _</span><span class="id"> =&gt;</span><span class="id"> _</span><span class="gallina-kwd"> end</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> -&gt;</span><span class="id"> :</span><span class="id"> bl</span><span class="id"> =</span><span class="id"> BLeft</span> (<span class="id">b1</span><span class="id"> *</span><span class="id"> b2</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> {}/bl;</span><span class="id"> move:</span><span class="id"> b1</span><span class="id"> b2</span><span class="id"> =&gt;</span><span class="id"> [[|p1]|p1]</span><span class="id"> [[|p2]|p2];</span><span class="id"> congr</span><span class="id"> BLeft</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> mulr0</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -2!</span>(<span class="id">ler0z</span><span class="id"> R</span>)<span class="id"> bnd_simp</span><span class="id"> intrM;</span><span class="id"> exact:</span><span class="id"> ler_pM</span>.<br/>
+<span class="id">-</span><span class="id"> case:</span><span class="id"> b1</span><span class="id"> =&gt;</span><span class="id"> [[|p1]|//];</span><span class="id"> rewrite</span><span class="id"> -2!</span>(<span class="id">ler0z</span><span class="id"> R</span>)<span class="id"> !bnd_simp</span><span class="id"> ?intrM</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> _</span><span class="id"> geb2</span><span class="id"> ?</span><span class="id"> ?;</span><span class="id"> apply:</span><span class="id"> mulr_ge0</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> apply/</span>(<span class="id">le_trans</span><span class="id"> geb2</span>)<span class="id">/ltW</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> p1gt0</span><span class="id"> b2ge0</span><span class="id"> lep1x1</span><span class="id"> ltb2x2</span>.<br/>
+&nbsp;&nbsp;<span class="id">have:</span> (<span class="id">Posz</span><span class="id"> p1</span>.<span class="id">+1</span>)<span class="id">%:~R</span><span class="id"> *</span><span class="id"> x2</span><span class="id"> &lt;=</span><span class="id"> x1</span><span class="id"> *</span><span class="id"> x2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> ler_pM2r</span><span class="id"> //;</span><span class="id"> apply:</span><span class="id"> le_lt_trans</span><span class="id"> ltb2x2</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> lt_le_trans;</span><span class="id"> rewrite</span><span class="id"> ltr_pM2l</span><span class="id"> //</span><span class="id"> ltr0z</span>.<br/>
+<span class="id">-</span><span class="id"> case:</span><span class="id"> b2</span><span class="id"> =&gt;</span><span class="id"> [[|p2]|//];</span><span class="id"> rewrite</span><span class="id"> -2!</span>(<span class="id">ler0z</span><span class="id"> R</span>)<span class="id"> !bnd_simp</span><span class="id"> ?intrM</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> geb1</span><span class="id"> _</span><span class="id"> ?</span><span class="id"> ?;</span><span class="id"> apply:</span><span class="id"> mulr_ge0</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> apply/</span>(<span class="id">le_trans</span><span class="id"> geb1</span>)<span class="id">/ltW</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> b1ge0</span><span class="id"> p2gt0</span><span class="id"> ltb1x1</span><span class="id"> lep2x2</span>.<br/>
+&nbsp;&nbsp;<span class="id">have:</span><span class="id"> b1%:~R</span><span class="id"> *</span><span class="id"> x2</span><span class="id"> &lt;</span><span class="id"> x1</span><span class="id"> *</span><span class="id"> x2;</span><span class="id"> last</span><span class="id"> exact/le_lt_trans/ler_pM</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> ltr_pM2r</span><span class="id"> //;</span><span class="id"> apply:</span><span class="id"> lt_le_trans</span><span class="id"> lep2x2;</span><span class="id"> rewrite</span><span class="id"> ltr0z</span>.<br/>
+<span class="id">-</span><span class="id"> rewrite</span><span class="id"> -2!</span>(<span class="id">ler0z</span><span class="id"> R</span>)<span class="id"> bnd_simp</span><span class="id"> intrM;</span><span class="id"> exact:</span><span class="id"> ltr_pM</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> mul_itv_boundrC_subproof</span><span class="id"> b1</span><span class="id"> b2</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">mul_itv_boundr_subdef</span><span class="id"> b1</span><span class="id"> b2</span><span class="id"> =</span><span class="id"> mul_itv_boundr_subdef</span><span class="id"> b2</span><span class="id"> b1</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> move:</span><span class="id"> b1</span><span class="id"> b2</span><span class="id"> =&gt;</span><span class="id"> [[]</span><span class="id"> [[|?]|?]</span><span class="id"> |</span><span class="id"> []]</span><span class="id"> [[]</span><span class="id"> [[|?]|?]</span><span class="id"> |</span><span class="id"> []]</span><span class="id"> //=;</span><span class="id"> rewrite</span><span class="id"> mulnC</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> mul_itv_boundr_subproof</span><span class="id"> b1</span><span class="id"> b2</span> (<span class="id">x1</span><span class="id"> x2</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="id">BLeft</span><span class="id"> 0%R</span><span class="id"> &lt;=</span><span class="id"> BLeft</span><span class="id"> x1</span><span class="id"> -&gt;</span><span class="id"> BLeft</span><span class="id"> 0%R</span><span class="id"> &lt;=</span><span class="id"> BLeft</span><span class="id"> x2</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;&nbsp;<span class="id">BRight</span><span class="id"> x1</span><span class="id"> &lt;=</span><span class="id"> Itv</span>.<span class="id">map_itv_bound</span><span class="id"> intr</span><span class="id"> b1</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;&nbsp;<span class="id">BRight</span><span class="id"> x2</span><span class="id"> &lt;=</span><span class="id"> Itv</span>.<span class="id">map_itv_bound</span><span class="id"> intr</span><span class="id"> b2</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;&nbsp;<span class="id">BRight</span> (<span class="id">x1</span><span class="id"> *</span><span class="id"> x2</span>)<span class="id"> &lt;=</span><span class="id"> Itv</span>.<span class="id">map_itv_bound</span><span class="id"> intr</span> (<span class="id">mul_itv_boundr_subdef</span><span class="id"> b1</span><span class="id"> b2</span>))<span class="id">%O</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move:</span><span class="id"> b1</span><span class="id"> b2</span><span class="id"> =&gt;</span><span class="id"> [b1b</span><span class="id"> b1</span><span class="id"> |</span><span class="id"> []]</span><span class="id"> [b2b</span><span class="id"> b2</span><span class="id"> |</span><span class="id"> []]</span><span class="id"> //=;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+<span class="id">-</span><span class="id"> move:</span><span class="id"> b2</span><span class="id"> b2b</span><span class="id"> =&gt;</span><span class="id"> [[|p2]|p2]</span><span class="id"> []</span><span class="id"> //</span><span class="id"> _</span><span class="id"> +</span><span class="id"> _</span><span class="id"> +;</span><span class="id"> rewrite</span><span class="id"> !bnd_simp</span><span class="id"> =&gt;</span><span class="id"> le1</span><span class="id"> le2</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> move:</span> (<span class="id">le_lt_trans</span><span class="id"> le1</span><span class="id"> le2</span>)<span class="id">;</span><span class="id"> rewrite</span><span class="id"> ltxx</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> move:</span> (<span class="id">conj</span><span class="id"> le1</span><span class="id"> le2</span>)<span class="id"> =&gt;</span><span class="id"> /andP/le_anti</span><span class="id"> &lt;-;</span><span class="id"> rewrite</span><span class="id"> mulr0</span>.<br/>
+<span class="id">-</span><span class="id"> move:</span><span class="id"> b1</span><span class="id"> b1b</span><span class="id"> =&gt;</span><span class="id"> [[|p1]|p1]</span><span class="id"> []</span><span class="id"> //</span><span class="id"> +</span><span class="id"> _</span><span class="id"> +</span><span class="id"> _;</span><span class="id"> rewrite</span><span class="id"> !bnd_simp</span><span class="id"> =&gt;</span><span class="id"> le1</span><span class="id"> le2</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> move:</span> (<span class="id">le_lt_trans</span><span class="id"> le1</span><span class="id"> le2</span>)<span class="id">;</span><span class="id"> rewrite</span><span class="id"> ltxx</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> move:</span> (<span class="id">conj</span><span class="id"> le1</span><span class="id"> le2</span>)<span class="id"> =&gt;</span><span class="id"> /andP/le_anti</span><span class="id"> &lt;-;</span><span class="id"> rewrite</span><span class="id"> mul0r</span>.<br/>
+<span class="id">case:</span><span class="id"> b1</span><span class="id"> =&gt;</span><span class="id"> [[|p1]|p1]</span>.<br/>
+<span class="id">-</span><span class="id"> case:</span><span class="id"> b1b</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> !bnd_simp</span><span class="id"> =&gt;</span><span class="id"> l</span><span class="id"> _</span><span class="id"> l'</span><span class="id"> _;</span><span class="id"> move:</span> (<span class="id">le_lt_trans</span><span class="id"> l</span><span class="id"> l'</span>)<span class="id">;</span><span class="id"> rewrite</span><span class="id"> ltxx</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move:</span><span class="id"> b2b</span><span class="id"> b2</span><span class="id"> =&gt;</span><span class="id"> []</span><span class="id"> [[|p2]|p2];</span><span class="id"> rewrite</span><span class="id"> !bnd_simp;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">first</span> (<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> _</span><span class="id"> l</span><span class="id"> _</span><span class="id"> l';</span><span class="id"> move:</span> (<span class="id">le_lt_trans</span><span class="id"> l</span><span class="id"> l'</span>)<span class="id">;</span><span class="id"> rewrite</span><span class="id"> ltxx</span>)<span class="id">;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> l</span><span class="id"> _</span><span class="id"> l'</span><span class="id"> _;</span><span class="id"> move:</span> (<span class="id">conj</span><span class="id"> l</span><span class="id"> l'</span>)<span class="id"> =&gt;</span><span class="id"> /andP/le_anti</span><span class="id"> &lt;-;</span><span class="id"> rewrite</span><span class="id"> mul0r</span>.<br/>
+<span class="id">-</span><span class="id"> rewrite</span><span class="id"> if_same</span>.<br/>
+&nbsp;&nbsp;<span class="id">case:</span><span class="id"> b2</span><span class="id"> =&gt;</span><span class="id"> [[|p2]|p2]</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> case:</span><span class="id"> b2b</span><span class="id"> =&gt;</span><span class="id"> _</span><span class="id"> +</span><span class="id"> _</span><span class="id"> +;</span><span class="id"> rewrite</span><span class="id"> !bnd_simp</span><span class="id"> =&gt;</span><span class="id"> l</span><span class="id"> l'</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move:</span> (<span class="id">le_lt_trans</span><span class="id"> l</span><span class="id"> l'</span>)<span class="id">;</span><span class="id"> rewrite</span><span class="id"> ltxx</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move:</span> (<span class="id">conj</span><span class="id"> l</span><span class="id"> l'</span>)<span class="id"> =&gt;</span><span class="id"> /andP/le_anti</span><span class="id"> &lt;-;</span><span class="id"> rewrite</span><span class="id"> mulr0</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> move:</span><span class="id"> b1b</span><span class="id"> b2b</span><span class="id"> =&gt;</span><span class="id"> []</span><span class="id"> [];</span><span class="id"> rewrite</span><span class="id"> !bnd_simp;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[intRing</span>.<span class="id">mulz</span><span class="id"> ?[a]</span><span class="id"> ?[b]]/</span>((<span class="id">Posz</span><span class="id"> ?[a]</span>)<span class="id"> *</span><span class="id"> ?[b]</span>)<span class="id">%R</span><span class="id"> intrM</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="id"> exact:</span><span class="id"> ltr_pM</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="id"> move=&gt;</span><span class="id"> x1ge0</span><span class="id"> x2ge0</span><span class="id"> ltx1p1</span><span class="id"> lex2p2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">have:</span><span class="id"> x1</span><span class="id"> *</span><span class="id"> p2</span>.<span class="id">+1%:~R</span><span class="id"> &lt;</span><span class="id"> p1</span>.<span class="id">+1%:~R</span><span class="id"> *</span><span class="id"> p2</span>.<span class="id">+1%:~R</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> ltr_pM2r</span><span class="id"> //</span><span class="id"> ltr0z</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact/le_lt_trans/ler_pM</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="id"> move=&gt;</span><span class="id"> x1ge0</span><span class="id"> x2ge0</span><span class="id"> lex1p1</span><span class="id"> ltx2p2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">have:</span><span class="id"> p1</span>.<span class="id">+1%:~R</span><span class="id"> *</span><span class="id"> x2</span><span class="id"> &lt;</span><span class="id"> p1</span>.<span class="id">+1%:~R</span><span class="id"> *</span><span class="id"> p2</span>.<span class="id">+1%:~R</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> ltr_pM2l</span><span class="id"> //</span><span class="id"> ltr0z</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact/le_lt_trans/ler_pM</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="id"> exact:</span><span class="id"> ler_pM</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> case:</span><span class="id"> b2b</span><span class="id"> =&gt;</span><span class="id"> _</span><span class="id"> +</span><span class="id"> _;</span><span class="id"> rewrite</span><span class="id"> 2!bnd_simp</span><span class="id"> =&gt;</span><span class="id"> l</span><span class="id"> l'</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move:</span> (<span class="id">le_lt_trans</span><span class="id"> l</span><span class="id"> l'</span>)<span class="id">;</span><span class="id"> rewrite</span><span class="id"> ltr0z</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move:</span> (<span class="id">le_trans</span><span class="id"> l</span><span class="id"> l'</span>)<span class="id">;</span><span class="id"> rewrite</span><span class="id"> ler0z</span>.<br/>
+<span class="id">-</span><span class="id"> case:</span><span class="id"> b1b</span><span class="id"> =&gt;</span><span class="id"> +</span><span class="id"> _</span><span class="id"> +</span><span class="id"> _;</span><span class="id"> rewrite</span><span class="id"> 2!bnd_simp</span><span class="id"> =&gt;</span><span class="id"> l</span><span class="id"> l'</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move:</span> (<span class="id">le_lt_trans</span><span class="id"> l</span><span class="id"> l'</span>)<span class="id">;</span><span class="id"> rewrite</span><span class="id"> ltr0z</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move:</span> (<span class="id">le_trans</span><span class="id"> l</span><span class="id"> l'</span>)<span class="id">;</span><span class="id"> rewrite</span><span class="id"> ler0z</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> mul_itv_boundr'_subproof</span><span class="id"> b1</span><span class="id"> b2</span> (<span class="id">x1</span><span class="id"> x2</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="id">BLeft</span><span class="id"> 0%:R</span><span class="id"> &lt;=</span><span class="id"> BLeft</span><span class="id"> x1</span><span class="id"> -&gt;</span><span class="id"> BRight</span><span class="id"> 0%:Z</span><span class="id"> &lt;=</span><span class="id"> b2</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;&nbsp;<span class="id">BRight</span><span class="id"> x1</span><span class="id"> &lt;=</span><span class="id"> Itv</span>.<span class="id">map_itv_bound</span><span class="id"> intr</span><span class="id"> b1</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;&nbsp;<span class="id">BRight</span><span class="id"> x2</span><span class="id"> &lt;=</span><span class="id"> Itv</span>.<span class="id">map_itv_bound</span><span class="id"> intr</span><span class="id"> b2</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;&nbsp;<span class="id">BRight</span> (<span class="id">x1</span><span class="id"> *</span><span class="id"> x2</span>)<span class="id"> &lt;=</span><span class="id"> Itv</span>.<span class="id">map_itv_bound</span><span class="id"> intr</span> (<span class="id">mul_itv_boundr_subdef</span><span class="id"> b1</span><span class="id"> b2</span>))<span class="id">%O</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> x1ge0</span><span class="id"> b2ge0</span><span class="id"> lex1b1</span><span class="id"> lex2b2</span>.<br/>
+<span class="id">have</span><span class="id"> [x2ge0</span><span class="id"> |</span><span class="id"> x2lt0]</span><span class="id"> :=</span><span class="id"> leP</span><span class="id"> 0</span><span class="id"> x2;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> mul_itv_boundr_subproof</span>.<br/>
+<span class="id">have</span><span class="id"> lem0</span><span class="id"> :</span> (<span class="id">BRight</span> (<span class="id">x1</span><span class="id"> *</span><span class="id"> x2</span>)<span class="id"> &lt;=</span><span class="id"> BRight</span><span class="id"> 0%R</span>)<span class="id">%O</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> bnd_simp</span><span class="id"> mulr_ge0_le0</span><span class="id"> //</span><span class="id"> ltW</span>.<br/>
+<span class="id">apply:</span><span class="id"> le_trans</span><span class="id"> lem0</span><span class="id"> _</span>.<br/>
+<span class="id">move:</span><span class="id"> b1</span><span class="id"> b2</span><span class="id"> lex1b1</span><span class="id"> lex2b2</span><span class="id"> b2ge0</span><span class="id"> =&gt;</span><span class="id"> [b1b</span><span class="id"> b1</span><span class="id"> |</span><span class="id"> []]</span><span class="id"> [b2b</span><span class="id"> b2</span><span class="id"> |</span><span class="id"> []]</span><span class="id"> //=;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move:</span><span class="id"> b2</span><span class="id"> b2b</span><span class="id"> =&gt;</span><span class="id"> [[|?]|?]</span><span class="id"> []</span>.<br/>
+<span class="id">-</span><span class="id"> move:</span><span class="id"> b1</span><span class="id"> b1b</span><span class="id"> =&gt;</span><span class="id"> [[|p1]|p1]</span><span class="id"> []</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> leBRight_ltBLeft</span><span class="id"> =&gt;</span><span class="id"> /</span>(<span class="id">le_lt_trans</span><span class="id"> x1ge0</span>)<span class="id">;</span><span class="id"> rewrite</span><span class="id"> ltxx</span>.<br/>
+<span class="id">case:</span><span class="id"> b1</span><span class="id"> =&gt;</span><span class="id"> [[|p1]|p1]</span>.<br/>
+<span class="id">-</span><span class="id"> case:</span><span class="id"> b1b;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> move:</span><span class="id"> b2b</span><span class="id"> b2</span><span class="id"> =&gt;</span><span class="id"> []</span><span class="id"> [[|]|]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> leBRight_ltBLeft</span><span class="id"> =&gt;</span><span class="id"> /</span>(<span class="id">le_lt_trans</span><span class="id"> x1ge0</span>)<span class="id">;</span><span class="id"> rewrite</span><span class="id"> ltxx</span>.<br/>
+<span class="id">-</span><span class="id"> rewrite</span><span class="id"> if_same</span>.<br/>
+&nbsp;&nbsp;<span class="id">case:</span><span class="id"> b2</span><span class="id"> =&gt;</span><span class="id"> [[|p2]|p2];</span><span class="id"> first</span> (<span class="gallina-kwd">by</span><span class="id"> case:</span><span class="id"> b2b</span>)<span class="id">;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> case:</span><span class="id"> b2b</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> if_same</span><span class="id"> =&gt;</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> leBSide</span><span class="id"> ltrW_lteif</span><span class="id"> //</span><span class="id"> ltr0z</span>.<br/>
+<span class="id">-</span><span class="id"> rewrite</span><span class="id"> leBRight_ltBLeft</span><span class="id"> =&gt;</span><span class="id"> /</span>(<span class="id">le_lt_trans</span><span class="id"> x1ge0</span>).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> case:</span><span class="id"> b1b;</span><span class="id"> rewrite</span><span class="id"> bnd_simp</span><span class="id"> ?ltr0z</span><span class="id"> //</span><span class="id"> ler0z</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> mul_itv_subdef</span> (<span class="id">i1</span><span class="id"> i2</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> int</span>)<span class="id"> :</span><span class="id"> interval</span><span class="id"> int</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">let</span><span class="id"> 'Interval</span><span class="id"> l1</span><span class="id"> u1</span><span class="id"> :=</span><span class="id"> i1</span><span class="gallina-kwd"> in</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">let</span><span class="id"> 'Interval</span><span class="id"> l2</span><span class="id"> u2</span><span class="id"> :=</span><span class="id"> i2</span><span class="gallina-kwd"> in</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">let</span><span class="id"> opp</span><span class="id"> :=</span><span class="id"> opp_itv_bound_subdef</span><span class="gallina-kwd"> in</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">let</span><span class="id"> mull</span><span class="id"> :=</span><span class="id"> mul_itv_boundl_subdef</span><span class="gallina-kwd"> in</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">let</span><span class="id"> mulr</span><span class="id"> :=</span><span class="id"> mul_itv_boundr_subdef</span><span class="gallina-kwd"> in</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">match</span><span class="id"> interval_sign</span><span class="id"> i1,</span><span class="id"> interval_sign</span><span class="id"> i2</span><span class="gallina-kwd"> with</span><br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> None,</span><span class="id"> _</span><span class="id"> |</span><span class="id"> _,</span><span class="id"> None</span><span class="id"> =&gt;</span><span class="id"> `[1,</span><span class="id"> 0]</span><br/>
+&nbsp;&nbsp;<span class="id">|</span><span class="id"> some</span><span class="id"> s1,</span><span class="id"> Some</span><span class="id"> s2</span><span class="id"> =&gt;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="gallina-kwd">match</span><span class="id"> s1,</span><span class="id"> s2</span><span class="gallina-kwd"> with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">|</span><span class="id"> =0,</span><span class="id"> _</span><span class="id"> =&gt;</span><span class="id"> `[0,</span><span class="id"> 0]</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">|</span><span class="id"> _,</span><span class="id"> =0</span><span class="id"> =&gt;</span><span class="id"> `[0,</span><span class="id"> 0]</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">|</span><span class="id"> &gt;=0,</span><span class="id"> &gt;=0</span><span class="id"> =&gt;</span><span class="id"> Interval</span> (<span class="id">mull</span><span class="id"> l1</span><span class="id"> l2</span>) (<span class="id">mulr</span><span class="id"> u1</span><span class="id"> u2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">|</span><span class="id"> &lt;=0,</span><span class="id"> &lt;=0</span><span class="id"> =&gt;</span><span class="id"> Interval</span> (<span class="id">mull</span> (<span class="id">opp</span><span class="id"> u1</span>) (<span class="id">opp</span><span class="id"> u2</span>)) (<span class="id">mulr</span> (<span class="id">opp</span><span class="id"> l1</span>) (<span class="id">opp</span><span class="id"> l2</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">|</span><span class="id"> &gt;=0,</span><span class="id"> &lt;=0</span><span class="id"> =&gt;</span><span class="id"> Interval</span> (<span class="id">opp</span> (<span class="id">mulr</span><span class="id"> u1</span> (<span class="id">opp</span><span class="id"> l2</span>))) (<span class="id">opp</span> (<span class="id">mull</span><span class="id"> l1</span> (<span class="id">opp</span><span class="id"> u2</span>)))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">|</span><span class="id"> &lt;=0,</span><span class="id"> &gt;=0</span><span class="id"> =&gt;</span><span class="id"> Interval</span> (<span class="id">opp</span> (<span class="id">mulr</span> (<span class="id">opp</span><span class="id"> l1</span>)<span class="id"> u2</span>)) (<span class="id">opp</span> (<span class="id">mull</span> (<span class="id">opp</span><span class="id"> u1</span>)<span class="id"> l2</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">|</span><span class="id"> &gt;=0,</span><span class="id"> &gt;=&lt;0</span><span class="id"> =&gt;</span><span class="id"> Interval</span> (<span class="id">opp</span> (<span class="id">mulr</span><span class="id"> u1</span> (<span class="id">opp</span><span class="id"> l2</span>))) (<span class="id">mulr</span><span class="id"> u1</span><span class="id"> u2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">|</span><span class="id"> &lt;=0,</span><span class="id"> &gt;=&lt;0</span><span class="id"> =&gt;</span><span class="id"> Interval</span> (<span class="id">opp</span> (<span class="id">mulr</span> (<span class="id">opp</span><span class="id"> l1</span>)<span class="id"> u2</span>)) (<span class="id">mulr</span> (<span class="id">opp</span><span class="id"> l1</span>) (<span class="id">opp</span><span class="id"> l2</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">|</span><span class="id"> &gt;=&lt;0,</span><span class="id"> &gt;=0</span><span class="id"> =&gt;</span><span class="id"> Interval</span> (<span class="id">opp</span> (<span class="id">mulr</span> (<span class="id">opp</span><span class="id"> l1</span>)<span class="id"> u2</span>)) (<span class="id">mulr</span><span class="id"> u1</span><span class="id"> u2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">|</span><span class="id"> &gt;=&lt;0,</span><span class="id"> &lt;=0</span><span class="id"> =&gt;</span><span class="id"> Interval</span> (<span class="id">opp</span> (<span class="id">mulr</span><span class="id"> u1</span> (<span class="id">opp</span><span class="id"> l2</span>))) (<span class="id">mulr</span> (<span class="id">opp</span><span class="id"> l1</span>) (<span class="id">opp</span><span class="id"> l2</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">|</span><span class="id"> &gt;=&lt;0,</span><span class="id"> &gt;=&lt;0</span><span class="id"> =&gt;</span><span class="id"> Interval</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">Order</span>.<span class="id">min</span> (<span class="id">opp</span> (<span class="id">mulr</span> (<span class="id">opp</span><span class="id"> l1</span>)<span class="id"> u2</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">opp</span> (<span class="id">mulr</span><span class="id"> u1</span> (<span class="id">opp</span><span class="id"> l2</span>))))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">Order</span>.<span class="id">max</span> (<span class="id">mulr</span> (<span class="id">opp</span><span class="id"> l1</span>) (<span class="id">opp</span><span class="id"> l2</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">mulr</span><span class="id"> u1</span><span class="id"> u2</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">end</span>)<span class="id">%snum_sign</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">end</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> mul_itv_subdef</span><span class="id"> /</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> map_itv_bound_min</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> itv_bound</span><span class="id"> int</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">Itv</span>.<span class="id">map_itv_bound</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> x%:~R</span><span class="id"> :</span><span class="id"> R</span>) (<span class="id">Order</span>.<span class="id">min</span><span class="id"> x</span><span class="id"> y</span>)<br/>
+&nbsp;&nbsp;<span class="id">=</span><span class="id"> Order</span>.<span class="id">min</span> (<span class="id">Itv</span>.<span class="id">map_itv_bound</span><span class="id"> intr</span><span class="id"> x</span>) (<span class="id">Itv</span>.<span class="id">map_itv_bound</span><span class="id"> intr</span><span class="id"> y</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">have</span><span class="id"> [lexy|ltyx]</span><span class="id"> :=</span><span class="id"> leP</span><span class="id"> x</span><span class="id"> y;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> !minEle</span><span class="id"> Itv</span>.<span class="id">le_map_itv_bound</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> minElt</span><span class="id"> -if_neg</span><span class="id"> -leNgt</span><span class="id"> Itv</span>.<span class="id">le_map_itv_bound</span><span class="id"> //</span><span class="id"> ltW</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> map_itv_bound_max</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> itv_bound</span><span class="id"> int</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">Itv</span>.<span class="id">map_itv_bound</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> x%:~R</span><span class="id"> :</span><span class="id"> R</span>) (<span class="id">Order</span>.<span class="id">max</span><span class="id"> x</span><span class="id"> y</span>)<br/>
+&nbsp;&nbsp;<span class="id">=</span><span class="id"> Order</span>.<span class="id">max</span> (<span class="id">Itv</span>.<span class="id">map_itv_bound</span><span class="id"> intr</span><span class="id"> x</span>) (<span class="id">Itv</span>.<span class="id">map_itv_bound</span><span class="id"> intr</span><span class="id"> y</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">have</span><span class="id"> [lexy|ltyx]</span><span class="id"> :=</span><span class="id"> leP</span><span class="id"> x</span><span class="id"> y;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> !maxEle</span><span class="id"> Itv</span>.<span class="id">le_map_itv_bound</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> maxElt</span><span class="id"> -if_neg</span><span class="id"> -leNgt</span><span class="id"> Itv</span>.<span class="id">le_map_itv_bound</span><span class="id"> //</span><span class="id"> ltW</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> mul_inum_subproof</span> (<span class="id">xi</span><span class="id"> yi</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> int</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">x</span><span class="id"> :</span><span class="id"> {itv</span><span class="id"> R</span><span class="id"> &amp;</span><span class="id"> xi}</span>) (<span class="id">y</span><span class="id"> :</span><span class="id"> {itv</span><span class="id"> R</span><span class="id"> &amp;</span><span class="id"> yi}</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">r</span><span class="id"> :=</span><span class="id"> mul_itv_subdef</span><span class="id"> xi</span><span class="id"> yi</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">Itv</span>.<span class="id">spec</span><span class="id"> r</span> (<span class="id">x%:inum</span><span class="id"> *</span><span class="id"> y%:inum</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> {}/r</span>.<br/>
+<span class="id">move:</span><span class="id"> xi</span><span class="id"> x</span><span class="id"> yi</span><span class="id"> y</span><span class="id"> =&gt;</span><span class="id"> [lx</span><span class="id"> ux]</span><span class="id"> [x</span><span class="id"> /=</span><span class="id"> /andP[+</span><span class="id"> +]]</span><span class="id"> [ly</span><span class="id"> uy]</span><span class="id"> [y</span><span class="id"> /=</span><span class="id"> /andP[+</span><span class="id"> +]]</span>.<br/>
+<span class="id">rewrite</span><span class="id"> -/</span>(<span class="id">interval_sign</span> (<span class="id">Interval</span><span class="id"> lx</span><span class="id"> ux</span>)).<br/>
+<span class="id">rewrite</span><span class="id"> -/</span>(<span class="id">interval_sign</span> (<span class="id">Interval</span><span class="id"> ly</span><span class="id"> uy</span>)).<br/>
+<span class="id">have</span><span class="id"> empty10</span> (<span class="id">z</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> l</span><span class="id"> u</span><span class="id"> :</span> (<span class="id">u</span><span class="id"> &lt;=</span><span class="id"> l</span>)<span class="id">%O</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">Itv</span>.<span class="id">map_itv_bound</span><span class="id"> [eta</span><span class="id"> intr]</span><span class="id"> l</span><span class="id"> &lt;=</span><span class="id"> BLeft</span><span class="id"> z</span>)<span class="id">%O</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">BRight</span><span class="id"> z</span><span class="id"> &lt;=</span><span class="id"> Itv</span>.<span class="id">map_itv_bound</span><span class="id"> [eta</span><span class="id"> intr]</span><span class="id"> u</span>)<span class="id">%O</span><span class="id"> -&gt;</span><span class="id"> False</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> leul;</span><span class="id"> rewrite</span><span class="id"> leBRight_ltBLeft</span><span class="id"> =&gt;</span><span class="id"> /le_lt_trans</span><span class="id"> /[apply]</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> lt_def</span><span class="id"> =&gt;</span><span class="id"> /andP[/[swap]]</span><span class="id"> =&gt;</span><span class="id"> +</span><span class="id"> /ltac:</span>(<span class="id">apply/negP</span>).<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> negbK;</span><span class="id"> move:</span><span class="id"> leul</span><span class="id"> =&gt;</span><span class="id"> /</span>(<span class="id">Itv</span>.<span class="id">le_map_itv_bound</span><span class="id"> R</span>)<span class="id"> le1</span><span class="id"> le2</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply/eqP/le_anti;</span><span class="id"> rewrite</span><span class="id"> le1</span>.<br/>
+<span class="id">pose</span><span class="id"> opp</span><span class="id"> :=</span><span class="id"> opp_itv_bound_subdef</span>.<br/>
+<span class="id">pose</span><span class="id"> mull</span><span class="id"> :=</span><span class="id"> mul_itv_boundl_subdef</span>.<br/>
+<span class="id">pose</span><span class="id"> mulr</span><span class="id"> :=</span><span class="id"> mul_itv_boundr_subdef</span>.<br/>
+<span class="id">have</span><span class="id"> [leuxlx|-&gt;</span><span class="id"> -&gt;|lxneg</span><span class="id"> uxneg|lxpos</span><span class="id"> uxpos|lxneg</span><span class="id"> uxpos]</span><span class="id"> :=</span><span class="id"> interval_signP</span>.<br/>
+<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> +</span><span class="id"> +</span><span class="id"> /ltac:</span>(<span class="id">exfalso</span>)<span class="id">;</span><span class="id"> exact:</span><span class="id"> empty10</span>.<br/>
+<span class="id">-</span><span class="id"> rewrite</span><span class="id"> 2!bnd_simp</span><span class="id"> =&gt;</span><span class="id"> lex1</span><span class="id"> lex2</span><span class="id"> ley1</span><span class="id"> ley2</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> -&gt;</span><span class="id"> :</span><span class="id"> x</span><span class="id"> =</span><span class="id"> 0</span><span class="gallina-kwd"> by</span><span class="id"> apply:</span><span class="id"> le_anti;</span><span class="id"> rewrite</span><span class="id"> lex1</span><span class="id"> lex2</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> mul0r</span>.<br/>
+&nbsp;&nbsp;<span class="id">case:</span><span class="id"> interval_signP;</span><span class="id"> [|by</span><span class="id"> move=&gt;</span><span class="id"> _</span><span class="id"> _;</span><span class="id"> rewrite</span><span class="id"> /Itv</span>.<span class="id">itv_cond</span><span class="id"> in_itv/=</span><span class="id"> lexx</span>..<span class="id">]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> leul;</span><span class="id"> exfalso;</span><span class="id"> move:</span><span class="id"> ley1</span><span class="id"> ley2;</span><span class="id"> apply:</span><span class="id"> empty10</span>.<br/>
+<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> lelxx</span><span class="id"> lexux</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> xneg</span><span class="id"> :</span><span class="id"> x</span><span class="id"> &lt;=</span><span class="id"> 0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">move:</span> (<span class="id">le_trans</span><span class="id"> lexux</span> (<span class="id">Itv</span>.<span class="id">le_map_itv_bound</span><span class="id"> R</span><span class="id"> uxneg</span>)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> bnd_simp</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> [leuyly|-&gt;</span><span class="id"> -&gt;|lyneg</span><span class="id"> uyneg|lypos</span><span class="id"> uypos|lyneg</span><span class="id"> uypos]</span><span class="id"> :=</span><span class="id"> interval_signP</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> move=&gt;</span><span class="id"> +</span><span class="id"> +</span><span class="id"> /ltac:</span>(<span class="id">exfalso</span>)<span class="id">;</span><span class="id"> exact:</span><span class="id"> empty10</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> rewrite</span><span class="id"> 2!bnd_simp</span><span class="id"> =&gt;</span><span class="id"> ley1</span><span class="id"> ley2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">have</span><span class="id"> -&gt;</span><span class="id"> :</span><span class="id"> y</span><span class="id"> =</span><span class="id"> 0</span><span class="gallina-kwd"> by</span><span class="id"> apply:</span><span class="id"> le_anti;</span><span class="id"> rewrite</span><span class="id"> ley1</span><span class="id"> ley2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> mulr0</span><span class="id"> /Itv</span>.<span class="id">itv_cond</span><span class="id"> in_itv/=</span><span class="id"> lexx</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> move=&gt;</span><span class="id"> lelyy</span><span class="id"> leyuy</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">have</span><span class="id"> yneg</span><span class="id"> :</span><span class="id"> y</span><span class="id"> &lt;=</span><span class="id"> 0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">move:</span> (<span class="id">le_trans</span><span class="id"> leyuy</span> (<span class="id">Itv</span>.<span class="id">le_map_itv_bound</span><span class="id"> R</span><span class="id"> uyneg</span>)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> bnd_simp</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[Interval</span><span class="id"> _</span><span class="id"> _]/</span>(<span class="id">Interval</span> (<span class="id">mull</span> (<span class="id">opp</span><span class="id"> ux</span>) (<span class="id">opp</span><span class="id"> uy</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">mulr</span> (<span class="id">opp</span><span class="id"> lx</span>) (<span class="id">opp</span><span class="id"> ly</span>))).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -mulrNN</span><span class="id"> /Itv</span>.<span class="id">itv_cond</span><span class="id"> itv_boundlr</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> mul_itv_boundl_subproof</span><span class="id"> ?mul_itv_boundr_subproof</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> bnd_simp</span><span class="id"> oppr_ge0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> bnd_simp</span><span class="id"> oppr_ge0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_boundr_subproof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_boundr_subproof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_ge0_subproof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_ge0_subproof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_boundl_subproof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_boundl_subproof</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> move=&gt;</span><span class="id"> lelyy</span><span class="id"> leyuy</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">have</span><span class="id"> ypos</span><span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;=</span><span class="id"> y</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">move:</span> (<span class="id">le_trans</span> (<span class="id">Itv</span>.<span class="id">le_map_itv_bound</span><span class="id"> R</span><span class="id"> lypos</span>)<span class="id"> lelyy</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> bnd_simp</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[Interval</span><span class="id"> _</span><span class="id"> _]/</span>(<span class="id">Interval</span> (<span class="id">opp</span> (<span class="id">mulr</span> (<span class="id">opp</span><span class="id"> lx</span>)<span class="id"> uy</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">opp</span> (<span class="id">mull</span> (<span class="id">opp</span><span class="id"> ux</span>)<span class="id"> ly</span>))).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[x</span><span class="id"> *</span><span class="id"> y]opprK</span><span class="id"> -mulNr</span><span class="id"> /Itv</span>.<span class="id">itv_cond</span><span class="id"> itv_boundlr</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> opp_itv_boundl_subproof</span><span class="id"> opp_itv_boundr_subproof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> mul_itv_boundl_subproof</span><span class="id"> ?mul_itv_boundr_subproof</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> bnd_simp</span><span class="id"> oppr_ge0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_boundr_subproof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_ge0_subproof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_boundl_subproof</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> move=&gt;</span><span class="id"> lelyy</span><span class="id"> leyuy</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[Interval</span><span class="id"> _</span><span class="id"> _]/</span>(<span class="id">Interval</span> (<span class="id">opp</span> (<span class="id">mulr</span> (<span class="id">opp</span><span class="id"> lx</span>)<span class="id"> uy</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">mulr</span> (<span class="id">opp</span><span class="id"> lx</span>) (<span class="id">opp</span><span class="id"> ly</span>))).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[x</span><span class="id"> *</span><span class="id"> y]opprK</span><span class="id"> -mulNr</span><span class="id"> /Itv</span>.<span class="id">itv_cond</span><span class="id"> itv_boundlr</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> opp_itv_boundl_subproof</span><span class="id"> -mulrN</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> 2?mul_itv_boundr'_subproof</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> bnd_simp</span><span class="id"> oppr_ge0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> leBRight_ltBLeft</span><span class="id"> opp_itv_gt0_subproof</span><span class="id"> ltBRight_leBLeft</span><span class="id"> ltW</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_boundr_subproof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_boundr_subproof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> bnd_simp</span><span class="id"> oppr_ge0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> ltW</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_boundr_subproof</span>.<br/>
+<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> lelxx</span><span class="id"> lexux</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> xpos</span><span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;=</span><span class="id"> x</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">move:</span> (<span class="id">le_trans</span> (<span class="id">Itv</span>.<span class="id">le_map_itv_bound</span><span class="id"> R</span><span class="id"> lxpos</span>)<span class="id"> lelxx</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> bnd_simp</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> [leuyly|-&gt;</span><span class="id"> -&gt;|lyneg</span><span class="id"> uyneg|lypos</span><span class="id"> uypos|lyneg</span><span class="id"> uypos]</span><span class="id"> :=</span><span class="id"> interval_signP</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> move=&gt;</span><span class="id"> +</span><span class="id"> +</span><span class="id"> /ltac:</span>(<span class="id">exfalso</span>)<span class="id">;</span><span class="id"> exact:</span><span class="id"> empty10</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> rewrite</span><span class="id"> 2!bnd_simp</span><span class="id"> =&gt;</span><span class="id"> ley1</span><span class="id"> ley2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">have</span><span class="id"> -&gt;</span><span class="id"> :</span><span class="id"> y</span><span class="id"> =</span><span class="id"> 0</span><span class="gallina-kwd"> by</span><span class="id"> apply:</span><span class="id"> le_anti;</span><span class="id"> rewrite</span><span class="id"> ley1</span><span class="id"> ley2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> mulr0</span><span class="id"> /Itv</span>.<span class="id">itv_cond</span><span class="id"> in_itv/=</span><span class="id"> lexx</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> move=&gt;</span><span class="id"> lelyy</span><span class="id"> leyuy</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">have</span><span class="id"> yneg</span><span class="id"> :</span><span class="id"> y</span><span class="id"> &lt;=</span><span class="id"> 0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">move:</span> (<span class="id">le_trans</span><span class="id"> leyuy</span> (<span class="id">Itv</span>.<span class="id">le_map_itv_bound</span><span class="id"> R</span><span class="id"> uyneg</span>)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> bnd_simp</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[Interval</span><span class="id"> _</span><span class="id"> _]/</span>(<span class="id">Interval</span> (<span class="id">opp</span> (<span class="id">mulr</span><span class="id"> ux</span> (<span class="id">opp</span><span class="id"> ly</span>)))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">opp</span> (<span class="id">mull</span><span class="id"> lx</span> (<span class="id">opp</span><span class="id"> uy</span>)))).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[x</span><span class="id"> *</span><span class="id"> y]opprK</span><span class="id"> -mulrN</span><span class="id"> /Itv</span>.<span class="id">itv_cond</span><span class="id"> itv_boundlr</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> opp_itv_boundl_subproof</span><span class="id"> opp_itv_boundr_subproof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> mul_itv_boundr_subproof</span><span class="id"> ?mul_itv_boundl_subproof</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_ge0_subproof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_boundl_subproof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> bnd_simp</span><span class="id"> oppr_ge0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_boundr_subproof</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> move=&gt;</span><span class="id"> lelyy</span><span class="id"> leyuy</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">have</span><span class="id"> ypos</span><span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;=</span><span class="id"> y</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">move:</span> (<span class="id">le_trans</span> (<span class="id">Itv</span>.<span class="id">le_map_itv_bound</span><span class="id"> R</span><span class="id"> lypos</span>)<span class="id"> lelyy</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> bnd_simp</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[Interval</span><span class="id"> _</span><span class="id"> _]/</span>(<span class="id">Interval</span> (<span class="id">mull</span><span class="id"> lx</span><span class="id"> ly</span>) (<span class="id">mulr</span><span class="id"> ux</span><span class="id"> uy</span>)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> /Itv</span>.<span class="id">itv_cond</span><span class="id"> itv_boundlr</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> mul_itv_boundr_subproof</span><span class="id"> ?mul_itv_boundl_subproof</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> move=&gt;</span><span class="id"> lelyy</span><span class="id"> leyuy</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[Interval</span><span class="id"> _</span><span class="id"> _]/</span>(<span class="id">Interval</span> (<span class="id">opp</span> (<span class="id">mulr</span><span class="id"> ux</span> (<span class="id">opp</span><span class="id"> ly</span>))) (<span class="id">mulr</span><span class="id"> ux</span><span class="id"> uy</span>)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[x</span><span class="id"> *</span><span class="id"> y]opprK</span><span class="id"> -mulrN</span><span class="id"> /Itv</span>.<span class="id">itv_cond</span><span class="id"> itv_boundlr</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> opp_itv_boundl_subproof</span><span class="id"> -mulrN</span><span class="id"> opprK</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> 2?mul_itv_boundr'_subproof</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> ltW</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> leBRight_ltBLeft</span><span class="id"> opp_itv_gt0_subproof</span><span class="id"> ltBRight_leBLeft</span><span class="id"> ltW</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_boundr_subproof</span>.<br/>
+<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> lelxx</span><span class="id"> lexux</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> [leuyly|-&gt;</span><span class="id"> -&gt;|lyneg</span><span class="id"> uyneg|lypos</span><span class="id"> uypos|lyneg</span><span class="id"> uypos]</span><span class="id"> :=</span><span class="id"> interval_signP</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> move=&gt;</span><span class="id"> +</span><span class="id"> +</span><span class="id"> /ltac:</span>(<span class="id">exfalso</span>)<span class="id">;</span><span class="id"> exact:</span><span class="id"> empty10</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> rewrite</span><span class="id"> 2!bnd_simp</span><span class="id"> =&gt;</span><span class="id"> ley1</span><span class="id"> ley2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">have</span><span class="id"> -&gt;</span><span class="id"> :</span><span class="id"> y</span><span class="id"> =</span><span class="id"> 0</span><span class="gallina-kwd"> by</span><span class="id"> apply:</span><span class="id"> le_anti;</span><span class="id"> rewrite</span><span class="id"> ley1</span><span class="id"> ley2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> mulr0</span><span class="id"> /Itv</span>.<span class="id">itv_cond</span><span class="id"> in_itv/=</span><span class="id"> lexx</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> move=&gt;</span><span class="id"> lelyy</span><span class="id"> leyuy</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">have</span><span class="id"> yneg</span><span class="id"> :</span><span class="id"> y</span><span class="id"> &lt;=</span><span class="id"> 0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">move:</span> (<span class="id">le_trans</span><span class="id"> leyuy</span> (<span class="id">Itv</span>.<span class="id">le_map_itv_bound</span><span class="id"> R</span><span class="id"> uyneg</span>)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> bnd_simp</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[Interval</span><span class="id"> _</span><span class="id"> _]/</span>(<span class="id">Interval</span> (<span class="id">opp</span> (<span class="id">mulr</span><span class="id"> ux</span> (<span class="id">opp</span><span class="id"> ly</span>)))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">mulr</span> (<span class="id">opp</span><span class="id"> lx</span>) (<span class="id">opp</span><span class="id"> ly</span>))).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[x</span><span class="id"> *</span><span class="id"> y]opprK</span><span class="id"> -mulrN</span><span class="id"> /Itv</span>.<span class="id">itv_cond</span><span class="id"> itv_boundlr</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> /mulr</span><span class="id"> mul_itv_boundrC_subproof</span><span class="id"> mulrC</span><span class="id"> opp_itv_boundl_subproof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> [in</span><span class="id"> X</span><span class="gallina-kwd"> in</span><span class="id"> _</span><span class="id"> &amp;&amp;</span><span class="id"> X]mul_itv_boundrC_subproof</span><span class="id"> -mulrN</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> mul_itv_boundr'_subproof</span><span class="id"> ?mul_itv_boundr'_subproof</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> bnd_simp</span><span class="id"> oppr_ge0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> leBRight_ltBLeft</span><span class="id"> opp_itv_gt0_subproof</span><span class="id"> ltBRight_leBLeft</span><span class="id"> ltW</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_boundr_subproof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_boundr_subproof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> bnd_simp</span><span class="id"> oppr_ge0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> ltW</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_boundr_subproof</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> move=&gt;</span><span class="id"> lelyy</span><span class="id"> leyuy</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">have</span><span class="id"> ypos</span><span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;=</span><span class="id"> y</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">move:</span> (<span class="id">le_trans</span> (<span class="id">Itv</span>.<span class="id">le_map_itv_bound</span><span class="id"> R</span><span class="id"> lypos</span>)<span class="id"> lelyy</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> bnd_simp</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[Interval</span><span class="id"> _</span><span class="id"> _]/</span>(<span class="id">Interval</span> (<span class="id">opp</span> (<span class="id">mulr</span> (<span class="id">opp</span><span class="id"> lx</span>)<span class="id"> uy</span>)) (<span class="id">mulr</span><span class="id"> ux</span><span class="id"> uy</span>)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[x</span><span class="id"> *</span><span class="id"> y]opprK</span><span class="id"> -mulNr</span><span class="id"> /Itv</span>.<span class="id">itv_cond</span><span class="id"> itv_boundlr</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> /mulr</span><span class="id"> mul_itv_boundrC_subproof</span><span class="id"> mulrC</span><span class="id"> opp_itv_boundl_subproof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> [in</span><span class="id"> X</span><span class="gallina-kwd"> in</span><span class="id"> _</span><span class="id"> &amp;&amp;</span><span class="id"> X]mul_itv_boundrC_subproof</span><span class="id"> -mulrN</span><span class="id"> opprK</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> mul_itv_boundr'_subproof</span><span class="id"> ?mul_itv_boundr'_subproof</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> ltW</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> leBRight_ltBLeft</span><span class="id"> opp_itv_gt0_subproof</span><span class="id"> ltBRight_leBLeft</span><span class="id"> ltW</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_boundr_subproof</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> move=&gt;</span><span class="id"> lelyy</span><span class="id"> leyuy</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[Interval</span><span class="id"> _</span><span class="id"> _]/</span>(<span class="id">Interval</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">Order</span>.<span class="id">min</span> (<span class="id">opp</span> (<span class="id">mulr</span> (<span class="id">opp</span><span class="id"> lx</span>)<span class="id"> uy</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">opp</span> (<span class="id">mulr</span><span class="id"> ux</span> (<span class="id">opp</span><span class="id"> ly</span>))))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">Order</span>.<span class="id">max</span> (<span class="id">mulr</span> (<span class="id">opp</span><span class="id"> lx</span>) (<span class="id">opp</span><span class="id"> ly</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">mulr</span><span class="id"> ux</span><span class="id"> uy</span>))).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> /Itv</span>.<span class="id">itv_cond</span><span class="id"> itv_boundlr</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> map_itv_bound_min</span><span class="id"> map_itv_bound_max</span><span class="id"> ge_min</span><span class="id"> le_max</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[x</span><span class="id"> *</span><span class="id"> y]opprK</span><span class="id"> !opp_itv_boundl_subproof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[in</span><span class="id"> X</span><span class="gallina-kwd"> in</span> ((<span class="id">X</span><span class="id"> ||</span><span class="id"> _</span>)<span class="id"> &amp;&amp;</span><span class="id"> _</span>)<span class="id">]mulNr</span><span class="id"> -[in</span><span class="id"> X</span><span class="gallina-kwd"> in</span> ((_<span class="id"> ||</span><span class="id"> X</span>)<span class="id"> &amp;&amp;</span><span class="id"> _</span>)<span class="id">]mulrN</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[in</span><span class="id"> X</span><span class="gallina-kwd"> in</span> (_<span class="id"> &amp;&amp;</span> (<span class="id">X</span><span class="id"> ||</span><span class="id"> _</span>))<span class="id">]mulrNN</span><span class="id"> !opprK</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">have</span><span class="id"> [xpos|xneg]</span><span class="id"> :=</span><span class="id"> leP</span><span class="id"> 0</span><span class="id"> x</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="id"> rewrite</span><span class="id"> [in</span><span class="id"> X</span><span class="gallina-kwd"> in</span> ((_<span class="id"> ||</span><span class="id"> X</span>)<span class="id"> &amp;&amp;</span><span class="id"> _</span>)<span class="id">]mul_itv_boundr'_subproof</span><span class="id"> ?orbT</span><span class="id"> //=;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> ?[in</span><span class="id"> X</span><span class="gallina-kwd"> in</span> (_<span class="id"> ||</span><span class="id"> X</span>)<span class="id">]mul_itv_boundr'_subproof</span><span class="id"> ?orbT</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> ltW</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> leBRight_ltBLeft</span><span class="id"> opp_itv_gt0_subproof</span><span class="id"> ltBRight_leBLeft</span><span class="id"> ltW</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_boundr_subproof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">*</span><span class="id"> rewrite</span><span class="id"> [in</span><span class="id"> X</span><span class="gallina-kwd"> in</span> ((<span class="id">X</span><span class="id"> ||</span><span class="id"> _</span>)<span class="id"> &amp;&amp;</span><span class="id"> _</span>)<span class="id">]mul_itv_boundr'_subproof</span><span class="id"> //=;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> ?[in</span><span class="id"> X</span><span class="gallina-kwd"> in</span> (<span class="id">X</span><span class="id"> ||</span><span class="id"> _</span>)<span class="id">]mul_itv_boundr'_subproof</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> bnd_simp</span><span class="id"> oppr_ge0</span><span class="id"> ltW</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> leBRight_ltBLeft</span><span class="id"> opp_itv_gt0_subproof</span><span class="id"> ltBRight_leBLeft</span><span class="id"> ltW</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_boundr_subproof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_boundr_subproof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> bnd_simp</span><span class="id"> oppr_ge0</span><span class="id"> ltW</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> ltW</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> opp_itv_boundr_subproof</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Canonical</span><span class="id"> mul_inum</span> (<span class="id">xi</span><span class="id"> yi</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> int</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">x</span><span class="id"> :</span><span class="id"> {itv</span><span class="id"> R</span><span class="id"> &amp;</span><span class="id"> xi}</span>) (<span class="id">y</span><span class="id"> :</span><span class="id"> {itv</span><span class="id"> R</span><span class="id"> &amp;</span><span class="id"> yi}</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">Itv</span>.<span class="id">mk</span> (<span class="id">mul_inum_subproof</span><span class="id"> x</span><span class="id"> y</span>).<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> RealDomainStability</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> Morph</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> {i</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> int}</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Notation</span><span class="id"> nR</span><span class="id"> :=</span><span class="id"> {itv</span><span class="id"> R</span><span class="id"> &amp;</span><span class="id"> i}</span>.<br/>
+<span class="vernacular">Implicit</span><span class="id"> Types</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> nR</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Notation</span><span class="id"> inum</span><span class="id"> :=</span> (<span class="id">@inum</span><span class="id"> R</span><span class="id"> i</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> inum_eq</span><span class="id"> :</span><span class="id"> {mono</span><span class="id"> inum</span><span class="id"> :</span><span class="id"> x</span><span class="id"> y</span><span class="id"> /</span><span class="id"> x</span><span class="id"> ==</span><span class="id"> y}</span><br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
+<span class="vernacular">Lemma</span><span class="id"> inum_le</span><span class="id"> :</span><span class="id"> {mono</span><span class="id"> inum</span><span class="id"> :</span><span class="id"> x</span><span class="id"> y</span><span class="id"> /</span> (<span class="id">x</span><span class="id"> &lt;=</span><span class="id"> y</span>)<span class="id">%O}</span><br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
+<span class="vernacular">Lemma</span><span class="id"> inum_lt</span><span class="id"> :</span><span class="id"> {mono</span><span class="id"> inum</span><span class="id"> :</span><span class="id"> x</span><span class="id"> y</span><span class="id"> /</span> (<span class="id">x</span><span class="id"> &lt;</span><span class="id"> y</span>)<span class="id">%O}</span><br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> Morph</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> Test1</span>.<br/>
+<br/>
+<span class="vernacular">Variable</span><span class="id"> R</span><span class="id"> :</span><span class="id"> numDomainType</span>.<br/>
+<span class="vernacular">Variable</span><span class="id"> x</span><span class="id"> :</span><span class="id"> {i01</span><span class="id"> R}</span>.<br/>
+<br/>
+<span class="vernacular">Goal</span><span class="id"> 0%:i01</span><span class="id"> =</span><span class="id"> 1%:i01</span><span class="id"> :&gt;</span><span class="id"> {i01</span><span class="id"> R}</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+Abort.</div></details>
+<br/>
+<span class="vernacular">Goal</span> (<span class="id">-</span><span class="id"> x%:inum</span>)<span class="id">%:itv</span><span class="id"> =</span> (<span class="id">-</span><span class="id"> x%:inum</span>)<span class="id">%:itv</span><span class="id"> :&gt;</span><span class="id"> {itv</span><span class="id"> R</span><span class="id"> &amp;</span><span class="id"> `[-1,</span><span class="id"> 0]}</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+Abort.</div></details>
+<br/>
+<span class="vernacular">Goal</span> (<span class="id">1</span><span class="id"> -</span><span class="id"> x%:inum</span>)<span class="id">%:i01</span><span class="id"> =</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+Abort.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> Test1</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> Test2</span>.<br/>
+<br/>
+<span class="vernacular">Variable</span><span class="id"> R</span><span class="id"> :</span><span class="id"> realDomainType</span>.<br/>
+<span class="vernacular">Variable</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> {i01</span><span class="id"> R}</span>.<br/>
+<br/>
+<span class="vernacular">Goal</span> (<span class="id">x%:inum</span><span class="id"> *</span><span class="id"> y%:inum</span>)<span class="id">%:i01</span><span class="id"> =</span><span class="id"> x%:inum%:i01</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+Abort.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> Test2</span>.<br/>
+<br/>
+<span class="vernacular">Module</span><span class="id"> Test3</span>.<br/>
+<span class="vernacular">Section</span><span class="id"> Test3</span>.<br/>
+<span class="vernacular">Variable</span><span class="id"> R</span><span class="id"> :</span><span class="id"> realDomainType</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> s_of_pq</span> (<span class="id">p</span><span class="id"> q</span><span class="id"> :</span><span class="id"> {i01</span><span class="id"> R}</span>)<span class="id"> :</span><span class="id"> {i01</span><span class="id"> R}</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;(<span class="id">1</span><span class="id"> -</span> ((<span class="id">1</span><span class="id"> -</span><span class="id"> p%:inum</span>)<span class="id">%:i01%:inum</span><span class="id"> *</span> (<span class="id">1</span><span class="id"> -</span><span class="id"> q%:inum</span>)<span class="id">%:i01%:inum</span>))<span class="id">%:i01</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> s_of_p0</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> {i01</span><span class="id"> R}</span>)<span class="id"> :</span><span class="id"> s_of_pq</span><span class="id"> p</span><span class="id"> 0%:i01</span><span class="id"> =</span><span class="id"> p</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> apply/val_inj;</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> subr0</span><span class="id"> mulr1</span><span class="id"> subKr</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Canonical</span><span class="id"> onem_itv01</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> {i01</span><span class="id"> R}</span>)<span class="id"> :</span><span class="id"> {i01</span><span class="id"> R}</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">@Itv</span>.<span class="id">mk</span><span class="id"> _</span><span class="id"> _</span> (<span class="id">onem</span><span class="id"> p%:inum</span>)<span class="id"> [itv</span><span class="id"> of</span><span class="id"> 1</span><span class="id"> -</span><span class="id"> p%:inum]</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> s_of_pq'</span> (<span class="id">p</span><span class="id"> q</span><span class="id"> :</span><span class="id"> {i01</span><span class="id"> R}</span>)<span class="id"> :</span><span class="id"> {i01</span><span class="id"> R}</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;(<span class="id">`1-</span> (<span class="id">`1-</span>(<span class="id">p%:inum</span>)<span class="id"> *</span><span class="id"> `1-</span>(<span class="id">q%:inum</span>)))<span class="id">%:i01</span>.<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> Test3</span>.<br/>
+<span class="vernacular">End</span><span class="id"> Test3</span>.<br/>
+
+      <div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/">a fork of coq2html</a></div>
+    </div>
+  </div>
+    </main>
+</body>
+</html>

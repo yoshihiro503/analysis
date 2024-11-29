@@ -1,0 +1,240 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module mathcomp.analysis.homotopy_theory.path</title>
+<meta name="description" content="Documentation of Coq module mathcomp.analysis.homotopy_theory.path" />
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="init()">
+
+  <main>
+    <div class="sidebar">
+      <h2>Files</h2>
+      
+    </div>
+
+  <div class="coq">
+
+    <div class="content">
+      <p><a href="./index.html">Top</a></p>
+      <h1 class="title">Module mathcomp.analysis.homotopy_theory.path</h1>
+<span class="vernacular">From</span><span class="id"> HB</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> structures</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> all_ssreflect</span><span class="id"> all_algebra</span><span class="id"> finmap</span><span class="id"> generic_quotient</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> mathcomp_extra</span><span class="id"> boolp</span><span class="id"> classical_sets</span><span class="id"> functions</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> cardinality</span><span class="id"> fsbigop</span><span class="id"> reals</span><span class="id"> signed</span><span class="id"> topology</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> function_spaces</span><span class="id"> wedge_sigT</span>.<br/>
+<br/>
+<div class="ssrdoc md">
+# Paths
+Paths from biPointed spaces.
+
+```
+   mk_path ctsf f0 f1 == constructs a value in `pathType x y` given proofs
+                         that the endpoints of `f` are `x` and `y`
+ reparameterize f phi == the path `f` with a different parameterization
+       chain_path f g == the path which follows f, then follows g
+                         Only makes sense when `f one = g zero`. The
+                         domain is the wedge of domains of `f` and `g`.
+```
+The type `{path i from x to y in T}` is the continuous functions on the
+bipointed space i that go from x to y staying in T. It is endowed with
+- Topology via the compact-open topology
+
+</div>
+<br/>
+<span class="gallina-kwd">Set</span><span class="vernacular"> Implicit</span><span class="vernacular"> Arguments</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Strict</span><span class="vernacular"> Implicit</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Printing</span><span class="vernacular"> Implicit</span><span class="vernacular"> Defensive</span>.<br/>
+<br/>
+<span class="vernacular">Reserved</span><span class="vernacular"> Notation</span> <span class="id">&quot;{ 'path' i 'from' x 'to' y }&quot;</span> (<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">at</span><span class="id"> level</span><span class="id"> 0,</span><span class="id"> i</span><span class="gallina-kwd"> at</span><span class="id"> level</span><span class="id"> 69,</span><span class="id"> x</span><span class="gallina-kwd"> at</span><span class="id"> level</span><span class="id"> 69,</span><span class="id"> y</span><span class="gallina-kwd"> at</span><span class="id"> level</span><span class="id"> 69,</span><br/>
+&nbsp;&nbsp;<span class="id">only</span><span class="id"> parsing,</span><br/>
+&nbsp;&nbsp;<span class="id">format</span> <span class="id">&quot;{ 'path'  i  'from'  x  'to'  y }&quot;</span>).<br/>
+<span class="vernacular">Reserved</span><span class="vernacular"> Notation</span> <span class="id">&quot;{ 'path' i 'from' x 'to' y 'in' T }&quot;</span> (<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">at</span><span class="id"> level</span><span class="id"> 0,</span><span class="id"> i</span><span class="gallina-kwd"> at</span><span class="id"> level</span><span class="id"> 69,</span><span class="id"> x</span><span class="gallina-kwd"> at</span><span class="id"> level</span><span class="id"> 69,</span><span class="id"> y</span><span class="gallina-kwd"> at</span><span class="id"> level</span><span class="id"> 69,</span><span class="id"> T</span><span class="gallina-kwd"> at</span><span class="id"> level</span><span class="id"> 69,</span><br/>
+&nbsp;&nbsp;<span class="id">format</span> <span class="id">&quot;{ 'path'  i  'from'  x  'to'  y  'in'  T }&quot;</span>).<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> classical_set_scope</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ring_scope</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> quotient_scope</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">mixin</span><span class="vernacular"> Record</span><span class="id"> isPath</span><span class="id"> {i</span><span class="id"> :</span><span class="id"> bpTopologicalType}</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> topologicalType}</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> T</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">f</span><span class="id"> :</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> T</span>)<span class="id"> of</span><span class="id"> isContinuous</span><span class="id"> i</span><span class="id"> T</span><span class="id"> f</span><span class="id"> :=</span><span class="id"> {</span><br/>
+&nbsp;&nbsp;<span class="id">path_zero</span><span class="id"> :</span><span class="id"> f</span><span class="id"> zero</span><span class="id"> =</span><span class="id"> x;</span><br/>
+&nbsp;&nbsp;<span class="id">path_one</span><span class="id"> :</span><span class="id"> f</span><span class="id"> one</span><span class="id"> =</span><span class="id"> y;</span><br/>
+<span class="id">}</span>.<br/>
+<br/>
+<span class="id">#[short</span>(<span class="id">type=</span><span class="id">&quot;pathType&quot;</span>)<span class="id">]</span><br/>
+<span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> Path</span><span class="id"> {i</span><span class="id"> :</span><span class="id"> bpTopologicalType}</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> topologicalType}</span><br/>
+&nbsp;&nbsp;(<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> T</span>)<span class="id"> :=</span><span class="id"> {f</span><span class="id"> of</span><span class="id"> isPath</span><span class="id"> i</span><span class="id"> T</span><span class="id"> x</span><span class="id"> y</span><span class="id"> f</span><span class="id"> &amp;</span><span class="id"> isContinuous</span><span class="id"> i</span><span class="id"> T</span><span class="id"> f}</span>.<br/>
+<br/>
+<span class="vernacular">Notation</span> <span class="id">&quot;{ 'path' i 'from' x 'to' y }&quot;</span><span class="id"> :=</span> (<span class="id">pathType</span><span class="id"> i</span><span class="id"> x</span><span class="id"> y</span>)<span class="id"> :</span><span class="id"> type_scope</span>.<br/>
+<span class="vernacular">Notation</span> <span class="id">&quot;{ 'path' i 'from' x 'to' y 'in' T }&quot;</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;(<span class="id">@pathType</span><span class="id"> i</span><span class="id"> T</span><span class="id"> x</span><span class="id"> y</span>)<span class="id"> :</span><span class="id"> type_scope</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> {i</span><span class="id"> :</span><span class="id"> bpTopologicalType}</span><br/>
+&nbsp;&nbsp;<span class="id">{T</span><span class="id"> :</span><span class="id"> topologicalType}</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> T</span>)<span class="id"> :=</span><span class="id"> gen_eqMixin</span><span class="id"> {path</span><span class="id"> i</span><span class="id"> from</span><span class="id"> x</span><span class="id"> to</span><span class="id"> y}</span>.<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> {i</span><span class="id"> :</span><span class="id"> bpTopologicalType}</span><br/>
+&nbsp;&nbsp;<span class="id">{T</span><span class="id"> :</span><span class="id"> topologicalType}</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> T</span>)<span class="id"> :=</span><span class="id"> gen_choiceMixin</span><span class="id"> {path</span><span class="id"> i</span><span class="id"> from</span><span class="id"> x</span><span class="id"> to</span><span class="id"> y}</span>.<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> {i</span><span class="id"> :</span><span class="id"> bpTopologicalType}</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">{T</span><span class="id"> :</span><span class="id"> topologicalType}</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> T</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">Topological</span>.<span class="id">copy</span><span class="id"> {path</span><span class="id"> i</span><span class="id"> from</span><span class="id"> x</span><span class="id"> to</span><span class="id"> y}</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">@weak_topology</span><span class="id"> {path</span><span class="id"> i</span><span class="id"> from</span><span class="id"> x</span><span class="id"> to</span><span class="id"> y}</span><span class="id"> {compact-open,</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> T}</span><span class="id"> id</span>).<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> path_eq</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> topologicalType}</span><span class="id"> {i</span><span class="id"> :</span><span class="id"> bpTopologicalType}</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> T</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> path_eqP</span> (<span class="id">a</span><span class="id"> b</span><span class="id"> :</span><span class="id"> {path</span><span class="id"> i</span><span class="id"> from</span><span class="id"> x</span><span class="id"> to</span><span class="id"> y}</span>)<span class="id"> :</span><span class="id"> a</span><span class="id"> =</span><span class="id"> b</span><span class="id"> &lt;-&gt;</span><span class="id"> a</span><span class="id"> =1</span><span class="id"> b</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">split=&gt;</span><span class="id"> [-&gt;//|]</span>.<br/>
+<span class="id">move:</span><span class="id"> a</span><span class="id"> b</span><span class="id"> =&gt;</span><span class="id"> [/=</span><span class="id"> f</span><span class="id"> [[+</span><span class="id"> +]]]</span><span class="id"> [/=</span><span class="id"> g</span><span class="id"> [[+</span><span class="id"> +]]]</span><span class="id"> fgE</span>.<br/>
+<span class="id">move/funext</span><span class="id"> :</span><span class="id"> fgE</span><span class="id"> =&gt;</span><span class="id"> -&gt;</span><span class="id"> /=</span><span class="id"> a1</span><span class="id"> [b1</span><span class="id"> c1]</span><span class="id"> a2</span><span class="id"> [b2</span><span class="id"> c2];</span><span class="id"> congr</span> (_<span class="id"> _</span>).<br/>
+<span class="id">rewrite</span> (<span class="id">Prop_irrelevance</span><span class="id"> a1</span><span class="id"> a2</span>) (<span class="id">Prop_irrelevance</span><span class="id"> b1</span><span class="id"> b2</span>).<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span> (<span class="id">Prop_irrelevance</span><span class="id"> c1</span><span class="id"> c2</span>).<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> path_eq</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> cst_path</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> topologicalType}</span><span class="id"> {i</span><span class="id"> :</span><span class="id"> bpTopologicalType}</span> (<span class="id">x:</span><span class="id"> T</span>).<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> @isPath</span>.<span class="id">Build</span><span class="id"> i</span><span class="id"> T</span><span class="id"> x</span><span class="id"> x</span> (<span class="id">cst</span><span class="id"> x</span>)<span class="id"> erefl</span><span class="id"> erefl</span>.<br/>
+<span class="vernacular">End</span><span class="id"> cst_path</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> path_domain_path</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {i</span><span class="id"> :</span><span class="id"> bpTopologicalType}</span>.<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> @isPath</span>.<span class="id">Build</span><span class="id"> i</span><span class="id"> i</span><span class="id"> zero</span><span class="id"> one</span><span class="id"> idfun</span><span class="id"> erefl</span><span class="id"> erefl</span>.<br/>
+<span class="vernacular">End</span><span class="id"> path_domain_path</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> path_compose</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {T</span><span class="id"> U</span><span class="id"> :</span><span class="id"> topologicalType}</span> (<span class="id">i:</span><span class="id"> bpTopologicalType</span>) (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> T</span>).<br/>
+<span class="vernacular">Context</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> continuousType</span><span class="id"> T</span><span class="id"> U</span>) (<span class="id">p</span><span class="id"> :</span><span class="id"> {path</span><span class="id"> i</span><span class="id"> from</span><span class="id"> x</span><span class="id"> to</span><span class="id"> y}</span>).<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> fp_zero</span><span class="id"> :</span> (<span class="id">f</span><span class="id"> \o</span><span class="id"> p</span>)<span class="id"> zero</span><span class="id"> =</span><span class="id"> f</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> !path_zero</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> fp_one</span><span class="id"> :</span> (<span class="id">f</span><span class="id"> \o</span><span class="id"> p</span>)<span class="id"> one</span><span class="id"> =</span><span class="id"> f</span><span class="id"> y</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> !path_one</span>. Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> isPath</span>.<span class="id">Build</span><span class="id"> i</span><span class="id"> U</span> (<span class="id">f</span><span class="id"> x</span>) (<span class="id">f</span><span class="id"> y</span>) (<span class="id">f</span><span class="id"> \o</span><span class="id"> p</span>)<br/>
+&nbsp;&nbsp;<span class="id">fp_zero</span><span class="id"> fp_one</span>.<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> path_compose</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> path_reparameterize</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> topologicalType}</span> (<span class="id">i</span><span class="id"> j:</span><span class="id"> bpTopologicalType</span>) (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> T</span>).<br/>
+<span class="vernacular">Context</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> {path</span><span class="id"> i</span><span class="id"> from</span><span class="id"> x</span><span class="id"> to</span><span class="id"> y}</span>) (<span class="id">phi</span><span class="id"> :</span><span class="id"> {path</span><span class="id"> j</span><span class="id"> from</span><span class="id"> zero</span><span class="id"> to</span><span class="id"> one</span><span class="gallina-kwd"> in</span><span class="id"> i}</span>).<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> reparameterize</span><span class="id"> :=</span><span class="id"> f</span><span class="id"> \o</span><span class="id"> phi</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> fphi_zero</span><span class="id"> :</span><span class="id"> reparameterize</span><span class="id"> zero</span><span class="id"> =</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /reparameterize</span><span class="id"> /=</span><span class="id"> ?path_zero</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> fphi_one</span><span class="id"> :</span><span class="id"> reparameterize</span><span class="id"> one</span><span class="id"> =</span><span class="id"> y</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /reparameterize</span><span class="id"> /=</span><span class="id"> ?path_one</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> fphi_cts</span><span class="id"> :</span><span class="id"> continuous</span><span class="id"> reparameterize</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?;</span><span class="id"> apply:</span><span class="id"> continuous_comp;</span><span class="id"> apply:</span><span class="id"> cts_fun</span>. Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> isContinuous</span>.<span class="id">Build</span><span class="id"> _</span><span class="id"> _</span><span class="id"> reparameterize</span><span class="id"> fphi_cts</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> isPath</span>.<span class="id">Build</span><span class="id"> j</span><span class="id"> T</span><span class="id"> x</span><span class="id"> y</span><span class="id"> reparameterize</span><br/>
+&nbsp;&nbsp;<span class="id">fphi_zero</span><span class="id"> fphi_one</span>.<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> path_reparameterize</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> mk_path</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {i</span><span class="id"> :</span><span class="id"> bpTopologicalType}</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> topologicalType}</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> T}</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> T</span>) (<span class="id">ctsf</span><span class="id"> :</span><span class="id"> continuous</span><span class="id"> f</span>).<br/>
+<span class="vernacular">Context</span> (<span class="id">f0</span><span class="id"> :</span><span class="id"> f</span><span class="id"> zero</span><span class="id"> =</span><span class="id"> x</span>) (<span class="id">f1</span><span class="id"> :</span><span class="id"> f</span><span class="id"> one</span><span class="id"> =</span><span class="id"> y</span>).<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> mk_path</span><span class="id"> :</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> T</span><span class="id"> :=</span><span class="gallina-kwd"> let</span><span class="id"> _</span><span class="id"> :=</span> (<span class="id">ctsf,</span><span class="id"> f0,</span><span class="id"> f1</span>)<span class="gallina-kwd"> in</span><span class="id"> f</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> isContinuous</span>.<span class="id">Build</span><span class="id"> i</span><span class="id"> T</span><span class="id"> mk_path</span><span class="id"> ctsf</span>.<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> @isPath</span>.<span class="id">Build</span><span class="id"> i</span><span class="id"> T</span><span class="id"> x</span><span class="id"> y</span><span class="id"> mk_path</span><span class="id"> f0</span><span class="id"> f1</span>.<br/>
+<span class="vernacular">End</span><span class="id"> mk_path</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> chain_path</span><span class="id"> {i</span><span class="id"> j</span><span class="id"> :</span><span class="id"> bpTopologicalType}</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> topologicalType}</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">f</span><span class="id"> :</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> T</span>) (<span class="id">g</span><span class="id"> :</span><span class="id"> j</span><span class="id"> -&gt;</span><span class="id"> T</span>)<span class="id"> :</span><span class="id"> bpwedge</span><span class="id"> i</span><span class="id"> j</span><span class="id"> -&gt;</span><span class="id"> T</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">wedge_fun</span> (<span class="gallina-kwd">fun</span><span class="id"> b</span><span class="id"> =&gt;</span><span class="gallina-kwd"> if</span><span class="id"> b</span><span class="gallina-kwd"> return</span> (<span class="gallina-kwd">if</span><span class="id"> b</span><span class="gallina-kwd"> then</span><span class="id"> i</span><span class="gallina-kwd"> else</span><span class="id"> j</span>)<span class="id"> -&gt;</span><span class="id"> T</span><span class="gallina-kwd"> then</span><span class="id"> f</span><span class="gallina-kwd"> else</span><span class="id"> g</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> chain_path_cts_point</span><span class="id"> {i</span><span class="id"> j</span><span class="id"> :</span><span class="id"> bpTopologicalType}</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> topologicalType}</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">f</span><span class="id"> :</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> T</span>) (<span class="id">g</span><span class="id"> :</span><span class="id"> j</span><span class="id"> -&gt;</span><span class="id"> T</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">continuous</span><span class="id"> f</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">continuous</span><span class="id"> g</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">f</span><span class="id"> one</span><span class="id"> =</span><span class="id"> g</span><span class="id"> zero</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">continuous</span> (<span class="id">chain_path</span><span class="id"> f</span><span class="id"> g</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> cf</span><span class="id"> cg</span><span class="id"> fgE;</span><span class="id"> apply:</span><span class="id"> wedge_fun_continuous</span><span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> [[]|[]</span><span class="id"> []]</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Section</span><span class="id"> chain_path</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> topologicalType}</span><span class="id"> {i</span><span class="id"> j</span><span class="id"> :</span><span class="id"> bpTopologicalType}</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> z:</span><span class="id"> T</span>).<br/>
+<span class="vernacular">Context</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> {path</span><span class="id"> i</span><span class="id"> from</span><span class="id"> x</span><span class="id"> to</span><span class="id"> y}</span>) (<span class="id">q</span><span class="id"> :</span><span class="id"> {path</span><span class="id"> j</span><span class="id"> from</span><span class="id"> y</span><span class="id"> to</span><span class="id"> z}</span>).<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> chain_path_zero</span><span class="id"> :</span><span class="id"> chain_path</span><span class="id"> p</span><span class="id"> q</span><span class="id"> zero</span><span class="id"> =</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> /chain_path</span><span class="id"> /=</span><span class="id"> wedge_lift_funE</span><span class="id"> ?path_one</span><span class="id"> ?path_zero</span><span class="id"> //</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> case</span><span class="id"> =&gt;</span><span class="id"> //=</span><span class="id"> [][]</span><span class="id"> //=;</span><span class="id"> rewrite</span><span class="id"> ?path_one</span><span class="id"> ?path_zero</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> chain_path_one</span><span class="id"> :</span><span class="id"> chain_path</span><span class="id"> p</span><span class="id"> q</span><span class="id"> one</span><span class="id"> =</span><span class="id"> z</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> /chain_path</span><span class="id"> /=</span><span class="id"> wedge_lift_funE</span><span class="id"> ?path_zero</span><span class="id"> ?path_one</span><span class="id"> //</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> case</span><span class="id"> =&gt;</span><span class="id"> //=</span><span class="id"> [][]</span><span class="id"> //=;</span><span class="id"> rewrite</span><span class="id"> ?path_one</span><span class="id"> ?path_zero</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> chain_path_cts</span><span class="id"> :</span><span class="id"> continuous</span> (<span class="id">chain_path</span><span class="id"> p</span><span class="id"> q</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">apply:</span><span class="id"> chain_path_cts_point;</span><span class="id"> [exact:</span><span class="id"> cts_fun</span>..<span class="id">|]</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> path_zero</span><span class="id"> path_one</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span> <span class="id"> @isContinuous</span>.<span class="id">Build</span><span class="id"> _</span><span class="id"> T</span> (<span class="id">chain_path</span><span class="id"> p</span><span class="id"> q</span>)<br/>
+&nbsp;&nbsp;<span class="id">chain_path_cts</span>.<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span> <span class="id"> @isPath</span>.<span class="id">Build</span><span class="id"> _</span><span class="id"> T</span><span class="id"> x</span><span class="id"> z</span> (<span class="id">chain_path</span><span class="id"> p</span><span class="id"> q</span>)<br/>
+&nbsp;&nbsp;<span class="id">chain_path_zero</span><span class="id"> chain_path_one</span>.<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> chain_path</span>.<br/>
+
+      <div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/">a fork of coq2html</a></div>
+    </div>
+  </div>
+    </main>
+</body>
+</html>
