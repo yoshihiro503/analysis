@@ -1,0 +1,239 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module mathcomp.experimental_reals.discrete</title>
+<meta name="description" content="Documentation of Coq module mathcomp.experimental_reals.discrete" />
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="init()">
+
+  <main>
+    <div class="sidebar">
+      <h2>Files</h2>
+      
+    </div>
+
+  <div class="coq">
+
+    <div class="content">
+      <p><a href="./index.html">Top</a></p>
+      <h1 class="title">Module mathcomp.experimental_reals.discrete</h1>
+<br/>
+<span class="vernacular">From</span><span class="id"> HB</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> structures</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> all_ssreflect</span><span class="id"> all_algebra</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span>.<span class="id">classical</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> boolp</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> xfinmap</span><span class="id"> reals</span>.<br/>
+<span class="vernacular">From</span><span class="id"> Coq</span><span class="vernacular"> Require</span><span class="id"> Setoid</span>.<br/>
+<br/>
+<span class="gallina-kwd">Set</span>  <span class="vernacular"> Implicit</span><span class="vernacular"> Arguments</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Strict</span><span class="vernacular"> Implicit</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Printing</span><span class="vernacular"> Implicit</span><span class="vernacular"> Defensive</span>.<br/>
+<br/>
+<span class="vernacular">Import</span><span class="id"> GRing</span>.<span class="id">Theory</span><span class="id"> Num</span>.<span class="id">Theory</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ring_scope</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> real_scope</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="vernacular"> ProofIrrelevantChoice</span>.<br/>
+<br/>
+<span class="vernacular">Context</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> choiceType}</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> existsTP</span> (<span class="id">P</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="gallina-kwd"> Prop</span>)<span class="id"> :</span><span class="id"> {</span><span class="id"> x</span><span class="id"> :</span><span class="id"> T</span><span class="id"> |</span><span class="id"> P</span><span class="id"> x</span><span class="id"> }</span><span class="id"> +</span> (<span class="gallina-kwd">forall</span><span class="id"> x,</span><span class="id"> ~</span><span class="id"> P</span><span class="id"> x</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">case:</span> (<span class="id">boolP</span><span class="id"> `[&lt;exists</span><span class="id"> x</span><span class="id"> :</span><span class="id"> T,</span><span class="id"> P</span><span class="id"> x&gt;]</span>)<span class="id"> =&gt;</span><span class="id"> [/exists_asboolP</span><span class="id"> |</span><span class="id"> /asboolPn]</span><span class="id"> h</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> case/cid:</span><span class="id"> h</span><span class="id"> =&gt;</span><span class="id"> w</span><span class="id"> Pw;</span><span class="id"> left;</span><span class="gallina-kwd"> exists</span><span class="id"> w;</span><span class="id"> apply/asboolP</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> right=&gt;</span><span class="id"> x</span><span class="id"> Px;</span><span class="id"> apply/h;</span><span class="gallina-kwd"> exists</span><span class="id"> x</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="vernacular"> ProofIrrelevantChoice</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> PredSubtype</span>.<br/>
+<span class="vernacular">Section</span><span class="id"> Def</span>.<br/>
+<span class="vernacular">Variable</span><span class="id"> T</span><span class="id"> :</span><span class="gallina-kwd"> Type</span>.<br/>
+<span class="vernacular">Variable</span><span class="id"> E</span><span class="id"> :</span><span class="id"> pred</span><span class="id"> T</span>.<br/>
+<br/>
+<span class="vernacular">Record</span><span class="id"> pred_sub</span><span class="id"> :</span><span class="gallina-kwd"> Type</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">PSubSub</span><span class="id"> {</span><span class="id"> rsval</span><span class="id"> :&gt;</span><span class="id"> T;</span><span class="id"> rsvalP</span><span class="id"> :</span><span class="id"> rsval</span><span class="id"> \in</span><span class="id"> E</span><span class="id"> }</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> [isSub</span><span class="gallina-kwd"> for</span><span class="id"> rsval]</span>.<br/>
+<span class="vernacular">End</span><span class="id"> Def</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> eqType</span>) (<span class="id">E</span><span class="id"> :</span><span class="id"> pred</span><span class="id"> T</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">[Equality</span><span class="id"> of</span><span class="id"> pred_sub</span><span class="id"> E</span><span class="gallina-kwd"> by</span><span class="id"> &lt;:]</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> choiceType</span>) (<span class="id">E</span><span class="id"> :</span><span class="id"> pred</span><span class="id"> T</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">[Choice</span><span class="id"> of</span><span class="id"> pred_sub</span><span class="id"> E</span><span class="gallina-kwd"> by</span><span class="id"> &lt;:]</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> countType</span>) (<span class="id">E</span><span class="id"> :</span><span class="id"> pred</span><span class="id"> T</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">[Countable</span><span class="id"> of</span><span class="id"> pred_sub</span><span class="id"> E</span><span class="gallina-kwd"> by</span><span class="id"> &lt;:]</span>.<br/>
+<span class="vernacular">End</span><span class="id"> PredSubtype</span>.<br/>
+<br/>
+<span class="vernacular">Notation</span> <span class="id">&quot;[ 'psub' E ]&quot;</span><span class="id"> :=</span> (<span class="id">@pred_sub</span><span class="id"> _</span><span class="id"> E</span>)<br/>
+&nbsp;&nbsp;(<span class="id">format</span> <span class="id">&quot;[ 'psub'  E ]&quot;</span>).<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> PIncl</span>.<br/>
+<span class="vernacular">Variables</span> (<span class="id">T</span><span class="id"> :</span><span class="gallina-kwd"> Type</span>) (<span class="id">E</span><span class="id"> F</span><span class="id"> :</span><span class="id"> pred</span><span class="id"> T</span>) (<span class="id">le</span><span class="id"> :</span><span class="id"> {subset</span><span class="id"> E</span><span class="id"> &lt;=</span><span class="id"> F}</span>).<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> pincl</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> [psub</span><span class="id"> E]</span>)<span class="id"> :</span><span class="id"> [psub</span><span class="id"> F]</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">PSubSub</span> (<span class="id">le</span> (<span class="id">valP</span><span class="id"> x</span>)).<br/>
+<span class="vernacular">End</span><span class="id"> PIncl</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> Countable</span>.<br/>
+<span class="vernacular">Variable</span> (<span class="id">T</span><span class="id"> :</span><span class="gallina-kwd"> Type</span>) (<span class="id">E</span><span class="id"> :</span><span class="id"> pred</span><span class="id"> T</span>).<br/>
+<br/>
+<span class="vernacular">Variant</span><span class="id"> countable</span><span class="id"> :</span><span class="gallina-kwd"> Type</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">Countable</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">rpickle</span><span class="id"> :</span><span class="id"> [psub</span><span class="id"> E]</span><span class="id"> -&gt;</span><span class="id"> nat</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">runpickle</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> -&gt;</span><span class="id"> option</span><span class="id"> [psub</span><span class="id"> E]</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">of</span><span class="id"> pcancel</span><span class="id"> rpickle</span><span class="id"> runpickle</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> rpickle</span> (<span class="id">c</span><span class="id"> :</span><span class="id"> countable</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">let:</span><span class="id"> Countable</span><span class="id"> p</span><span class="id"> _</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> c</span><span class="gallina-kwd"> in</span><span class="id"> p</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> runpickle</span> (<span class="id">c</span><span class="id"> :</span><span class="id"> countable</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">let:</span><span class="id"> Countable</span><span class="id"> _</span><span class="id"> p</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> c</span><span class="gallina-kwd"> in</span><span class="id"> p</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> rpickleK</span><span class="id"> c:</span><span class="id"> pcancel</span> (<span class="id">rpickle</span><span class="id"> c</span>) (<span class="id">runpickle</span><span class="id"> c</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> case:</span><span class="id"> c</span>. Qed.</div></details>
+<span class="vernacular">End</span><span class="id"> Countable</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> CountableTheory</span>.<br/>
+<span class="vernacular">Lemma</span><span class="id"> countable_countable</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> countType</span>) (<span class="id">E</span><span class="id"> :</span><span class="id"> pred</span><span class="id"> T</span>)<span class="id"> :</span><span class="id"> countable</span><span class="id"> E</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="gallina-kwd"> exists</span><span class="id"> choice</span>.<span class="id">pickle</span><span class="id"> choice</span>.<span class="id">unpickle;</span><span class="id"> apply/choice</span>.<span class="id">pickleK</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Section</span><span class="id"> CanCountable</span>.<br/>
+<span class="vernacular">Variables</span> (<span class="id">T</span><span class="id"> :</span><span class="gallina-kwd"> Type</span>) (<span class="id">U</span><span class="id"> :</span><span class="id"> countType</span>) (<span class="id">E</span><span class="id"> :</span><span class="id"> pred</span><span class="id"> T</span>).<br/>
+<span class="vernacular">Variables</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> [psub</span><span class="id"> E]</span><span class="id"> -&gt;</span><span class="id"> U</span>) (<span class="id">g</span><span class="id"> :</span><span class="id"> U</span><span class="id"> -&gt;</span><span class="id"> [psub</span><span class="id"> E]</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> can_countable</span><span class="id"> :</span><span class="id"> cancel</span><span class="id"> f</span><span class="id"> g</span><span class="id"> -&gt;</span><span class="id"> countable</span><span class="id"> E</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">pose</span><span class="id"> p</span><span class="id"> :=</span><span class="id"> choice</span>.<span class="id">pickle</span><span class="id"> \o</span><span class="id"> f;</span><span class="id"> pose</span><span class="id"> u</span><span class="id"> n</span><span class="id"> :=</span><span class="id"> omap</span><span class="id"> g</span> (<span class="id">choice</span>.<span class="id">unpickle</span><span class="id"> n</span>).<br/>
+<span class="id">move=&gt;</span><span class="id"> can_fg;</span><span class="id"> apply</span> (<span class="id">@Countable</span><span class="id"> _</span><span class="id"> E</span><span class="id"> p</span><span class="id"> u</span>)<span class="id"> =&gt;</span><span class="id"> x</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> {}/u</span><span class="id"> {}/p</span><span class="id"> /=</span><span class="id"> choice</span>.<span class="id">pickleK</span><span class="id"> /=</span><span class="id"> can_fg</span>.<br/>
+Qed.</div></details>
+<span class="vernacular">End</span><span class="id"> CanCountable</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> CountType</span>.<br/>
+<span class="vernacular">Variables</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> eqType</span>) (<span class="id">E</span><span class="id"> :</span><span class="id"> pred</span><span class="id"> T</span>) (<span class="id">c</span><span class="id"> :</span><span class="id"> countable</span><span class="id"> E</span>).<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> countable_countMixin</span> <span class="id"> :=</span><span class="id"> Countable</span>.<span class="id">copy</span><span class="id"> [psub</span><span class="id"> E]</span><br/>
+&nbsp;&nbsp;(<span class="id">pcan_type</span> (<span class="id">rpickleK</span><span class="id"> c</span>)).<br/>
+<span class="vernacular">Definition</span><span class="id"> countable_choiceMixin</span><span class="id"> :=</span><span class="id"> Choice</span>.<span class="id">copy</span><span class="id"> [psub</span><span class="id"> E]</span><br/>
+&nbsp;&nbsp;(<span class="id">pcan_type</span> (<span class="id">rpickleK</span><span class="id"> c</span>)).<br/>
+<span class="vernacular">End</span><span class="id"> CountType</span>.<br/>
+<span class="vernacular">End</span><span class="id"> CountableTheory</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> Finite</span>.<br/>
+<span class="vernacular">Variables</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> eqType</span>).<br/>
+<br/>
+<span class="vernacular">CoInductive</span><span class="id"> finite</span> (<span class="id">E</span><span class="id"> :</span><span class="id"> pred</span><span class="id"> T</span>)<span class="id"> :</span><span class="gallina-kwd"> Type</span><span class="id"> :=</span><br/>
+<span class="id">|</span><span class="id"> Finite</span><span class="id"> s</span><span class="id"> of</span><span class="id"> uniq</span><span class="id"> s</span><span class="id"> &amp;</span><span class="id"> {subset</span><span class="id"> E</span><span class="id"> &lt;=</span><span class="id"> s}</span>.<br/>
+<span class="vernacular">End</span><span class="id"> Finite</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> FiniteTheory</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> choiceType}</span>.<br/>
+<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> finiteP</span> (<span class="id">E</span><span class="id"> :</span><span class="id"> pred</span><span class="id"> T</span>)<span class="id"> :</span> (<span class="gallina-kwd">exists</span><span class="id"> s</span><span class="id"> :</span><span class="id"> seq</span><span class="id"> T,</span><span class="id"> {subset</span><span class="id"> E</span><span class="id"> &lt;=</span><span class="id"> s}</span>)<span class="id"> -&gt;</span><span class="id"> finite</span><span class="id"> E</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">case/cid=&gt;</span><span class="id"> s</span><span class="id"> sEs;</span><span class="gallina-kwd"> exists</span> (<span class="id">undup</span><span class="id"> s</span>)<span class="id">;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> undup_uniq</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> x;</span><span class="id"> rewrite</span><span class="id"> mem_undup;</span><span class="id"> exact:</span><span class="id"> sEs</span>.<br/>
+Qed.</div></details>
+<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> finiteNP</span> (<span class="id">E</span><span class="id"> :</span><span class="id"> pred</span><span class="id"> T</span>)<span class="id">:</span> (<span class="gallina-kwd">forall</span><span class="id"> s</span><span class="id"> :</span><span class="id"> seq</span><span class="id"> T,</span><span class="id"> ~</span><span class="id"> {subset</span><span class="id"> E</span><span class="id"> &lt;=</span><span class="id"> s}</span>)<span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">forall</span><span class="id"> n,</span><span class="gallina-kwd"> exists</span><span class="id"> s</span><span class="id"> :</span><span class="id"> seq</span><span class="id"> T,</span><span class="id"> [/\</span><span class="id"> size</span><span class="id"> s</span><span class="id"> =</span><span class="id"> n,</span><span class="id"> uniq</span><span class="id"> s</span><span class="id"> &amp;</span><span class="id"> {subset</span><span class="id"> s</span><span class="id"> &lt;=</span><span class="id"> E}]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> finN;</span><span class="id"> elim=&gt;</span><span class="id"> [|n</span><span class="id"> [s]</span><span class="id"> [&lt;-</span><span class="id"> uq_s</span><span class="id"> sE]];</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="gallina-kwd"> exists</span><span class="id"> [::]</span>.<br/>
+<span class="id">have</span><span class="id"> [x</span><span class="id"> sxN</span><span class="id"> xE]:</span><span class="gallina-kwd"> exists2</span><span class="id"> x,</span><span class="id"> x</span><span class="id"> \notin</span><span class="id"> s</span><span class="id"> &amp;</span><span class="id"> x</span><span class="id"> \in</span><span class="id"> E</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> contra_notP</span> (<span class="id">finN</span> (<span class="id">filter</span> (<span class="id">mem</span><span class="id"> E</span>)<span class="id"> s</span>))<span class="id"> =&gt;</span><span class="id"> /forall2NP</span><span class="id"> finE</span><span class="id"> x</span><span class="id"> Ex</span>.<br/>
+&nbsp;&nbsp;<span class="id">move/or_asboolP:</span> (<span class="id">finE</span><span class="id"> x</span>).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> !asbool_neg</span><span class="id"> !asboolb</span><span class="id"> negbK</span><span class="id"> Ex</span><span class="id"> mem_filter</span><span class="id"> orbF</span><span class="id"> [</span>(<span class="id">mem</span><span class="id"> E</span>)<span class="id"> x]Ex</span>.<br/>
+<span class="gallina-kwd">exists</span> (<span class="id">x</span><span class="id"> ::</span><span class="id"> s</span>)<span class="id"> =&gt;</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> sxN;</span><span class="id"> split=&gt;</span><span class="id"> //</span><span class="id"> y</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> in_cons</span><span class="id"> =&gt;</span><span class="id"> /orP[/eqP-&gt;//|/sE]</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> FiniteTheory</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> FiniteCountable</span>.<br/>
+<span class="vernacular">Variables</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> eqType</span>) (<span class="id">E</span><span class="id"> :</span><span class="id"> pred</span><span class="id"> T</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> finite_countable</span><span class="id"> :</span><span class="id"> finite</span><span class="id"> E</span><span class="id"> -&gt;</span><span class="id"> countable</span><span class="id"> E</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">case=&gt;</span><span class="id"> s</span><span class="id"> uqs</span><span class="id"> Es;</span><span class="id"> pose</span><span class="id"> t</span><span class="id"> :=</span><span class="id"> pmap</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span> (<span class="id">insub</span><span class="id"> x</span><span class="id"> :</span><span class="id"> option</span><span class="id"> [psub</span><span class="id"> E]</span>))<span class="id"> s</span>.<br/>
+<span class="id">pose</span><span class="id"> f</span><span class="id"> x</span><span class="id"> :=</span><span class="id"> index</span><span class="id"> x</span><span class="id"> t;</span><span class="id"> pose</span><span class="id"> g</span><span class="id"> i</span><span class="id"> :=</span><span class="id"> nth</span><span class="id"> None</span><span class="id"> [seq</span><span class="id"> Some</span><span class="id"> x</span><span class="id"> |</span><span class="id"> x</span><span class="id"> &lt;-</span><span class="id"> t]</span><span class="id"> i</span>.<br/>
+<span class="id">apply</span> (<span class="id">@Countable</span><span class="id"> _</span><span class="id"> E</span><span class="id"> f</span><span class="id"> g</span>)<span class="id"> =&gt;</span><span class="id"> x;</span><span class="id"> rewrite</span><span class="id"> {}/f</span><span class="id"> {}/g</span><span class="id"> /=</span>.<br/>
+<span class="id">have</span><span class="id"> x_in_t:</span><span class="id"> x</span><span class="id"> \in</span><span class="id"> t;</span><span class="id"> first</span><span class="id"> case:</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> x</span><span class="id"> h</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> {}/t</span><span class="id"> mem_pmap_sub</span><span class="id"> /=</span><span class="id"> Es</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span> (<span class="id">nth_map</span><span class="id"> x</span>)<span class="id"> ?index_mem</span><span class="id"> ?nth_index</span>.<br/>
+Qed.</div></details>
+<span class="vernacular">End</span><span class="id"> FiniteCountable</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> CountSub</span>.<br/>
+<span class="vernacular">Variables</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> eqType</span>) (<span class="id">E</span><span class="id"> F</span><span class="id"> :</span><span class="id"> pred</span><span class="id"> T</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> countable_sub:</span><span class="id"> {subset</span><span class="id"> E</span><span class="id"> &lt;=</span><span class="id"> F}</span><span class="id"> -&gt;</span><span class="id"> countable</span><span class="id"> F</span><span class="id"> -&gt;</span><span class="id"> countable</span><span class="id"> E</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> le_EF</span><span class="id"> [f</span><span class="id"> g</span><span class="id"> fgK];</span><span class="id"> pose</span><span class="id"> f'</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> [psub</span><span class="id"> E]</span>)<span class="id"> :=</span><span class="id"> f</span> (<span class="id">pincl</span><span class="id"> le_EF</span><span class="id"> x</span>).<br/>
+<span class="id">pose</span><span class="id"> g'</span><span class="id"> x</span><span class="id"> :=</span><span class="id"> obind</span> (<span class="id">insub</span> (<span class="id">sT</span><span class="id"> :=</span><span class="id"> [the</span><span class="id"> subType</span><span class="id"> _</span><span class="id"> of</span><span class="id"> [psub</span><span class="id"> E]]</span>)) (<span class="id">omap</span><span class="id"> val</span> (<span class="id">g</span><span class="id"> x</span>)).<br/>
+<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span><span class="id"> f'</span><span class="id"> g'</span><span class="id"> =&gt;</span><span class="id"> x;</span><span class="id"> rewrite</span><span class="id"> /f'</span><span class="id"> /g'</span><span class="id"> fgK</span><span class="id"> /=</span><span class="id"> valK</span>.<br/>
+Qed.</div></details>
+<span class="vernacular">End</span><span class="id"> CountSub</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> CountableUnion</span>.<br/>
+<span class="vernacular">Variables</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> eqType</span>) (<span class="id">E</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> -&gt;</span><span class="id"> pred</span><span class="id"> T</span>).<br/>
+<br/>
+<span class="vernacular">Hypothesis</span><span class="id"> cE</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> i,</span><span class="id"> countable</span> (<span class="id">E</span><span class="id"> i</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> cunion_countable</span><span class="id"> :</span><span class="id"> countable</span><span class="id"> [pred</span><span class="id"> x</span><span class="id"> |</span><span class="id"> `[&lt;</span><span class="gallina-kwd"> exists</span><span class="id"> i,</span><span class="id"> x</span><span class="id"> \in</span><span class="id"> E</span><span class="id"> i</span><span class="id"> &gt;]]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">pose</span><span class="id"> Ci</span><span class="id"> i</span><span class="id"> :</span><span class="id"> countType</span><span class="id"> :=</span><span class="id"> HB</span>.<span class="id">pack</span><span class="id"> [psub</span> (<span class="id">E</span><span class="id"> i</span>)<span class="id">]</span> (<span class="id">countable_countMixin</span> (<span class="id">cE</span><span class="id"> i</span>)).<br/>
+<span class="id">pose</span><span class="id"> S</span><span class="id"> :=</span><span class="id"> {</span><span class="id"> i</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> &amp;</span><span class="id"> Ci</span><span class="id"> i</span><span class="id"> };</span><span class="id"> set</span><span class="id"> F</span><span class="id"> :=</span><span class="id"> [pred</span><span class="id"> x</span><span class="id"> |</span><span class="id"> _]</span>.<br/>
+<span class="id">have</span><span class="id"> H:</span><span class="gallina-kwd"> forall</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> [psub</span><span class="id"> F]</span>)<span class="id">,</span><span class="gallina-kwd"> exists</span><span class="id"> i</span><span class="id"> :</span><span class="id"> nat,</span><span class="id"> val</span><span class="id"> x</span><span class="id"> \in</span><span class="id"> E</span><span class="id"> i</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> case=&gt;</span><span class="id"> x</span><span class="id"> /=</span><span class="id"> /asboolP[i]</span><span class="id"> Eix;</span><span class="gallina-kwd"> exists</span><span class="id"> i</span>.<br/>
+<span class="id">have</span><span class="id"> G:</span><span class="gallina-kwd"> forall</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> S</span>)<span class="id">,</span><span class="id"> val</span> (<span class="id">tagged</span><span class="id"> x</span>)<span class="id"> \in</span><span class="id"> F</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> case=&gt;</span><span class="id"> i</span><span class="id"> [x</span><span class="id"> /=</span><span class="id"> Eix];</span><span class="id"> apply/asboolP;</span><span class="gallina-kwd"> exists</span><span class="id"> i</span>.<br/>
+<span class="id">pose</span><span class="id"> f</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> [psub</span><span class="id"> F]</span>)<span class="id"> :</span><span class="id"> S</span><span class="id"> :=</span><span class="id"> Tagged</span> (<span class="gallina-kwd">fun</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> [psub</span><span class="id"> E</span><span class="id"> i]</span>)<br/>
+&nbsp;&nbsp;(<span class="id">PSubSub</span> (<span class="id">xchooseP</span> (<span class="id">H</span><span class="id"> x</span>))).<br/>
+<span class="id">pose</span><span class="id"> g</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> S</span>)<span class="id"> :=</span><span class="id"> PSubSub</span> (<span class="id">G</span><span class="id"> x</span>).<br/>
+<span class="gallina-kwd">by</span><span class="id"> have</span><span class="id"> /can_countable:</span><span class="id"> cancel</span><span class="id"> f</span><span class="id"> g</span><span class="gallina-kwd"> by</span><span class="id"> case=&gt;</span><span class="id"> x</span><span class="id"> hx;</span><span class="id"> apply/val_inj</span>.<br/>
+Qed.</div></details>
+<span class="vernacular">End</span><span class="id"> CountableUnion</span>.<br/>
+
+      <div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/">a fork of coq2html</a></div>
+    </div>
+  </div>
+    </main>
+</body>
+</html>

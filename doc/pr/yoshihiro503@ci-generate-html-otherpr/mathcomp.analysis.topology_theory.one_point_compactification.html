@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module mathcomp.analysis.topology_theory.one_point_compactification</title>
+<meta name="description" content="Documentation of Coq module mathcomp.analysis.topology_theory.one_point_compactification" />
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="init()">
+
+  <main>
+    <div class="sidebar">
+      <h2>Files</h2>
+      
+    </div>
+
+  <div class="coq">
+
+    <div class="content">
+      <p><a href="./index.html">Top</a></p>
+      <h1 class="title">Module mathcomp.analysis.topology_theory.one_point_compactification</h1>
+<span class="vernacular">From</span><span class="id"> HB</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> structures</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> all_ssreflect</span><span class="id"> all_algebra</span><span class="id"> all_classical</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> signed</span><span class="id"> topology_structure</span><span class="id"> uniform_structure</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> pseudometric_structure</span><span class="id"> compact</span><span class="id"> weak_topology</span>.<br/>
+<br/>
+<div class="ssrdoc md">
+# One-Point Compactifications
+
+Builds the one-point compactification of a topological space `X`. The main
+results are that the compactification is indeed compact, and that `X`
+embeds into its one-point compactification.
+
+     one_point_compactification X == the one-point compactification of `X`
+                                     as an alias of `option X`
+</div>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> classical_set_scope</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ring_scope</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> one_point_compactification</span> (<span class="id">X</span><span class="id"> :</span><span class="gallina-kwd"> Type</span>)<span class="id"> :</span><span class="gallina-kwd"> Type</span><span class="id"> :=</span><span class="id"> option</span><span class="id"> X</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> one_point_compactification</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {X</span><span class="id"> :</span><span class="id"> topologicalType}</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Notation</span><span class="id"> opc</span><span class="id"> :=</span> (<span class="id">one_point_compactification</span><span class="id"> X</span>).<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Choice</span>.<span class="id">on</span><span class="id"> opc</span>.<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Pointed</span>.<span class="id">on</span><span class="id"> opc</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> one_point_nbhs</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> opc</span>)<span class="id"> :</span><span class="id"> set_system</span><span class="id"> opc</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">if</span><span class="id"> x</span><span class="id"> is</span><span class="id"> Some</span><span class="id"> x'</span><span class="gallina-kwd"> then</span><span class="id"> Some</span><span class="id"> @</span><span class="id"> nbhs</span><span class="id"> x'</span><span class="gallina-kwd"> else</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">filter_from</span> (<span class="id">compact</span><span class="id"> `&amp;`</span><span class="id"> closed</span>) (<span class="gallina-kwd">fun</span><span class="id"> U</span><span class="id"> =&gt;</span> (<span class="id">Some</span><span class="id"> @`</span><span class="id"> ~`U</span>)<span class="id"> `|`</span><span class="id"> [set</span><span class="id"> None]</span>).<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> one_point_filter</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> opc</span>)<span class="id"> :</span><span class="id"> ProperFilter</span> (<span class="id">one_point_nbhs</span><span class="id"> x</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">case:</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> [x|];</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> fmap_proper_filter</span>.<br/>
+<span class="id">apply:</span><span class="id"> filter_from_proper;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> _;</span><span class="gallina-kwd"> exists</span><span class="id"> None;</span><span class="id"> right</span>.<br/>
+<span class="id">apply:</span><span class="id"> filter_from_filter</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span><span class="id"> set0;</span><span class="id"> split;</span><span class="id"> [exact:</span><span class="id"> compact0</span><span class="id"> |</span><span class="id"> exact:</span><span class="id"> closed0]</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> P</span><span class="id"> Q</span><span class="id"> [cptP</span><span class="id"> cloP]</span><span class="id"> [cptQ</span><span class="id"> cloQ];</span><span class="gallina-kwd"> exists</span> (<span class="id">P</span><span class="id"> `|`</span><span class="id"> Q</span>).<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> split;</span><span class="id"> [exact:</span><span class="id"> compactU</span><span class="id"> |</span><span class="id"> exact:</span><span class="id"> closedU]</span>.<br/>
+<span class="id">-</span><span class="id"> case=&gt;</span><span class="id"> [x</span><span class="id"> [|//]|[]</span><span class="id"> //=</span><span class="id"> _];</span><span class="id"> [|by</span><span class="id"> split;</span><span class="id"> right</span>..<span class="id">]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> [a</span><span class="id"> /not_orP[Pa</span><span class="id"> Qa]]</span><span class="id"> [&lt;-{x}];</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> left;</span><span class="gallina-kwd"> exists</span><span class="id"> a</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> one_point_singleton</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> opc</span>)<span class="id"> U</span><span class="id"> :</span><span class="id"> one_point_nbhs</span><span class="id"> x</span><span class="id"> U</span><span class="id"> -&gt;</span><span class="id"> U</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> case:</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> [x'</span><span class="id"> /=</span><span class="id"> /nbhs_singleton//|[W</span><span class="id"> _]];</span><span class="id"> apply;</span><span class="id"> right</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> one_point_nbhs_nbhs</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> opc</span>) (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span><span class="id"> opc</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">one_point_nbhs</span><span class="id"> p</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> one_point_nbhs</span><span class="id"> p</span> (<span class="id">one_point_nbhs^~</span><span class="id"> A</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">case:</span><span class="id"> p</span><span class="id"> =&gt;</span><span class="id"> [r</span><span class="id"> /=|]</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> nbhs_simpl</span><span class="id"> nbhsE</span><span class="id"> =&gt;</span><span class="id"> -[U</span><span class="id"> [oU</span><span class="id"> Ur]</span><span class="id"> USA/=]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span><span class="id"> U</span><span class="id"> =&gt;</span><span class="id"> //=</span><span class="id"> z</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> nbhs_simpl</span><span class="id"> nbhsE</span><span class="id"> =&gt;</span><span class="id"> Uz;</span><span class="gallina-kwd"> exists</span><span class="id"> U</span>.<br/>
+<span class="id">case=&gt;</span><span class="id"> C</span><span class="id"> [cptC</span><span class="id"> cloC]</span><span class="id"> nCA</span><span class="id"> /=;</span><span class="gallina-kwd"> exists</span><span class="id"> C</span><span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> -[|_];</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="gallina-kwd"> exists</span><span class="id"> C</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> x</span><span class="id"> [|//]</span><span class="id"> [y]</span><span class="id"> /[swap]</span><span class="id"> -[-&gt;</span><span class="id"> /=]</span><span class="id"> nCx;</span><span class="id"> rewrite</span><span class="id"> nbhs_simpl</span><span class="id"> nbhsE/=</span>.<br/>
+<span class="gallina-kwd">exists</span> (<span class="id">~`</span><span class="id"> C</span>)<span class="id">;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> closed_openC</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> z</span><span class="id"> /=</span><span class="id"> nCz;</span><span class="id"> apply:</span><span class="id"> nCA;</span><span class="id"> left</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> hasNbhs</span>.<span class="id">Build</span><span class="id"> opc</span><span class="id"> one_point_nbhs</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> @Nbhs_isNbhsTopological</span>.<span class="id">Build</span><span class="id"> opc</span><br/>
+&nbsp;&nbsp;<span class="id">one_point_filter</span><span class="id"> one_point_singleton</span><span class="id"> one_point_nbhs_nbhs</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> one_point_compactification_compact</span><span class="id"> :</span><span class="id"> compact</span><span class="id"> [set:</span><span class="id"> opc]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">apply/compact_near_coveringP</span><span class="id"> =&gt;</span><span class="id"> ?</span><span class="id"> F</span><span class="id"> /=</span><span class="id"> P</span><span class="id"> FF</span><span class="id"> FT</span>.<br/>
+<span class="id">have</span><span class="id"> [[U</span><span class="id"> i]</span><span class="id"> [[W</span><span class="id"> [cptW</span><span class="id"> cW]</span><span class="id"> /=</span><span class="id"> WU</span><span class="id"> nFi</span><span class="id"> UiP]]]</span><span class="id"> :=</span><span class="id"> FT</span><span class="id"> None</span><span class="id"> I</span>.<br/>
+<span class="id">have</span><span class="id"> P'F</span><span class="id"> x</span><span class="id"> :</span><span class="id"> W</span><span class="id"> x</span><span class="id"> -&gt;</span><span class="id"> \near</span><span class="id"> x</span><span class="id"> &amp;</span><span class="id"> F,</span><span class="id"> P</span><span class="id"> F</span> (<span class="id">Some</span><span class="id"> x</span>).<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> Wx;</span><span class="id"> suff:</span><span class="id"> \forall</span><span class="id"> y</span><span class="id"> \near</span><span class="id"> Some</span><span class="id"> @</span><span class="id"> x</span><span class="id"> &amp;</span><span class="id"> f</span><span class="id"> \near</span><span class="id"> id</span><span class="id"> @</span><span class="id"> F,</span><span class="id"> P</span><span class="id"> f</span><span class="id"> y</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> near_map2</span>.<br/>
+&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> FT</span> (<span class="id">Some</span><span class="id"> x</span>)<span class="id"> I</span>.<br/>
+<span class="id">move/compact_near_coveringP/</span>(_<span class="id"> _</span><span class="id"> F</span><span class="id"> _</span><span class="id"> FF</span><span class="id"> P'F</span>)<span class="id"> :</span><span class="id"> cptW</span><span class="id"> =&gt;</span><span class="id"> cWP</span>.<br/>
+<span class="id">near=&gt;</span><span class="id"> j</span><span class="id"> =&gt;</span><span class="id"> z</span><span class="id"> _;</span><span class="id"> case:</span><span class="id"> z</span><span class="id"> =&gt;</span><span class="id"> [z|]</span>.<br/>
+<span class="id">-</span><span class="id"> have</span><span class="id"> [?|Wz]</span><span class="id"> :=</span><span class="id"> pselect</span> (<span class="id">W</span><span class="id"> z</span>)<span class="id">;</span><span class="id"> first</span><span class="id"> exact:</span> (<span class="id">near</span><span class="id"> cWP</span>).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span> (<span class="id">UiP</span> (<span class="id">_,</span><span class="id"> _</span>))<span class="id">;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> /=;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">[apply:</span><span class="id"> WU;</span><span class="id"> left;</span><span class="gallina-kwd"> exists</span><span class="id"> z|exact:</span> (<span class="id">near</span><span class="id"> nFi</span>)<span class="id">]</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> apply:</span> (<span class="id">UiP</span> (<span class="id">_,</span><span class="id"> _</span>))<span class="id">;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> /=;</span><span class="id"> [apply:</span><span class="id"> WU;</span><span class="id"> right|exact:</span> (<span class="id">near</span><span class="id"> nFi</span>)<span class="id">]</span>.<br/>
+<span class="id">Unshelve</span>.<span class="id"> all:</span><span class="gallina-kwd"> by</span><span class="id"> end_near</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> one_point_compactification_some_nbhs</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> X</span>) (<span class="id">U</span><span class="id"> :</span><span class="id"> set</span><span class="id"> X</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">nbhs</span><span class="id"> x</span><span class="id"> U</span><span class="id"> -&gt;</span><span class="id"> @nbhs</span><span class="id"> _</span><span class="id"> opc</span> (<span class="id">Some</span><span class="id"> x</span>) (<span class="id">Some</span><span class="id"> @`</span><span class="id"> U</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact/filterS/preimage_image</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> one_point_compactification_some_continuous</span><span class="id"> :</span><span class="id"> continuous</span> (<span class="id">Some</span><span class="id"> :</span><span class="id"> X</span><span class="id"> -&gt;</span><span class="id"> opc</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> x</span><span class="id"> U</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> one_point_compactification_open_some</span> (<span class="id">U</span><span class="id"> :</span><span class="id"> set</span><span class="id"> X</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">open</span><span class="id"> U</span><span class="id"> -&gt;</span><span class="id"> @open</span><span class="id"> opc</span> (<span class="id">Some</span><span class="id"> @`</span><span class="id"> U</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> !openE/=</span><span class="id"> =&gt;</span><span class="id"> UU'</span><span class="id"> opcX</span><span class="id"> [x</span><span class="id"> /UU'</span><span class="id"> Ux</span><span class="id"> &lt;-]</span>.<br/>
+<span class="id">exact/one_point_compactification_some_nbhs</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> one_point_compactification_weak_topology</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">@nbhs</span><span class="id"> _</span> (<span class="id">@weak_topology</span><span class="id"> X</span><span class="id"> opc</span><span class="id"> Some</span>)<span class="id"> =</span><span class="id"> @nbhs</span><span class="id"> _</span><span class="id"> X</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> predeq2E</span><span class="id"> =&gt;</span><span class="id"> x</span><span class="id"> U;</span><span class="id"> split;</span><span class="id"> rewrite</span><span class="id"> /</span>(<span class="id">@nbhs</span><span class="id"> _</span> (<span class="id">weak_topology</span><span class="id"> _</span>))<span class="id">/=</span>.<br/>
+&nbsp;&nbsp;<span class="id">case=&gt;</span><span class="id"> _</span><span class="id"> [[/=</span><span class="id"> W]</span><span class="id"> oW</span><span class="id"> &lt;-</span><span class="id"> /=</span><span class="id"> WSs]</span><span class="id"> /filterS;</span><span class="id"> apply</span>.<br/>
+&nbsp;&nbsp;<span class="id">exact/one_point_compactification_some_continuous/oW</span>.<br/>
+<span class="id">rewrite</span><span class="id"> nbhsE</span><span class="id"> =&gt;</span><span class="id"> -[V</span><span class="id"> [oV</span><span class="id"> Vx</span><span class="id"> VU]];</span><span class="gallina-kwd"> exists</span><span class="id"> V;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+<span class="gallina-kwd">exists</span> (<span class="id">Some</span><span class="id"> @`</span><span class="id"> V</span>)<span class="id">;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> one_point_compactification_open_some</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> eqEsubset;</span><span class="id"> split=&gt;</span><span class="id"> [y</span><span class="id"> [z</span><span class="id"> Vz</span><span class="id"> [&lt;-//]]|];</span><span class="id"> exact:</span><span class="id"> preimage_image</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> one_point_compactification</span>.<br/>
+
+      <div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/">a fork of coq2html</a></div>
+    </div>
+  </div>
+    </main>
+</body>
+</html>

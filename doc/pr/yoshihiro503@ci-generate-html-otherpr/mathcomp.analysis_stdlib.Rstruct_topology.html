@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module mathcomp.analysis_stdlib.Rstruct_topology</title>
+<meta name="description" content="Documentation of Coq module mathcomp.analysis_stdlib.Rstruct_topology" />
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="init()">
+
+  <main>
+    <div class="sidebar">
+      <h2>Files</h2>
+      
+    </div>
+
+  <div class="coq">
+
+    <div class="content">
+      <p><a href="./index.html">Top</a></p>
+      <h1 class="title">Module mathcomp.analysis_stdlib.Rstruct_topology</h1>
+<div class="ssrdoc md">
+# Compatibility with the real numbers of Coq
+
+Lemmas about continuity
+</div>
+<br/>
+<span class="vernacular">Require</span><span class="vernacular"> Import</span><span class="id"> Rdefinitions</span><span class="id"> Raxioms</span><span class="id"> RIneq</span><span class="id"> Rbasic_fun</span><span class="id"> Zwf</span>.<br/>
+<span class="vernacular">Require</span><span class="vernacular"> Import</span><span class="id"> Epsilon</span><span class="vernacular"> FunctionalExtensionality</span><span class="id"> Ranalysis1</span><span class="id"> Rsqrt_def</span>.<br/>
+<span class="vernacular">Require</span><span class="vernacular"> Import</span><span class="id"> Rtrigo1</span><span class="id"> Reals</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> all_ssreflect</span><span class="id"> ssralg</span><span class="id"> poly</span><span class="id"> mxpoly</span><span class="id"> ssrnum</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> archimedean</span>.<br/>
+<span class="vernacular">From</span><span class="id"> HB</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> structures</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> mathcomp_extra</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> boolp</span><span class="id"> classical_sets</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> reals</span><span class="id"> signed</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> topology</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Export</span><span class="id"> Rstruct</span>.<br/>
+<br/>
+<span class="gallina-kwd">Set</span><span class="vernacular"> Implicit</span><span class="vernacular"> Arguments</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Strict</span><span class="vernacular"> Implicit</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Printing</span><span class="vernacular"> Implicit</span><span class="vernacular"> Defensive</span>.<br/>
+<span class="vernacular">Import</span><span class="id"> Order</span>.<span class="id">TTheory</span><span class="id"> GRing</span>.<span class="id">Theory</span><span class="id"> Num</span>.<span class="id">Theory</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> R_scope</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ring_scope</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> analysis_struct</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> PseudoMetric</span>.<span class="id">copy</span><span class="id"> R</span><span class="id"> R^o</span>.<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Pointed</span>.<span class="id">copy</span><span class="id"> R</span><span class="id"> R^o</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> continuity_pt_nbhs</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> R</span><span class="id"> -&gt;</span><span class="id"> R</span>)<span class="id"> x</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">continuity_pt</span><span class="id"> f</span><span class="id"> x</span><span class="id"> &lt;-&gt;</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">forall</span><span class="id"> eps</span><span class="id"> :</span><span class="id"> {posnum</span><span class="id"> R},</span><span class="id"> nbhs</span><span class="id"> x</span> (<span class="gallina-kwd">fun</span><span class="id"> u</span><span class="id"> =&gt;</span><span class="id"> `|f</span><span class="id"> u</span><span class="id"> -</span><span class="id"> f</span><span class="id"> x|</span><span class="id"> &lt;</span><span class="id"> eps%:num</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">split=&gt;</span><span class="id"> [fcont</span><span class="id"> e|fcont</span><span class="id"> _/RltP/posnumP[e]];</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> [_/posnumP[d]</span><span class="id"> xd_fxe]</span><span class="id"> :=</span><span class="id"> fcont</span><span class="id"> e</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists</span><span class="id"> d%:num;</span><span class="id"> split;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> apply/RltP;</span><span class="id"> have</span><span class="id"> :=</span><span class="id"> [gt0</span><span class="id"> of</span><span class="id"> d%:num]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> y</span><span class="id"> [_</span><span class="id"> /RltP</span><span class="id"> yxd];</span><span class="id"> apply/RltP/xd_fxe;</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> distrC</span>.<br/>
+<span class="id">have</span><span class="id"> /RltP</span><span class="id"> egt0</span><span class="id"> :=</span><span class="id"> [gt0</span><span class="id"> of</span><span class="id"> e%:num]</span>.<br/>
+<span class="id">have</span><span class="id"> [_</span><span class="id"> [/RltP/posnumP[d]</span><span class="id"> dx_fxe]]</span><span class="id"> :=</span><span class="id"> fcont</span><span class="id"> e%:num</span><span class="id"> egt0</span>.<br/>
+<span class="gallina-kwd">exists</span><span class="id"> d%:num</span><span class="id"> =&gt;</span><span class="id"> //=</span><span class="id"> y</span><span class="id"> xyd;</span><span class="id"> case:</span> (<span class="id">eqVneq</span><span class="id"> x</span><span class="id"> y</span>)<span class="id"> =&gt;</span><span class="id"> [-&gt;|xney]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> subrr</span><span class="id"> normr0</span>.<br/>
+<span class="id">apply/RltP/dx_fxe;</span><span class="id"> split;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> split=&gt;</span><span class="id"> //;</span><span class="id"> apply/eqP</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> have</span><span class="id"> /RltP</span><span class="id"> :=</span><span class="id"> xyd;</span><span class="id"> rewrite</span><span class="id"> distrC</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> continuity_pt_cvg</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> R</span><span class="id"> -&gt;</span><span class="id"> R</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">continuity_pt</span><span class="id"> f</span><span class="id"> x</span><span class="id"> &lt;-&gt;</span><span class="id"> {for</span><span class="id"> x,</span><span class="id"> continuous</span><span class="id"> f}</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">eapply</span><span class="id"> iff_trans;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> continuity_pt_nbhs</span>.<br/>
+<span class="id">apply</span><span class="id"> iff_sym</span>.<br/>
+<span class="id">have</span><span class="id"> FF</span><span class="id"> :</span><span class="id"> Filter</span> (<span class="id">f</span><span class="id"> @</span><span class="id"> x</span>)<span class="id">%classic</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> typeclasses</span><span class="id"> eauto</span>.<br/>
+&nbsp;&nbsp;<span class="comment">(*by&nbsp;apply&nbsp;fmap_filter;&nbsp;apply:&nbsp;@filter_filter'&nbsp;(locally_filter&nbsp;_).*)</span><br/>
+<span class="id">case:</span> (<span class="id">@fcvg_ballP</span><span class="id"> _</span><span class="id"> _</span> (<span class="id">f</span><span class="id"> @</span><span class="id"> x</span>)<span class="id">%classic</span><span class="id"> FF</span> (<span class="id">f</span><span class="id"> x</span>))<span class="id"> =&gt;</span><span class="id"> {FF}H1</span><span class="id"> H2</span>.<br/>
+<span class="comment">(*&nbsp;TODO:&nbsp;in&nbsp;need&nbsp;for&nbsp;lemmas&nbsp;and/or&nbsp;refactoring&nbsp;of&nbsp;already&nbsp;existing&nbsp;lemmas&nbsp;(ball&nbsp;vs.&nbsp;Rabs)&nbsp;*)</span><br/>
+<span class="id">split</span><span class="id"> =&gt;</span><span class="id"> [{H2}</span><span class="id"> -</span><span class="id"> /H1</span><span class="id"> {}H1</span><span class="id"> eps|{H1}</span><span class="id"> H]</span>.<br/>
+<span class="id">-</span><span class="id"> have</span><span class="id"> {H1}</span><span class="id"> [//|_/posnumP[x0]</span><span class="id"> Hx0]</span><span class="id"> :=</span><span class="id"> H1</span><span class="id"> eps%:num</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists</span><span class="id"> x0%:num</span><span class="id"> =&gt;</span><span class="id"> //=</span><span class="id"> Hx0'</span><span class="id"> /Hx0</span><span class="id"> /=</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> distrC;</span><span class="id"> apply</span>.<br/>
+<span class="id">-</span><span class="id"> apply</span><span class="id"> H2</span><span class="id"> =&gt;</span><span class="id"> _</span><span class="id"> /posnumP[eps];</span><span class="id"> move:</span> (<span class="id">H</span><span class="id"> eps</span>)<span class="id"> =&gt;</span><span class="id"> {H}</span><span class="id"> [_</span><span class="id"> /posnumP[x0]</span><span class="id"> Hx0]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists</span><span class="id"> x0%:num</span><span class="id"> =&gt;</span><span class="id"> //=</span><span class="id"> y</span><span class="id"> /Hx0</span><span class="id"> /=</span><span class="id"> {}Hx0</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /ball</span><span class="id"> /=</span><span class="id"> distrC</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> continuity_ptE</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> R</span><span class="id"> -&gt;</span><span class="id"> R</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">continuity_pt</span><span class="id"> f</span><span class="id"> x</span><span class="id"> &lt;-&gt;</span><span class="id"> {for</span><span class="id"> x,</span><span class="id"> continuous</span><span class="id"> f}</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact:</span><span class="id"> continuity_pt_cvg</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> classical_set_scope</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> continuity_pt_cvg'</span><span class="id"> f</span><span class="id"> x</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">continuity_pt</span><span class="id"> f</span><span class="id"> x</span><span class="id"> &lt;-&gt;</span><span class="id"> f</span><span class="id"> @</span><span class="id"> x^'</span><span class="id"> --&gt;</span><span class="id"> f</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> continuity_ptE</span><span class="id"> continuous_withinNx</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> continuity_pt_dnbhs</span><span class="id"> f</span><span class="id"> x</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">continuity_pt</span><span class="id"> f</span><span class="id"> x</span><span class="id"> &lt;-&gt;</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">forall</span><span class="id"> eps,</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> eps</span><span class="id"> -&gt;</span><span class="id"> x^'</span> (<span class="gallina-kwd">fun</span><span class="id"> u</span><span class="id"> =&gt;</span><span class="id"> `|f</span><span class="id"> x</span><span class="id"> -</span><span class="id"> f</span><span class="id"> u|</span><span class="id"> &lt;</span><span class="id"> eps</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> continuity_pt_cvg'</span><span class="id"> -filter_fromP</span><span class="id"> cvg_ballP</span><span class="id"> -filter_fromP</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> nbhs_pt_comp</span> (<span class="id">P</span><span class="id"> :</span><span class="id"> R</span><span class="id"> -&gt;</span><span class="gallina-kwd"> Prop</span>) (<span class="id">f</span><span class="id"> :</span><span class="id"> R</span><span class="id"> -&gt;</span><span class="id"> R</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">nbhs</span> (<span class="id">f</span><span class="id"> x</span>)<span class="id"> P</span><span class="id"> -&gt;</span><span class="id"> continuity_pt</span><span class="id"> f</span><span class="id"> x</span><span class="id"> -&gt;</span><span class="id"> \near</span><span class="id"> x,</span><span class="id"> P</span> (<span class="id">f</span><span class="id"> x</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> Lf</span><span class="id"> /continuity_pt_cvg;</span><span class="id"> apply</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> analysis_struct</span>.<br/>
+
+      <div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/">a fork of coq2html</a></div>
+    </div>
+  </div>
+    </main>
+</body>
+</html>

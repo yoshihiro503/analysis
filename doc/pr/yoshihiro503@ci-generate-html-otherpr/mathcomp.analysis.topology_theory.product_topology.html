@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module mathcomp.analysis.topology_theory.product_topology</title>
+<meta name="description" content="Documentation of Coq module mathcomp.analysis.topology_theory.product_topology" />
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="init()">
+
+  <main>
+    <div class="sidebar">
+      <h2>Files</h2>
+      
+    </div>
+
+  <div class="coq">
+
+    <div class="content">
+      <p><a href="./index.html">Top</a></p>
+      <h1 class="title">Module mathcomp.analysis.topology_theory.product_topology</h1>
+<span class="vernacular">From</span><span class="id"> HB</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> structures</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> all_ssreflect</span><span class="id"> all_algebra</span><span class="id"> all_classical</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> signed</span><span class="id"> topology_structure</span><span class="id"> uniform_structure</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> pseudometric_structure</span><span class="id"> compact</span>.<br/>
+<br/>
+<div class="ssrdoc md">
+# Product topology
+
+Product `(T * U)%type` are endowed with the structures of:
+- topology
+- uniform space
+- pseudometric space
+</div>
+<br/>
+<span class="vernacular">Import</span><span class="id"> Order</span>.<span class="id">TTheory</span><span class="id"> GRing</span>.<span class="id">Theory</span><span class="id"> Num</span>.<span class="id">Theory</span>.<br/>
+<br/>
+<span class="gallina-kwd">Set</span><span class="vernacular"> Implicit</span><span class="vernacular"> Arguments</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Strict</span><span class="vernacular"> Implicit</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Printing</span><span class="vernacular"> Implicit</span><span class="vernacular"> Defensive</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> classical_set_scope</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ring_scope</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> Prod_Topology</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {T</span><span class="id"> U</span><span class="id"> :</span><span class="id"> topologicalType}</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> prod_nbhs</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> T</span><span class="id"> *</span><span class="id"> U</span>)<span class="id"> :=</span><span class="id"> filter_prod</span> (<span class="id">nbhs</span><span class="id"> p</span>.<span class="id">1</span>) (<span class="id">nbhs</span><span class="id"> p</span>.<span class="id">2</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> prod_nbhs_filter</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> T</span><span class="id"> *</span><span class="id"> U</span>)<span class="id"> :</span><span class="id"> ProperFilter</span> (<span class="id">prod_nbhs</span><span class="id"> p</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact:</span><span class="id"> filter_prod_proper</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> prod_nbhs_singleton</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> T</span><span class="id"> *</span><span class="id"> U</span>) (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">T</span><span class="id"> *</span><span class="id"> U</span>))<span class="id"> :</span><span class="id"> prod_nbhs</span><span class="id"> p</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> A</span><span class="id"> p</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> [QR</span><span class="id"> [/nbhs_singleton</span><span class="id"> Qp1</span><span class="id"> /nbhs_singleton</span><span class="id"> Rp2]];</span><span class="id"> apply</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> prod_nbhs_nbhs</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> T</span><span class="id"> *</span><span class="id"> U</span>) (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">T</span><span class="id"> *</span><span class="id"> U</span>))<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">prod_nbhs</span><span class="id"> p</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> prod_nbhs</span><span class="id"> p</span> (<span class="id">prod_nbhs^~</span><span class="id"> A</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> [QR</span><span class="id"> [/nbhs_interior</span><span class="id"> p1_Q</span><span class="id"> /nbhs_interior</span><span class="id"> p2_R]</span><span class="id"> sQRA]</span>.<br/>
+<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span> (<span class="id">QR</span>.<span class="id">1^°,</span><span class="id"> QR</span>.<span class="id">2^°</span>)<span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> ??;</span><span class="gallina-kwd"> exists</span><span class="id"> QR</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> hasNbhs</span>.<span class="id">Build</span> (<span class="id">T</span><span class="id"> *</span><span class="id"> U</span>)<span class="id">%type</span><span class="id"> prod_nbhs</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Nbhs_isNbhsTopological</span>.<span class="id">Build</span> (<span class="id">T</span><span class="id"> *</span><span class="id"> U</span>)<span class="id">%type</span><br/>
+&nbsp;&nbsp;<span class="id">prod_nbhs_filter</span><span class="id"> prod_nbhs_singleton</span><span class="id"> prod_nbhs_nbhs</span>.<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> Prod_Topology</span>.<br/>
+<br/>
+<div class="doc">Topology on matrices </div>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> fst_open</span><span class="id"> {U</span><span class="id"> V</span><span class="id"> :</span><span class="id"> topologicalType}</span> (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">U</span><span class="id"> *</span><span class="id"> V</span>))<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">open</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> open</span> (<span class="id">fst</span><span class="id"> @`</span><span class="id"> A</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> !openE</span><span class="id"> =&gt;</span><span class="id"> oA</span><span class="id"> z</span><span class="id"> [[a</span><span class="id"> b/=]</span><span class="id"> Aab</span><span class="id"> &lt;-];</span><span class="id"> rewrite</span><span class="id"> /interior</span>.<br/>
+<span class="id">have</span><span class="id"> [[P</span><span class="id"> Q]</span><span class="id"> [Pa</span><span class="id"> Qb]</span><span class="id"> pqA]</span><span class="id"> :=</span><span class="id"> oA</span><span class="id"> _</span><span class="id"> Aab;</span><span class="id"> apply:</span> (<span class="id">@filterS</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> P</span>)<span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> p</span><span class="id"> Pp</span>.<br/>
+<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span> (<span class="id">p,</span><span class="id"> b</span>)<span class="id"> =&gt;</span><span class="id"> //=;</span><span class="id"> apply:</span><span class="id"> pqA;</span><span class="id"> split=&gt;</span><span class="id"> //=;</span><span class="id"> exact:</span><span class="id"> nbhs_singleton</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> snd_open</span><span class="id"> {U</span><span class="id"> V</span><span class="id"> :</span><span class="id"> topologicalType}</span> (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">U</span><span class="id"> *</span><span class="id"> V</span>))<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">open</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> open</span> (<span class="id">snd</span><span class="id"> @`</span><span class="id"> A</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> !openE</span><span class="id"> =&gt;</span><span class="id"> oA</span><span class="id"> z</span><span class="id"> [[a</span><span class="id"> b/=]</span><span class="id"> Aab</span><span class="id"> &lt;-];</span><span class="id"> rewrite</span><span class="id"> /interior</span>.<br/>
+<span class="id">have</span><span class="id"> [[P</span><span class="id"> Q]</span><span class="id"> [Pa</span><span class="id"> Qb]</span><span class="id"> pqA]</span><span class="id"> :=</span><span class="id"> oA</span><span class="id"> _</span><span class="id"> Aab;</span><span class="id"> apply:</span> (<span class="id">@filterS</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> Q</span>)<span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> q</span><span class="id"> Qq</span>.<br/>
+<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span> (<span class="id">a,</span><span class="id"> q</span>)<span class="id"> =&gt;</span><span class="id"> //=;</span><span class="id"> apply:</span><span class="id"> pqA;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> nbhs_singleton</span>.<br/>
+Qed.</div></details>
+<br/>
+<div class="doc">product of two uniform spaces </div>
+<br/>
+<span class="vernacular">Section</span><span class="id"> prod_Uniform</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> relation_scope</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {U</span><span class="id"> V</span><span class="id"> :</span><span class="id"> uniformType}</span>.<br/>
+<span class="vernacular">Implicit</span><span class="id"> Types</span><span class="id"> A</span><span class="id"> :</span><span class="id"> set</span> ((<span class="id">U</span><span class="id"> *</span><span class="id"> V</span>)<span class="id"> *</span> (<span class="id">U</span><span class="id"> *</span><span class="id"> V</span>)).<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> prod_ent</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">[set</span><span class="id"> A</span><span class="id"> :</span><span class="id"> set</span> ((<span class="id">U</span><span class="id"> *</span><span class="id"> V</span>)<span class="id"> *</span> (<span class="id">U</span><span class="id"> *</span><span class="id"> V</span>))<span class="id"> |</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">filter_prod</span> (<span class="id">@entourage</span><span class="id"> U</span>) (<span class="id">@entourage</span><span class="id"> V</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">[set</span> ((<span class="id">xy</span>.<span class="id">1</span>.<span class="id">1,xy</span>.<span class="id">2</span>.<span class="id">1</span>)<span class="id">,</span>(<span class="id">xy</span>.<span class="id">1</span>.<span class="id">2,xy</span>.<span class="id">2</span>.<span class="id">2</span>))<span class="id"> |</span><span class="id"> xy</span><span class="gallina-kwd"> in</span><span class="id"> A]]</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> prod_entP</span> (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">U</span><span class="id"> *</span><span class="id"> U</span>)) (<span class="id">B</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">V</span><span class="id"> *</span><span class="id"> V</span>))<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> entourage</span><span class="id"> B</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">prod_ent</span><span class="id"> [set</span><span class="id"> xy</span><span class="id"> |</span><span class="id"> A</span> (<span class="id">xy</span>.<span class="id">1</span>.<span class="id">1,</span><span class="id"> xy</span>.<span class="id">2</span>.<span class="id">1</span>)<span class="id"> /\</span><span class="id"> B</span> (<span class="id">xy</span>.<span class="id">1</span>.<span class="id">2,</span><span class="id"> xy</span>.<span class="id">2</span>.<span class="id">2</span>)<span class="id">]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> entA</span><span class="id"> entB;</span><span class="gallina-kwd"> exists</span> (<span class="id">A,B</span>)<span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> xy</span><span class="id"> ABxy</span>.<br/>
+<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span> ((<span class="id">xy</span>.<span class="id">1</span>.<span class="id">1,</span><span class="id"> xy</span>.<span class="id">2</span>.<span class="id">1</span>)<span class="id">,</span>(<span class="id">xy</span>.<span class="id">1</span>.<span class="id">2,xy</span>.<span class="id">2</span>.<span class="id">2</span>))<span class="id">;</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> -!surjective_pairing</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> prod_ent_filter</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> prod_ent</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">have</span><span class="id"> prodF</span><span class="id"> :=</span><span class="id"> filter_prod_filter</span> (<span class="id">@entourage_filter</span><span class="id"> U</span>) (<span class="id">@entourage_filter</span><span class="id"> V</span>).<br/>
+<span class="id">split;</span><span class="id"> rewrite</span><span class="id"> /prod_ent</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -setXTT;</span><span class="id"> apply:</span><span class="id"> prod_entP</span><span class="id"> filterT</span><span class="id"> filterT</span>.<br/>
+<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> A</span><span class="id"> B</span><span class="id"> /=</span><span class="id"> entA</span><span class="id"> entB;</span><span class="id"> apply:</span><span class="id"> filterS</span> (<span class="id">filterI</span><span class="id"> entA</span><span class="id"> entB</span>)<span class="id"> =&gt;</span><span class="id"> xy</span><span class="id"> []</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> [zt</span><span class="id"> Azt</span><span class="id"> ztexy]</span><span class="id"> [zt'</span><span class="id"> Bzt'</span><span class="id"> zt'exy];</span><span class="gallina-kwd"> exists</span><span class="id"> zt</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> split=&gt;</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;<span class="id">move/eqP:</span><span class="id"> ztexy;</span><span class="id"> rewrite</span><span class="id"> -zt'exy</span><span class="id"> !xpair_eqE</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> andbACA</span><span class="id"> -!xpair_eqE</span><span class="id"> -!surjective_pairing</span><span class="id"> =&gt;</span><span class="id"> /eqP-&gt;</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> A</span><span class="id"> B</span><span class="id"> sAB</span><span class="id"> /=;</span><span class="id"> apply:</span><span class="id"> filterS</span><span class="id"> =&gt;</span><span class="id"> ?</span><span class="id"> [xy</span><span class="id"> /sAB</span><span class="id"> ??];</span><span class="gallina-kwd"> exists</span><span class="id"> xy</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> prod_ent_refl</span><span class="id"> A</span><span class="id"> :</span><span class="id"> prod_ent</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> diagonal</span><span class="id"> `&lt;=`</span><span class="id"> A</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> [B</span><span class="id"> [entB1</span><span class="id"> entB2]</span><span class="id"> sBA]</span><span class="id"> xy</span><span class="id"> /eqP</span>.<br/>
+<span class="id">rewrite</span><span class="id"> [_</span>.<span class="id">1]surjective_pairing</span><span class="id"> [xy</span>.<span class="id">2]surjective_pairing</span><span class="id"> xpair_eqE</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> /andP</span><span class="id"> [/eqP</span><span class="id"> xy1e</span><span class="id"> /eqP</span><span class="id"> xy2e]</span>.<br/>
+<span class="id">have</span><span class="id"> /sBA</span><span class="id"> :</span> (<span class="id">B</span>.<span class="id">1</span><span class="id"> `*`</span><span class="id"> B</span>.<span class="id">2</span>) ((<span class="id">xy</span>.<span class="id">1</span>.<span class="id">1,</span><span class="id"> xy</span>.<span class="id">2</span>.<span class="id">1</span>)<span class="id">,</span> (<span class="id">xy</span>.<span class="id">1</span>.<span class="id">2,</span><span class="id"> xy</span>.<span class="id">2</span>.<span class="id">2</span>)).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> xy1e</span><span class="id"> xy2e;</span><span class="id"> split=&gt;</span><span class="id"> /=;</span><span class="id"> exact:</span><span class="id"> entourage_refl</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> [zt</span><span class="id"> Azt</span><span class="id"> /eqP];</span><span class="id"> rewrite</span><span class="id"> !xpair_eqE</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> andbACA</span><span class="id"> -!xpair_eqE</span><span class="id"> -!surjective_pairing</span><span class="id"> =&gt;</span><span class="id"> /eqP&lt;-</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> prod_ent_inv</span><span class="id"> A</span><span class="id"> :</span><span class="id"> prod_ent</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> prod_ent</span><span class="id"> A^-1</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> [B</span><span class="id"> [/entourage_inv</span><span class="id"> entB1</span><span class="id"> /entourage_inv</span><span class="id"> entB2]</span><span class="id"> sBA]</span>.<br/>
+<span class="id">have:=</span><span class="id"> prod_entP</span><span class="id"> entB1</span><span class="id"> entB2;</span><span class="id"> rewrite</span><span class="id"> /prod_ent/=;</span><span class="id"> apply:</span><span class="id"> filterS</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> _</span><span class="id"> [p</span><span class="id"> /</span>(<span class="id">sBA</span> (<span class="id">_,_</span>))<span class="id"> [[x</span><span class="id"> y]</span><span class="id"> ?</span><span class="id"> xyE]</span><span class="id"> &lt;-];</span><span class="gallina-kwd"> exists</span> (<span class="id">y,x</span>)<span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> move/eqP:</span><span class="id"> xyE</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> !xpair_eqE</span><span class="id"> =&gt;</span><span class="id"> /andP[/andP[/eqP-&gt;</span><span class="id"> /eqP-&gt;]</span><span class="id"> /andP[/eqP-&gt;</span><span class="id"> /eqP-&gt;]]</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> prod_ent_split</span><span class="id"> A</span><span class="id"> :</span><span class="id"> prod_ent</span><span class="id"> A</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists2</span><span class="id"> B,</span><span class="id"> prod_ent</span><span class="id"> B</span><span class="id"> &amp;</span> (<span class="id">B</span><span class="id"> \;</span><span class="id"> B</span><span class="id"> `&lt;=`</span><span class="id"> A</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> [B</span><span class="id"> [entB1</span><span class="id"> entB2]]</span><span class="id"> sBA;</span><span class="gallina-kwd"> exists</span><span class="id"> [set</span><span class="id"> xy</span><span class="id"> |</span><span class="id"> split_ent</span><span class="id"> B</span>.<span class="id">1</span> (<span class="id">xy</span>.<span class="id">1</span>.<span class="id">1,xy</span>.<span class="id">2</span>.<span class="id">1</span>)<span class="id"> /\</span><br/>
+&nbsp;&nbsp;<span class="id">split_ent</span><span class="id"> B</span>.<span class="id">2</span> (<span class="id">xy</span>.<span class="id">1</span>.<span class="id">2,xy</span>.<span class="id">2</span>.<span class="id">2</span>)<span class="id">]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> prod_entP;</span><span class="id"> apply:</span><span class="id"> entourage_split_ent</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> xy</span><span class="id"> [uv</span><span class="id"> /=</span><span class="id"> [hB1xyuv1</span><span class="id"> hB2xyuv1]</span><span class="id"> [hB1xyuv2</span><span class="id"> hB2xyuv2]]</span>.<br/>
+<span class="id">have</span><span class="id"> /sBA</span><span class="id"> :</span> (<span class="id">B</span>.<span class="id">1</span><span class="id"> `*`</span><span class="id"> B</span>.<span class="id">2</span>) ((<span class="id">xy</span>.<span class="id">1</span>.<span class="id">1,</span><span class="id"> xy</span>.<span class="id">2</span>.<span class="id">1</span>)<span class="id">,</span>(<span class="id">xy</span>.<span class="id">1</span>.<span class="id">2,xy</span>.<span class="id">2</span>.<span class="id">2</span>)).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> split=&gt;</span><span class="id"> /=;</span><span class="id"> apply:</span><span class="id"> subset_split_ent</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> [exists</span><span class="id"> uv</span>.<span class="id">1|exists</span><span class="id"> uv</span>.<span class="id">2]</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> [zt</span><span class="id"> Azt</span><span class="id"> /eqP];</span><span class="id"> rewrite</span><span class="id"> !xpair_eqE</span><span class="id"> andbACA</span><span class="id"> -!xpair_eqE</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -!surjective_pairing</span><span class="id"> =&gt;</span><span class="id"> /eqP&lt;-</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> prod_ent_nbhsE</span><span class="id"> :</span><span class="id"> nbhs</span><span class="id"> =</span><span class="id"> nbhs_</span><span class="id"> prod_ent</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> predeq2E</span><span class="id"> =&gt;</span><span class="id"> xy</span><span class="id"> A;</span><span class="id"> split=&gt;</span><span class="id"> [[B</span><span class="id"> []]</span><span class="id"> |</span><span class="id"> [B</span><span class="id"> [C</span><span class="id"> [entC1</span><span class="id"> entC2]</span><span class="id"> sCB]</span><span class="id"> sBA]]</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -!nbhs_entourageE</span><span class="id"> =&gt;</span><span class="id"> -</span><span class="id"> [C1</span><span class="id"> entC1</span><span class="id"> sCB1]</span><span class="id"> [C2</span><span class="id"> entC2</span><span class="id"> sCB2]</span><span class="id"> sBA</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists</span><span class="id"> [set</span><span class="id"> xy</span><span class="id"> |</span><span class="id"> C1</span> (<span class="id">xy</span>.<span class="id">1</span>.<span class="id">1,</span><span class="id"> xy</span>.<span class="id">2</span>.<span class="id">1</span>)<span class="id"> /\</span><span class="id"> C2</span> (<span class="id">xy</span>.<span class="id">1</span>.<span class="id">2,</span><span class="id"> xy</span>.<span class="id">2</span>.<span class="id">2</span>)<span class="id">]</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> prod_entP</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> uv</span><span class="id"> /xsectionP/=</span><span class="id"> [/xsectionP/sCB1</span><span class="id"> Buv1</span><span class="id"> /xsectionP/sCB2/</span>(<span class="id">conj</span><span class="id"> Buv1</span>)<span class="id">]</span>.<br/>
+&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> sBA</span>.<br/>
+<span class="gallina-kwd">exists</span> (<span class="id">xsection</span><span class="id"> C</span>.<span class="id">1</span><span class="id"> xy</span>.<span class="id">1,</span><span class="id"> xsection</span><span class="id"> C</span>.<span class="id">2</span><span class="id"> xy</span>.<span class="id">2</span>).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -!nbhs_entourageE;</span><span class="id"> split;</span><span class="id"> [exists</span><span class="id"> C</span>.<span class="id">1|exists</span><span class="id"> C</span>.<span class="id">2]</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> uv</span><span class="id"> [/=</span><span class="id"> /xsectionP</span><span class="id"> Cxyuv1</span><span class="id"> /xsectionP</span><span class="id"> Cxyuv2];</span><span class="id"> apply:</span><span class="id"> sBA</span>.<br/>
+<span class="id">have</span><span class="id"> /sCB</span><span class="id"> :</span> (<span class="id">C</span>.<span class="id">1</span><span class="id"> `*`</span><span class="id"> C</span>.<span class="id">2</span>) ((<span class="id">xy</span>.<span class="id">1,uv</span>.<span class="id">1</span>)<span class="id">,</span> (<span class="id">xy</span>.<span class="id">2,uv</span>.<span class="id">2</span>))<span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> [zt</span><span class="id"> Bzt</span><span class="id"> /eqP];</span><span class="id"> rewrite</span><span class="id"> !xpair_eqE</span><span class="id"> andbACA</span><span class="id"> -!xpair_eqE</span>.<br/>
+<span class="gallina-kwd">by</span> <span class="id"> rewrite</span><span class="id"> -!surjective_pairing</span><span class="id"> =&gt;</span><span class="id"> /eqP</span><span class="id"> ztE;</span><span class="id"> apply/xsectionP;</span><span class="id"> rewrite</span><span class="id"> -ztE</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Nbhs_isUniform</span>.<span class="id">Build</span> (<span class="id">U</span><span class="id"> *</span><span class="id"> V</span>)<span class="id">%type</span><br/>
+&nbsp;&nbsp;<span class="id">prod_ent_filter</span><span class="id"> prod_ent_refl</span><span class="id"> prod_ent_inv</span><span class="id"> prod_ent_split</span><span class="id"> prod_ent_nbhsE</span>.<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> prod_Uniform</span>.<br/>
+<br/>
+<div class="doc">product of two pseudoMetric spaces </div>
+<span class="vernacular">Section</span><span class="id"> prod_PseudoMetric</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> {U</span><span class="id"> V</span><span class="id"> :</span><span class="id"> pseudoMetricType</span><span class="id"> R}</span>.<br/>
+<span class="vernacular">Implicit</span><span class="id"> Types</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> U</span><span class="id"> *</span><span class="id"> V</span>).<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> prod_ball</span><span class="id"> x</span> (<span class="id">eps</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> y</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">ball</span> (<span class="id">fst</span><span class="id"> x</span>)<span class="id"> eps</span> (<span class="id">fst</span><span class="id"> y</span>)<span class="id"> /\</span><span class="id"> ball</span> (<span class="id">snd</span><span class="id"> x</span>)<span class="id"> eps</span> (<span class="id">snd</span><span class="id"> y</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> prod_ball_center</span><span class="id"> x</span> (<span class="id">eps</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> eps</span><span class="id"> -&gt;</span><span class="id"> prod_ball</span><span class="id"> x</span><span class="id"> eps</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> /posnumP[?]</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> prod_ball_sym</span><span class="id"> x</span><span class="id"> y</span> (<span class="id">eps</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> prod_ball</span><span class="id"> x</span><span class="id"> eps</span><span class="id"> y</span><span class="id"> -&gt;</span><span class="id"> prod_ball</span><span class="id"> y</span><span class="id"> eps</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> [bxy1</span><span class="id"> bxy2];</span><span class="id"> split;</span><span class="id"> apply:</span><span class="id"> ball_sym</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> prod_ball_triangle</span><span class="id"> x</span><span class="id"> y</span><span class="id"> z</span> (<span class="id">e1</span><span class="id"> e2</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">prod_ball</span><span class="id"> x</span><span class="id"> e1</span><span class="id"> y</span><span class="id"> -&gt;</span><span class="id"> prod_ball</span><span class="id"> y</span><span class="id"> e2</span><span class="id"> z</span><span class="id"> -&gt;</span><span class="id"> prod_ball</span><span class="id"> x</span> (<span class="id">e1</span><span class="id"> +</span><span class="id"> e2</span>)<span class="id"> z</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> [bxy1</span><span class="id"> bxy2]</span><span class="id"> [byz1</span><span class="id"> byz2];</span><span class="id"> split;</span><span class="id"> apply:</span><span class="id"> ball_triangle;</span><span class="id"> eassumption</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> prod_entourage</span><span class="id"> :</span><span class="id"> entourage</span><span class="id"> =</span><span class="id"> entourage_</span><span class="id"> prod_ball</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> predeqE</span><span class="id"> =&gt;</span><span class="id"> P;</span><span class="id"> split;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> [_/posnumP[e]</span><span class="id"> sbeP]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists</span> (<span class="id">[set</span><span class="id"> xy</span><span class="id"> |</span><span class="id"> ball</span><span class="id"> xy</span>.<span class="id">1</span><span class="id"> e%:num</span><span class="id"> xy</span>.<span class="id">2],</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">[set</span><span class="id"> xy</span><span class="id"> |</span><span class="id"> ball</span><span class="id"> xy</span>.<span class="id">1</span><span class="id"> e%:num</span><span class="id"> xy</span>.<span class="id">2]</span>)<span class="id"> =&gt;</span><span class="id"> //=</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> [[a</span><span class="id"> b]</span><span class="id"> [c</span><span class="id"> d]]</span><span class="id"> [bab</span><span class="id"> bcd];</span><span class="gallina-kwd"> exists</span> ((<span class="id">a,</span><span class="id"> c</span>)<span class="id">,</span> (<span class="id">b,</span><span class="id"> d</span>))<span class="id">=&gt;</span><span class="id"> //=</span>.<br/>
+&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> sbeP</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> [[A</span><span class="id"> B]]</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> -!entourage_ballE</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> [[_/posnumP[eA]</span><span class="id"> sbA]</span><span class="id"> [_/posnumP[eB]</span><span class="id"> sbB]</span><span class="id"> sABP]</span>.<br/>
+<span class="gallina-kwd">exists</span> (<span class="id">Num</span>.<span class="id">min</span><span class="id"> eA</span><span class="id"> eB</span>)<span class="id">%:num</span><span class="id"> =&gt;</span><span class="id"> //=</span><span class="id"> -[[a</span><span class="id"> b]</span><span class="id"> [c</span><span class="id"> d]</span><span class="id"> [/=</span><span class="id"> bac</span><span class="id"> bbd]]</span>.<br/>
+<span class="id">suff</span><span class="id"> /sABP</span><span class="id"> []</span><span class="id"> :</span> (<span class="id">A</span><span class="id"> `*`</span><span class="id"> B</span>) ((<span class="id">a,</span><span class="id"> c</span>)<span class="id">,</span> (<span class="id">b,</span><span class="id"> d</span>))<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> [[??]</span><span class="id"> [??]]</span><span class="id"> ?</span><span class="id"> [&lt;-&lt;-&lt;-&lt;-]</span>.<br/>
+<span class="id">split;</span><span class="id"> [apply:</span><span class="id"> sbA|apply:</span><span class="id"> sbB]</span><span class="id"> =&gt;</span><span class="id"> /=</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> le_ball</span><span class="id"> bac;</span><span class="id"> rewrite</span><span class="id"> num_le</span><span class="id"> ge_min</span><span class="id"> lexx</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> le_ball</span><span class="id"> bbd;</span><span class="id"> rewrite</span><span class="id"> num_le</span><span class="id"> ge_min</span><span class="id"> lexx</span><span class="id"> orbT</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Uniform_isPseudoMetric</span>.<span class="id">Build</span><span class="id"> R</span> (<span class="id">U</span><span class="id"> *</span><span class="id"> V</span>)<span class="id">%type</span><br/>
+&nbsp;&nbsp;<span class="id">prod_ball_center</span><span class="id"> prod_ball_sym</span><span class="id"> prod_ball_triangle</span><span class="id"> prod_entourage</span>.<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> prod_PseudoMetric</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> Nbhs_fct2</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> Type}</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> {U</span><span class="id"> V</span><span class="id"> :</span><span class="id"> pseudoMetricType</span><span class="id"> R}</span>.<br/>
+<span class="vernacular">Lemma</span><span class="id"> fcvg_ball2P</span><span class="id"> {F</span><span class="id"> :</span><span class="id"> set_system</span><span class="id"> U}</span><span class="id"> {G</span><span class="id"> :</span><span class="id"> set_system</span><span class="id"> V}</span><br/>
+&nbsp;&nbsp;<span class="id">{FF</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> F}</span><span class="id"> {FG</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> G}</span> (<span class="id">y</span><span class="id"> :</span><span class="id"> U</span>) (<span class="id">z</span><span class="id"> :</span><span class="id"> V</span>)<span class="id">:</span><br/>
+&nbsp;&nbsp;(<span class="id">F,</span><span class="id"> G</span>)<span class="id"> --&gt;</span> (<span class="id">y,</span><span class="id"> z</span>)<span class="id"> &lt;-&gt;</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">forall</span><span class="id"> eps</span><span class="id"> :</span><span class="id"> R,</span><span class="id"> eps</span><span class="id"> &gt;</span><span class="id"> 0</span><span class="id"> -&gt;</span><span class="id"> \forall</span><span class="id"> y'</span><span class="id"> \near</span><span class="id"> F</span><span class="id"> &amp;</span><span class="id"> z'</span><span class="id"> \near</span><span class="id"> G,</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">ball</span><span class="id"> y</span><span class="id"> eps</span><span class="id"> y'</span><span class="id"> /\</span><span class="id"> ball</span><span class="id"> z</span><span class="id"> eps</span><span class="id"> z'</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact:</span><span class="id"> fcvg_ballP</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> cvg_ball2P</span><span class="id"> {I</span><span class="id"> J}</span><span class="id"> {F</span><span class="id"> :</span><span class="id"> set_system</span><span class="id"> I}</span><span class="id"> {G</span><span class="id"> :</span><span class="id"> set_system</span><span class="id"> J}</span><br/>
+&nbsp;&nbsp;<span class="id">{FF</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> F}</span><span class="id"> {FG</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> G}</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> I</span><span class="id"> -&gt;</span><span class="id"> U</span>) (<span class="id">g</span><span class="id"> :</span><span class="id"> J</span><span class="id"> -&gt;</span><span class="id"> V</span>) (<span class="id">y</span><span class="id"> :</span><span class="id"> U</span>) (<span class="id">z</span><span class="id"> :</span><span class="id"> V</span>)<span class="id">:</span><br/>
+&nbsp;&nbsp;(<span class="id">f</span><span class="id"> @</span><span class="id"> F,</span><span class="id"> g</span><span class="id"> @</span><span class="id"> G</span>)<span class="id"> --&gt;</span> (<span class="id">y,</span><span class="id"> z</span>)<span class="id"> &lt;-&gt;</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">forall</span><span class="id"> eps</span><span class="id"> :</span><span class="id"> R,</span><span class="id"> eps</span><span class="id"> &gt;</span><span class="id"> 0</span><span class="id"> -&gt;</span><span class="id"> \forall</span><span class="id"> i</span><span class="id"> \near</span><span class="id"> F</span><span class="id"> &amp;</span><span class="id"> j</span><span class="id"> \near</span><span class="id"> G,</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">ball</span><span class="id"> y</span><span class="id"> eps</span> (<span class="id">f</span><span class="id"> i</span>)<span class="id"> /\</span><span class="id"> ball</span><span class="id"> z</span><span class="id"> eps</span> (<span class="id">g</span><span class="id"> j</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> fcvg_ball2P;</span><span class="id"> split=&gt;</span><span class="id"> +</span><span class="id"> e</span><span class="id"> e0</span><span class="id"> =&gt;</span><span class="id"> /</span>(_<span class="id"> e</span><span class="id"> e0</span>).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> near_map2;</span><span class="id"> apply</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> fgyz;</span><span class="id"> rewrite</span><span class="id"> near_map2;</span><span class="id"> apply:</span><span class="id"> fgyz</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> Nbhs_fct2</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> compact_setX</span><span class="id"> {U</span><span class="id"> V</span><span class="id"> :</span><span class="id"> topologicalType}</span> (<span class="id">P</span><span class="id"> :</span><span class="id"> set</span><span class="id"> U</span>) (<span class="id">Q</span><span class="id"> :</span><span class="id"> set</span><span class="id"> V</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">compact</span><span class="id"> P</span><span class="id"> -&gt;</span><span class="id"> compact</span><span class="id"> Q</span><span class="id"> -&gt;</span><span class="id"> compact</span> (<span class="id">P</span><span class="id"> `*`</span><span class="id"> Q</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> !compact_near_coveringP</span><span class="id"> =&gt;</span><span class="id"> cptP</span><span class="id"> cptQ</span><span class="id"> I</span><span class="id"> F</span><span class="id"> Pr</span><span class="id"> Ff</span><span class="id"> cvfPQ</span>.<br/>
+<span class="id">have</span><span class="id"> :=</span><span class="id"> cptP</span><span class="id"> I</span><span class="id"> F</span> (<span class="gallina-kwd">fun</span><span class="id"> i</span><span class="id"> u</span><span class="id"> =&gt;</span><span class="gallina-kwd"> forall</span><span class="id"> q,</span><span class="id"> Q</span><span class="id"> q</span><span class="id"> -&gt;</span><span class="id"> Pr</span><span class="id"> i</span> (<span class="id">u,</span><span class="id"> q</span>))<span class="id"> Ff</span>.<br/>
+<span class="id">set</span><span class="id"> R</span><span class="id"> :=</span> (<span class="id">R</span><span class="gallina-kwd"> in</span> (<span class="id">R</span><span class="id"> -&gt;</span><span class="id"> _</span>)<span class="id"> -&gt;</span><span class="id"> _</span>)<span class="id">;</span><span class="id"> suff</span><span class="id"> R'</span><span class="id"> :</span><span class="id"> R</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move/</span>(_<span class="id"> R'</span>)<span class="id">;</span><span class="id"> apply:filter_app;</span><span class="id"> near=&gt;</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> +</span><span class="id"> [a</span><span class="id"> b]</span><span class="id"> [Pa</span><span class="id"> Qb];</span><span class="id"> apply</span>.<br/>
+<span class="id">rewrite</span><span class="id"> /R</span><span class="id"> =&gt;</span><span class="id"> x</span><span class="id"> Px;</span> <span class="id"> apply:</span> (<span class="id">@cptQ</span><span class="id"> _</span> (<span class="id">filter_prod</span><span class="id"> _</span><span class="id"> _</span>))<span class="id"> =&gt;</span><span class="id"> v</span><span class="id"> Qv</span>.<br/>
+<span class="id">case:</span> (<span class="id">cvfPQ</span> (<span class="id">x,</span><span class="id"> v</span>))<span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> [[N</span><span class="id"> G]]</span><span class="id"> /=</span><span class="id"> [[[N1</span><span class="id"> N2</span><span class="id"> /=</span><span class="id"> [N1x</span><span class="id"> N2v]]]]</span><span class="id"> N1N2N</span><span class="id"> FG</span><span class="id"> ngPr</span>.<br/>
+<span class="gallina-kwd">exists</span> (<span class="id">N2,</span><span class="id"> N1`*`G</span>)<span class="id">;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="gallina-kwd"> exists</span> (<span class="id">N1,</span><span class="id"> G</span>).<br/>
+<span class="id">case=&gt;</span><span class="id"> a</span><span class="id"> [b</span><span class="id"> i]</span><span class="id"> /=</span><span class="id"> [N2a</span><span class="id"> [N1b]]</span><span class="id"> Gi</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply:</span> (<span class="id">ngPr</span> (<span class="id">b,</span><span class="id"> a,</span><span class="id"> i</span>))<span class="id">;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> N1N2N</span>.<br/>
+<span class="id">Unshelve</span>.<span class="id"> all:</span><span class="gallina-kwd"> by</span><span class="id"> end_near</span>. Qed.</div></details>
+<span class="id">#[deprecated</span>(<span class="id">since=</span><span class="id">&quot;mathcomp-analysis 0.6.0&quot;</span><span class="id">,</span><span class="id"> note=</span><span class="id">&quot;renamed to `compact_setX`&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Notation</span><span class="id"> compact_setM</span><span class="id"> :=</span><span class="id"> compact_setX</span> (<span class="id">only</span><span class="id"> parsing</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> swap_continuous</span><span class="id"> {X</span><span class="id"> Y</span><span class="id"> :</span><span class="id"> topologicalType}</span><span class="id"> :</span><span class="id"> continuous</span> (<span class="id">@swap</span><span class="id"> X</span><span class="id"> Y</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">case=&gt;</span><span class="id"> a</span><span class="id"> b</span><span class="id"> W</span><span class="id"> /=</span><span class="id"> [[U</span><span class="id"> V]][]</span><span class="id"> /=</span><span class="id"> Ub</span><span class="id"> Va</span><span class="id"> UVW;</span><span class="gallina-kwd"> exists</span> (<span class="id">V,</span><span class="id"> U</span>)<span class="id">;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> split</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> case</span><span class="id"> =&gt;</span><span class="id"> //=</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> []</span><span class="id"> ?</span><span class="id"> ?;</span><span class="id"> exact:</span><span class="id"> UVW</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Section</span><span class="id"> reassociate_continuous</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {X</span><span class="id"> Y</span><span class="id"> Z</span><span class="id"> :</span><span class="id"> topologicalType}</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> prodA_continuous</span><span class="id"> :</span><span class="id"> continuous</span> (<span class="id">@prodA</span><span class="id"> X</span><span class="id"> Y</span><span class="id"> Z</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> []</span><span class="id"> [a</span><span class="id"> b]</span><span class="id"> c</span><span class="id"> U</span><span class="id"> [[/=</span><span class="id"> P</span><span class="id"> V]]</span><span class="id"> [Pa]</span><span class="id"> [][/=</span><span class="id"> Q</span><span class="id"> R][</span><span class="id"> Qb</span><span class="id"> Rc]</span><span class="id"> QRV</span><span class="id"> PVU</span>.<br/>
+<span class="gallina-kwd">exists</span> ((<span class="id">P</span><span class="id"> `*`</span><span class="id"> Q</span>)<span class="id">,</span><span class="id"> R</span>)<span class="id">;</span><span class="id"> first</span><span class="id"> split</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> exists</span> (<span class="id">P,</span><span class="id"> Q</span>)<span class="id">;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> []</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> case=&gt;</span><span class="id"> x</span><span class="id"> y</span><span class="id"> /=</span><span class="id"> [Px</span><span class="id"> Qy]</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> []</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> [[x</span><span class="id"> y]</span><span class="id"> z]</span><span class="id"> []</span><span class="id"> []</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> ?;</span><span class="id"> apply:</span><span class="id"> PVU;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> QRV</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> prodAr_continuous</span><span class="id"> :</span><span class="id"> continuous</span> (<span class="id">@prodAr</span><span class="id"> X</span><span class="id"> Y</span><span class="id"> Z</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">case=&gt;</span><span class="id"> a</span><span class="id"> [b</span><span class="id"> c]</span><span class="id"> U</span><span class="id"> [[V</span><span class="id"> R]]</span><span class="id"> [/=</span><span class="id"> [[P</span><span class="id"> Q</span><span class="id"> /=]]]</span><span class="id"> [Pa</span><span class="id"> Qb]</span><span class="id"> PQV</span><span class="id"> Rc</span><span class="id"> VRU</span>.<br/>
+<span class="gallina-kwd">exists</span> (<span class="id">P,</span> (<span class="id">Q</span><span class="id"> `*`</span><span class="id"> R</span>))<span class="id">;</span><span class="id"> first</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> exists</span> (<span class="id">Q,</span><span class="id"> R</span>)<span class="id">;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> []</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> case=&gt;</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> /=</span><span class="id"> []</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> case=&gt;</span><span class="id"> x</span><span class="id"> [y</span><span class="id"> z]</span><span class="id"> [?</span><span class="id"> [?</span><span class="id"> ?]];</span><span class="id"> apply:</span><span class="id"> VRU;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> PQV</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> reassociate_continuous</span>.<br/>
+
+      <div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/">a fork of coq2html</a></div>
+    </div>
+  </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,372 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module mathcomp.analysis.topology_theory.order_topology</title>
+<meta name="description" content="Documentation of Coq module mathcomp.analysis.topology_theory.order_topology" />
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="init()">
+
+  <main>
+    <div class="sidebar">
+      <h2>Files</h2>
+      
+    </div>
+
+  <div class="coq">
+
+    <div class="content">
+      <p><a href="./index.html">Top</a></p>
+      <h1 class="title">Module mathcomp.analysis.topology_theory.order_topology</h1>
+<span class="vernacular">From</span><span class="id"> HB</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> structures</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> all_ssreflect</span><span class="id"> all_algebra</span><span class="id"> finmap</span><span class="id"> all_classical</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> topology_structure</span><span class="id"> uniform_structure</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> product_topology</span><span class="id"> pseudometric_structure</span>.<br/>
+<br/>
+<div class="ssrdoc md">
+# Order topology
+
+```
+            orderTopologicalType == a topology built from intervals
+                order_topology T == the induced order topology on T
+```
+</div>
+<br/>
+<span class="vernacular">Import</span><span class="id"> Order</span>.<span class="id">TTheory</span><span class="id"> GRing</span>.<span class="id">Theory</span><span class="id"> Num</span>.<span class="id">Theory</span>.<br/>
+<br/>
+<span class="gallina-kwd">Set</span><span class="vernacular"> Implicit</span><span class="vernacular"> Arguments</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Strict</span><span class="vernacular"> Implicit</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Printing</span><span class="vernacular"> Implicit</span><span class="vernacular"> Defensive</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> classical_set_scope</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ring_scope</span>.<br/>
+<br/>
+<div class="doc">TODO: generalize this to a preOrder once that's available </div>
+<span class="id">HB</span>.<span class="id">mixin</span><span class="vernacular"> Record</span><span class="id"> Order_isNbhs</span><span class="id"> d</span> (<span class="id">T</span><span class="id"> :</span><span class="gallina-kwd"> Type</span>)<span class="id"> of</span><span class="id"> Nbhs</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> Order</span>.<span class="id">Total</span><span class="id"> d</span><span class="id"> T</span><span class="id"> :=</span><span class="id"> {</span><br/>
+<div class="doc">Note that just the intervals `]a, b<span class="bracket"> <span class="id">doesn't</span> <span class="id">work</span> <span class="id">when</span> <span class="id">the</span> <span class="id">order</span> <span class="id">has</span> <span class="id">a</span>
+      <span class="id">top</span> <span class="id">or</span> <span class="id">bottom</span> <span class="id">element</span>, <span class="id">so</span> <span class="id">we</span> <span class="id">also</span> <span class="id">need</span> <span class="id">the</span> <span class="id">rays</span> `</span>-oo, b<span class="bracket"> <span class="id">and</span> </span>a, +oo<span class="bracket"> *)
+  <span class="id">itv_nbhsE</span> : <span class="gallina-kwd">forall</span> <span class="id">x</span> : <span class="id">T</span>, <span class="id">nbhs</span> <span class="id">x</span> = <span class="id">filter_from</span>
+    (<span class="gallina-kwd">fun</span> <span class="id">i</span> =&gt; <span class="id">itv_open_ends</span> <span class="id">i</span> /\ <span class="id">x</span> \<span class="gallina-kwd">in</span> <span class="id">i</span>)
+    (<span class="gallina-kwd">fun</span> <span class="id">i</span> =&gt; [<span class="id">set</span>` <span class="id">i</span>])
+}.
+
+#[<span class="id">short</span>(<span class="id">type</span>=<span class="string">"orderNbhsType"</span>)<span class="id">]</span><br/>
+<span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> OrderNbhs</span><span class="id"> d</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">{</span><span class="id"> T</span><span class="id"> of</span><span class="id"> Nbhs</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> Order</span>.<span class="id">Total</span><span class="id"> d</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> Order_isNbhs</span><span class="id"> d</span><span class="id"> T</span><span class="id"> }</span>.<br/>
+<br/>
+<span class="id">#[short</span>(<span class="id">type=</span><span class="id">&quot;orderTopologicalType&quot;</span>)<span class="id">]</span><br/>
+<span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> OrderTopological</span><span class="id"> d</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">{</span><span class="id"> T</span><span class="id"> of</span><span class="id"> Topological</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> Order</span>.<span class="id">Total</span><span class="id"> d</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> Order_isNbhs</span><span class="id"> d</span><span class="id"> T</span><span class="id"> }</span>.<br/>
+<br/>
+<span class="id">#[short</span>(<span class="id">type=</span><span class="id">&quot;orderUniformType&quot;</span>)<span class="id">]</span><br/>
+<span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> OrderUniform</span><span class="id"> d</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">{T</span><span class="id"> of</span><span class="id"> Uniform</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> OrderTopological</span><span class="id"> d</span> <span class="id"> T}</span>.<br/>
+<br/>
+<span class="id">#[short</span>(<span class="id">type=</span><span class="id">&quot;orderPseudoMetricType&quot;</span>)<span class="id">]</span><br/>
+<span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> OrderPseudoMetric</span><span class="id"> d</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> numDomainType</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">{T</span><span class="id"> of</span><span class="id"> PseudoMetric</span><span class="id"> R</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> OrderTopological</span><span class="id"> d</span><span class="id"> T}</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> order_topologies</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> order_scope</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> classical_set_scope</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {d}</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> orderTopologicalType</span><span class="id"> d}</span>.<br/>
+<span class="vernacular">Implicit</span><span class="id"> Types</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> T</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> rray_open</span><span class="id"> x</span><span class="id"> :</span><span class="id"> open</span><span class="id"> `]x,</span><span class="id"> +oo[</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> openE</span><span class="id"> /interior</span><span class="id"> =&gt;</span><span class="id"> z</span><span class="id"> xoz;</span><span class="id"> rewrite</span><span class="id"> itv_nbhsE</span>.<br/>
+<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span><span class="id"> `]x,</span><span class="id"> +oo[%O</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> left</span>.<br/>
+Qed.</div></details>
+<span class="vernacular">Hint</span><span class="id"> Resolve</span><span class="id"> rray_open</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> lray_open</span><span class="id"> x</span><span class="id"> :</span><span class="id"> open</span><span class="id"> `]-oo,</span><span class="id"> x[</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> openE</span><span class="id"> /interior</span><span class="id"> =&gt;</span><span class="id"> z</span><span class="id"> xoz;</span><span class="id"> rewrite</span><span class="id"> itv_nbhsE</span>.<br/>
+<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span> (<span class="id">`]-oo,</span><span class="id"> x[</span>)<span class="id">%O</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> left</span>.<br/>
+Qed.</div></details>
+<span class="vernacular">Hint</span><span class="id"> Resolve</span><span class="id"> lray_open</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> itv_open</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> open</span><span class="id"> `]x,</span><span class="id"> y[</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> set_itv_splitI</span><span class="id"> /=;</span><span class="id"> apply:</span><span class="id"> openI</span>. Qed.</div></details>
+<span class="vernacular">Hint</span><span class="id"> Resolve</span><span class="id"> itv_open</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> itv_open_ends_open</span> (<span class="id">i</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> T</span>)<span class="id"> :</span><span class="id"> itv_open_ends</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> open</span><span class="id"> [set`</span><span class="id"> i]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">case:</span><span class="id"> i;</span><span class="id"> rewrite</span><span class="id"> /itv_open_ends</span><span class="id"> =&gt;</span><span class="id"> [[[]t1|[]]]</span><span class="id"> [[]t2|[]]</span><span class="id"> []?</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> set_itvE;</span><span class="id"> exact:</span><span class="id"> openT</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> rray_closed</span><span class="id"> x</span><span class="id"> :</span><span class="id"> closed</span><span class="id"> `[x,</span><span class="id"> +oo[</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -setCitvl</span><span class="id"> closedC</span>. Qed.</div></details>
+<span class="vernacular">Hint</span><span class="id"> Resolve</span><span class="id"> rray_closed</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> lray_closed</span><span class="id"> x</span><span class="id"> :</span><span class="id"> closed</span><span class="id"> `]-oo,</span><span class="id"> x]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -setCitvr</span><span class="id"> closedC</span>. Qed.</div></details>
+<span class="vernacular">Hint</span><span class="id"> Resolve</span><span class="id"> lray_closed</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> itv_closed</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> closed</span><span class="id"> `[x,</span><span class="id"> y]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> set_itv_splitI;</span><span class="id"> apply:</span><span class="id"> closedI</span><span class="id"> =&gt;</span><span class="id"> /=</span>. Qed.</div></details>
+<span class="vernacular">Hint</span><span class="id"> Resolve</span><span class="id"> itv_closed</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> itv_closure</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> closure</span><span class="id"> `]x,</span><span class="id"> y[</span><span class="id"> `&lt;=`</span><span class="id"> `[x,</span><span class="id"> y]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> closureE</span><span class="id"> =&gt;</span><span class="id"> r;</span><span class="id"> apply;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> subset_itvScc</span><span class="id"> =&gt;</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> bnd_simp</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> itv_closed_infimums</span> (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span><span class="id"> T</span>)<span class="id"> :</span><span class="id"> A</span><span class="id"> !=set0</span><span class="id"> -&gt;</span><span class="id"> closed</span><span class="id"> A</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">infimums</span><span class="id"> A</span><span class="id"> `&lt;=`</span><span class="id"> A</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> [a0</span><span class="id"> Aa0]</span><span class="id"> +</span><span class="id"> l</span><span class="id"> [loL]</span><span class="id"> hiL;</span><span class="id"> rewrite</span><span class="id"> closure_id</span><span class="id"> =&gt;</span><span class="id"> -&gt;</span><span class="id"> =&gt;</span><span class="id"> U</span>.<br/>
+<span class="id">rewrite</span><span class="id"> itv_nbhsE</span><span class="id"> =&gt;</span><span class="id"> -[[p</span><span class="id"> q</span><span class="id"> []]]</span>.<br/>
+<span class="id">have</span><span class="id"> [E|E]</span><span class="id"> :=</span><span class="id"> eqVneq</span> (<span class="id">[set`</span><span class="id"> Interval</span> (<span class="id">BSide</span><span class="id"> true</span><span class="id"> l</span>)<span class="id"> q]</span><span class="id"> `&amp;`</span><span class="id"> A</span>)<span class="id"> set0;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;<span class="id">case/set0P:</span><span class="id"> E</span><span class="id"> =&gt;</span><span class="id"> a</span><span class="id"> [lqa</span><span class="id"> ?]</span><span class="id"> ?</span><span class="id"> lpq</span><span class="id"> pqU;</span><span class="gallina-kwd"> exists</span><span class="id"> a;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> pqU;</span><span class="id"> move:</span><span class="id"> lpq</span><span class="id"> lqa;</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> ?inE</span><span class="id"> =&gt;</span><span class="id"> lpq</span><span class="id"> /le_trans;</span><span class="id"> apply</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move:</span><span class="id"> lpq</span><span class="id"> =&gt;</span><span class="id"> /andP</span><span class="id"> [?</span><span class="id"> ?];</span><span class="id"> exact/andP</span>.<br/>
+<span class="id">case:</span><span class="id"> q</span><span class="id"> E</span>.<br/>
+<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> b</span><span class="id"> q</span><span class="id"> /[swap]</span><span class="id"> /itv_open_ends_rside</span><span class="id"> -&gt;</span><span class="id"> E</span><span class="id"> lpq</span><span class="id"> ;</span><span class="id"> suff</span><span class="id"> :</span><span class="id"> lbound</span><span class="id"> A</span><span class="id"> q</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">move/hiL</span><span class="id"> =&gt;</span><span class="id"> +</span><span class="id"> _;</span><span class="id"> rewrite</span><span class="id"> leNgt;</span><span class="id"> apply:</span><span class="id"> contraNP</span><span class="id"> =&gt;</span><span class="id"> _</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move:</span><span class="id"> lpq;</span><span class="id"> rewrite</span><span class="id"> in_itv</span><span class="id"> =&gt;</span><span class="id"> /andP</span><span class="id"> []</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> a</span><span class="id"> Aa;</span><span class="id"> have</span><span class="id"> :</span> (<span class="id">~`</span> (<span class="id">`[l,</span><span class="id"> q[</span><span class="id"> `&amp;`</span><span class="id"> A</span>))<span class="id"> a</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> E</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> setCI</span><span class="id"> =&gt;</span><span class="id"> -[|//];</span><span class="id"> rewrite</span><span class="id"> setCitv</span><span class="id"> /=</span><span class="id"> ?in_itv/=</span><span class="id"> ?andbT</span><span class="id"> =&gt;</span><span class="id"> -[|//]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> ltNge</span> (<span class="id">loL</span><span class="id"> _</span><span class="id"> Aa</span>).<br/>
+<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> b</span><span class="id"> _</span><span class="id"> /itv_open_ends_rinfty</span><span class="id"> -&gt;</span><span class="id"> lpo</span><span class="id"> poU;</span><span class="gallina-kwd"> exists</span><span class="id"> a0;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> poU;</span><span class="id"> move:</span><span class="id"> lpo;</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> ?itv_boundlr</span><span class="id"> /=</span><span class="id"> =&gt;</span><span class="id"> /andP[pl</span><span class="id"> _];</span><span class="id"> apply/andP</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact/</span>(<span class="id">le_trans</span><span class="id"> pl</span>)<span class="id">/loL</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> itv_closed_supremums</span> (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span><span class="id"> T</span>)<span class="id"> :</span><span class="id"> A</span><span class="id"> !=set0</span><span class="id"> -&gt;</span><span class="id"> closed</span><span class="id"> A</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">supremums</span><span class="id"> A</span><span class="id"> `&lt;=`</span><span class="id"> A</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> [a0</span><span class="id"> Aa0]</span><span class="id"> +</span><span class="id"> l</span><span class="id"> [upL]</span><span class="id"> lbL;</span><span class="id"> rewrite</span><span class="id"> closure_id</span><span class="id"> =&gt;</span><span class="id"> -&gt;</span><span class="id"> =&gt;</span><span class="id"> U</span>.<br/>
+<span class="id">rewrite</span><span class="id"> itv_nbhsE</span><span class="id"> =&gt;</span><span class="id"> -[[p</span><span class="id"> q[]]]</span>.<br/>
+<span class="id">have</span><span class="id"> [E|E]</span><span class="id"> :=</span><span class="id"> eqVneq</span> (<span class="id">[set`</span><span class="id"> Interval</span><span class="id"> p</span> (<span class="id">BSide</span><span class="id"> false</span><span class="id"> l</span>)<span class="id">]</span><span class="id"> `&amp;`</span><span class="id"> A</span>)<span class="id"> set0;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;<span class="id">case/set0P:</span><span class="id"> E</span><span class="id"> =&gt;</span><span class="id"> a</span><span class="id"> [lqa</span><span class="id"> ?]</span><span class="id"> ?</span><span class="id"> lpq</span><span class="id"> pqU;</span><span class="gallina-kwd"> exists</span><span class="id"> a;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> pqU;</span><span class="id"> move:</span><span class="id"> lpq</span><span class="id"> lqa;</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> ?inE</span><span class="id"> =&gt;</span><span class="id"> lpq</span><span class="id"> /le_trans;</span><span class="id"> apply</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move:</span><span class="id"> lpq</span><span class="id"> =&gt;</span><span class="id"> /andP</span><span class="id"> [?</span><span class="id"> ?];</span><span class="id"> exact/andP</span>.<br/>
+<span class="id">case:</span><span class="id"> p</span><span class="id"> E</span>.<br/>
+<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> b</span><span class="id"> p</span><span class="id"> /[swap]</span><span class="id"> /itv_open_ends_lside</span><span class="id"> -&gt;</span><span class="id"> E</span><span class="id"> lpq</span><span class="id"> ;</span><span class="id"> suff</span><span class="id"> :</span><span class="id"> ubound</span><span class="id"> A</span><span class="id"> p</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">move/lbL</span><span class="id"> =&gt;</span><span class="id"> +</span><span class="id"> _;</span><span class="id"> rewrite</span><span class="id"> leNgt;</span><span class="id"> apply:</span><span class="id"> contraNP</span><span class="id"> =&gt;</span><span class="id"> _</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move:</span><span class="id"> lpq;</span><span class="id"> rewrite</span><span class="id"> in_itv</span><span class="id"> =&gt;</span><span class="id"> /andP</span><span class="id"> []</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> a</span><span class="id"> Aa;</span><span class="id"> have</span><span class="id"> :</span> (<span class="id">~`</span> (<span class="id">`]p,</span><span class="id"> l]</span><span class="id"> `&amp;`</span><span class="id"> A</span>))<span class="id"> a</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> E</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> setCI</span><span class="id"> =&gt;</span><span class="id"> -[|//];</span><span class="id"> rewrite</span><span class="id"> setCitv</span><span class="id"> /=</span><span class="id"> ?in_itv/=</span><span class="id"> ?andbT</span><span class="id"> =&gt;</span><span class="id"> -[//|]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> ltNge</span> (<span class="id">upL</span><span class="id"> _</span><span class="id"> Aa</span>).<br/>
+<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> b</span><span class="id"> _</span><span class="id"> /itv_open_ends_linfty</span><span class="id"> -&gt;</span><span class="id"> lpo</span><span class="id"> poU;</span><span class="gallina-kwd"> exists</span><span class="id"> a0;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> poU;</span><span class="id"> move:</span><span class="id"> lpo;</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> ?itv_boundrl</span><span class="id"> /=</span><span class="id"> =&gt;</span><span class="id"> /andP[_</span><span class="id"> pl];</span><span class="id"> apply/andP</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact/</span>(<span class="id">le_trans</span><span class="id"> _</span><span class="id"> pl</span>)<span class="id">/upL</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> sub_open_mem</span><span class="id"> x</span> (<span class="id">U</span><span class="id"> :</span><span class="id"> set</span><span class="id"> T</span>) (<span class="id">i</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> T</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">[/\</span><span class="id"> [set`</span><span class="id"> i]</span><span class="id"> `&lt;=`</span><span class="id"> U,</span><span class="id"> open</span><span class="id"> [set`</span><span class="id"> i]</span><span class="id"> &amp;</span><span class="id"> x</span><span class="id"> \in</span><span class="id"> i]</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> clopen_bigcup_clopen</span><span class="id"> x</span> (<span class="id">U</span><span class="id"> :</span><span class="id"> set</span><span class="id"> T</span>)<span class="id"> :</span><span class="id"> clopen</span><span class="id"> U</span><span class="id"> -&gt;</span><span class="id"> U</span><span class="id"> x</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">clopen</span> (<span class="id">\bigcup_</span>(<span class="id">i</span><span class="gallina-kwd"> in</span><span class="id"> sub_open_mem</span><span class="id"> x</span><span class="id"> U</span>)<span class="id"> [set`</span><span class="id"> i]</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">pose</span><span class="id"> I</span><span class="id"> :=</span><span class="id"> \bigcup_</span>(<span class="id">i</span><span class="gallina-kwd"> in</span><span class="id"> sub_open_mem</span><span class="id"> x</span><span class="id"> U</span>)<span class="id"> [set`</span><span class="id"> i]</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> clU</span><span class="id"> Ux;</span><span class="id"> split;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> apply:</span><span class="id"> bigcup_open</span><span class="id"> =&gt;</span><span class="id"> ?</span><span class="id"> []</span>.<br/>
+<span class="id">have</span><span class="id"> cIV</span><span class="id"> :</span><span class="id"> closure</span><span class="id"> I</span><span class="id"> `&lt;=`</span><span class="id"> U</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> closureE</span><span class="id"> =&gt;</span><span class="id"> z</span><span class="id"> /</span>(_<span class="id"> U</span>)<span class="id">;</span><span class="id"> apply;</span><span class="id"> split;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> case:</span><span class="id"> clU</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> [?</span><span class="id"> [+</span><span class="id"> _</span><span class="id"> _]];</span><span class="id"> exact</span>.<br/>
+<span class="id">apply/closure_id;</span><span class="id"> rewrite</span><span class="id"> eqEsubset;</span><span class="id"> split;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> subset_closure</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> z</span><span class="id"> cIi;</span><span class="id"> have</span><span class="id"> Uz</span><span class="id"> :</span><span class="id"> U</span><span class="id"> z</span><span class="gallina-kwd"> by</span><span class="id"> exact:</span><span class="id"> cIV</span>.<br/>
+<span class="id">case:</span><span class="id"> clU</span><span class="id"> =&gt;</span><span class="id"> +</span><span class="id"> _;</span> <span class="id"> rewrite</span><span class="id"> {1}openE</span><span class="id"> =&gt;</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> Uz</span>).<br/>
+<span class="id">rewrite</span><span class="id"> /interior</span><span class="id"> /=</span><span class="id"> itv_nbhsE</span><span class="id"> /=</span><span class="id"> =&gt;</span><span class="id"> -[i</span><span class="id"> [/itv_open_ends_open</span><span class="id"> oi</span><span class="id"> iy]</span><span class="id"> siU]</span>.<br/>
+<span class="id">case/</span>(_<span class="id"> [set`</span><span class="id"> i]</span>)<span class="id">:</span><span class="id"> cIi;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> move:</span><span class="id"> oi;</span><span class="id"> rewrite</span><span class="id"> openE;</span><span class="id"> exact</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> /=</span><span class="id"> w</span><span class="id"> [[j</span><span class="id"> [jU</span><span class="id"> oJ</span><span class="id"> jy</span><span class="id"> jw]]]</span><span class="id"> wi;</span><span class="gallina-kwd"> exists</span> (<span class="id">i</span><span class="id"> `|`</span><span class="id"> j</span>)<span class="id">%O;</span><span class="id"> first</span><span class="id"> last</span>.<br/>
+&nbsp;&nbsp;<span class="id">exact/</span>(<span class="id">le_trans</span><span class="id"> iy</span>)<span class="id">/leUl</span>.<br/>
+<span class="id">split;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> itv_setU</span><span class="id"> ?{1}subUset</span><span class="id"> //;</span><span class="gallina-kwd"> exists</span><span class="id"> w</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> itv_setU</span><span class="id"> ?{1}subUset</span><span class="id"> //;</span><span class="id"> [exact:</span><span class="id"> openU</span><span class="id"> |</span><span class="gallina-kwd"> exists</span><span class="id"> w]</span>.<br/>
+<span class="id">exact/</span>(<span class="id">le_trans</span><span class="id"> jy</span>)<span class="id">/leUr</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> order_topologies</span>.<br/>
+<span class="vernacular">Hint</span><span class="id"> Resolve</span><span class="id"> lray_open</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<span class="vernacular">Hint</span><span class="id"> Resolve</span><span class="id"> rray_open</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<span class="vernacular">Hint</span><span class="id"> Resolve</span><span class="id"> itv_open</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<span class="vernacular">Hint</span><span class="id"> Resolve</span><span class="id"> lray_closed</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<span class="vernacular">Hint</span><span class="id"> Resolve</span><span class="id"> rray_closed</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<span class="vernacular">Hint</span><span class="id"> Resolve</span><span class="id"> itv_closed</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> order_topology</span> (<span class="id">T</span><span class="id"> :</span><span class="gallina-kwd"> Type</span>)<span class="id"> :</span><span class="gallina-kwd"> Type</span><span class="id"> :=</span><span class="id"> T</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> induced_order_topology</span>.<br/>
+<br/>
+<span class="vernacular">Context</span><span class="id"> {d}</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> orderType</span><span class="id"> d}</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Notation</span><span class="id"> oT</span><span class="id"> :=</span> (<span class="id">order_topology</span><span class="id"> T</span>).<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> isPointed</span>.<span class="id">Build</span> (<span class="id">interval</span><span class="id"> T</span>) (<span class="id">`]-oo,+oo[</span>).<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Order</span>.<span class="id">Total</span>.<span class="id">on</span><span class="id"> oT</span>.<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> @isSubBaseTopological</span>.<span class="id">Build</span><span class="id"> oT</span><br/>
+&nbsp;&nbsp;(<span class="id">interval</span><span class="id"> T</span>) (<span class="id">itv_is_ray</span>) (<span class="gallina-kwd">fun</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> [set`</span><span class="id"> i]</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> order_nbhs_itv</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> oT</span>)<span class="id"> :</span><span class="id"> nbhs</span><span class="id"> x</span><span class="id"> =</span><span class="id"> filter_from</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="gallina-kwd">fun</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> itv_open_ends</span><span class="id"> i</span><span class="id"> /\</span><span class="id"> x</span><span class="id"> \in</span><span class="id"> i</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="gallina-kwd">fun</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> [set`</span><span class="id"> i]</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> eqEsubset;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> U;</span><span class="id"> first</span><span class="id"> last</span>.<br/>
+&nbsp;&nbsp;<span class="id">case=&gt;</span><span class="id"> /=</span><span class="id"> i</span><span class="id"> [ro</span><span class="id"> xi</span><span class="id"> /filterS];</span><span class="id"> apply;</span><span class="id"> move:</span><span class="id"> ro</span><span class="id"> =&gt;</span><span class="id"> [rayi|]</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">exists</span><span class="id"> [set`</span><span class="id"> i];</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //=</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">exists</span><span class="id"> [set</span><span class="id"> [set`</span><span class="id"> i]];</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> bigcup_set1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> A</span><span class="id"> -&gt;;</span><span class="gallina-kwd"> exists</span> (<span class="id">fset1</span><span class="id"> i</span>)<span class="id">;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> set_fset1</span><span class="id"> bigcap_set1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> ?;</span><span class="id"> rewrite</span><span class="id"> !inE</span><span class="id"> =&gt;</span><span class="id"> /eqP</span><span class="id"> -&gt;</span>.<br/>
+&nbsp;&nbsp;<span class="id">case:</span><span class="id"> i</span><span class="id"> xi</span><span class="id"> =&gt;</span><span class="id"> [][[]l|[]]</span><span class="id"> [[]r|[]]</span><span class="id"> xlr</span><span class="id"> []//=;</span><span class="gallina-kwd"> exists</span><span class="id"> `]l,</span><span class="id"> r[%classic</span>.<br/>
+&nbsp;&nbsp;<span class="id">split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="gallina-kwd"> exists</span><span class="id"> [set</span><span class="id"> `]l,</span><span class="id"> r[%classic];</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> bigcup_set1</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> ?</span><span class="id"> -&gt;;</span><span class="gallina-kwd"> exists</span><span class="id"> [fset</span><span class="id"> `]-oo,</span><span class="id"> r[</span><span class="id"> ;</span><span class="id"> `]l,</span><span class="id"> +oo[]%fset</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> ?;</span><span class="id"> rewrite</span><span class="id"> !inE</span><span class="id"> =&gt;</span><span class="id"> /orP[]</span><span class="id"> /eqP</span><span class="id"> -&gt;</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> set_fsetU</span><span class="id"> !set_fset1</span><span class="id"> bigcap_setU</span><span class="id"> !bigcap_set1</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span> (<span class="id">@set_itv_splitI</span><span class="id"> _</span><span class="id"> _</span><span class="id"> `]l,</span><span class="id"> r[</span>)<span class="id"> /=</span><span class="id"> setIC</span>.<br/>
+<span class="id">case=&gt;</span><span class="id"> ?</span><span class="id"> [[</span><span class="id"> I</span><span class="id"> Irp]</span><span class="id"> &lt;-]</span><span class="id"> [?]</span><span class="id"> /[dup]</span><span class="id"> /</span>(<span class="id">Irp</span><span class="id"> _</span>)<span class="id"> [F</span><span class="id"> rayF</span><span class="id"> &lt;-]</span><span class="gallina-kwd"> IF</span><span class="id"> Fix</span><span class="id"> IU</span>.<br/>
+<span class="id">pose</span><span class="id"> j</span><span class="id"> :=</span><span class="id"> \big[Order</span>.<span class="id">meet/`]-oo,</span><span class="id"> +oo[]_</span>(<span class="id">i</span><span class="id"> &lt;-</span><span class="id"> F</span>)<span class="id"> i</span>.<br/>
+<span class="gallina-kwd">exists</span><span class="id"> j;</span><span class="id"> first</span><span class="id"> split</span>.<br/>
+<span class="id">-</span><span class="id"> rewrite</span><span class="id"> /j</span> (<span class="id">@eq_fbig_cond</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> F</span><span class="id"> _</span> (<span class="id">mem</span><span class="id"> F</span>)<span class="id"> _</span><span class="id"> id</span>)<span class="id">//</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> apply:</span><span class="id"> big_ind;</span><span class="id"> [by</span><span class="id"> left|</span><span class="id"> exact:</span><span class="id"> itv_open_endsI|]</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> i</span><span class="id"> /rayF</span><span class="id"> /set_mem</span><span class="id"> ?;</span><span class="id"> left</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> p</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> !inE/=;</span><span class="id"> exact:</span><span class="id"> andb_id2l</span>.<br/>
+<span class="id">-</span><span class="id"> pose</span><span class="id"> f</span> (<span class="id">i</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> T</span>)<span class="id"> :</span><span class="gallina-kwd"> Prop</span><span class="id"> :=</span><span class="id"> x</span><span class="id"> \in</span><span class="id"> i;</span><span class="id"> suff</span><span class="id"> :</span><span class="id"> f</span><span class="id"> j</span><span class="gallina-kwd"> by</span><span class="id"> []</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> /j</span> (<span class="id">@eq_fbig_cond</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> F</span><span class="id"> _</span> (<span class="id">mem</span><span class="id"> F</span>)<span class="id"> _</span><span class="id"> id</span>)<span class="id">//=</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> apply:</span><span class="id"> big_ind</span><span class="id"> =&gt;</span><span class="id"> //=;</span><span class="id"> rewrite</span><span class="id"> /f</span><span class="id"> /=</span><span class="id"> =&gt;</span><span class="id"> a</span><span class="id"> ?</span><span class="id"> xa</span><span class="id"> ?;</span><span class="id"> rewrite</span><span class="id"> in_itvI</span><span class="id"> xa</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> p</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> !inE/=;</span><span class="id"> exact:</span><span class="id"> andb_id2l</span>.<br/>
+<span class="id">-</span><span class="id"> suff</span><span class="id"> -&gt;</span><span class="id"> :</span><span class="id"> [set`</span><span class="id"> j]</span><span class="id"> =</span><span class="id"> \bigcap_</span>(<span class="id">i</span><span class="gallina-kwd"> in</span><span class="id"> [set`</span><span class="id"> F]</span>)<span class="id"> [set`</span><span class="id"> i]</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> i</span><span class="id"> Fi;</span><span class="id"> apply:</span><span class="id"> IU;</span><span class="gallina-kwd"> exists</span> (<span class="id">\bigcap_</span>(<span class="id">i</span><span class="gallina-kwd"> in</span><span class="id"> [set`</span><span class="id"> F]</span>)<span class="id"> [set`</span><span class="id"> i]</span>).<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -bigsetI_fset_set</span><span class="id"> ?set_fsetK//</span>.<br/>
+&nbsp;&nbsp;<span class="id">pose</span><span class="id"> f</span> (<span class="id">i</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> T</span>) (<span class="id">j</span><span class="id"> :</span><span class="id"> set</span><span class="id"> T</span>)<span class="id"> :</span><span class="gallina-kwd"> Prop</span><span class="id"> :=</span><span class="id"> [set`</span><span class="id"> i]</span><span class="id"> =</span><span class="id"> j</span>.<br/>
+&nbsp;&nbsp;<span class="id">suff</span><span class="id"> :</span><span class="id"> f</span><span class="id"> j</span> (<span class="id">\big[setI/[set:</span><span class="id"> T]]_</span>(<span class="id">i</span><span class="id"> &lt;-</span><span class="id"> F</span>)<span class="id"> [set`</span><span class="id"> i]</span>)<span class="gallina-kwd"> by</span><span class="id"> []</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> /j</span><span class="id"> big_mkcond</span><span class="id"> /=;</span><span class="id"> apply:</span><span class="id"> big_ind2;</span><span class="id"> rewrite</span><span class="id"> /f</span><span class="id"> ?set_itvE//</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> &lt;-</span><span class="id"> &lt;-;</span><span class="id"> rewrite</span><span class="id"> itv_setI</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Order_isNbhs</span>.<span class="id">Build</span><span class="id"> _</span><span class="id"> oT</span><span class="id"> order_nbhs_itv</span>.<br/>
+<span class="vernacular">End</span><span class="id"> induced_order_topology</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> min_continuous</span><span class="id"> {d}</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> orderTopologicalType</span><span class="id"> d}</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">continuous</span> (<span class="gallina-kwd">fun</span><span class="id"> xy</span><span class="id"> :</span><span class="id"> T</span><span class="id"> *</span><span class="id"> T</span><span class="id"> =&gt;</span><span class="id"> Order</span>.<span class="id">min</span><span class="id"> xy</span>.<span class="id">1</span><span class="id"> xy</span>.<span class="id">2</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">case=&gt;</span><span class="id"> x</span><span class="id"> y;</span><span class="id"> have</span><span class="id"> [&lt;-</span><span class="id"> U</span><span class="id"> /=|]:=</span><span class="id"> eqVneq</span><span class="id"> x</span><span class="id"> y</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> min_l//</span><span class="id"> =&gt;</span><span class="id"> Ux;</span><span class="gallina-kwd"> exists</span> (<span class="id">U,</span><span class="id"> U</span>)<span class="id"> =&gt;</span><span class="id"> //=</span><span class="id"> -[a</span><span class="id"> b</span><span class="id"> [Ua</span><span class="id"> Ub]]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> have</span><span class="id"> /orP[?|?]/=</span><span class="id"> :=</span><span class="id"> le_total</span><span class="id"> a</span><span class="id"> b;</span><span class="id"> [rewrite</span><span class="id"> min_l|rewrite</span><span class="id"> min_r]</span>.<br/>
+<span class="id">wlog</span><span class="id"> xy</span><span class="id"> :</span><span class="id"> x</span><span class="id"> y</span><span class="id"> /</span> (<span class="id">x</span><span class="id"> &lt;</span><span class="id"> y</span>)<span class="id">%O</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> WH</span><span class="id"> /[dup]</span><span class="id"> /lt_total/orP[|yx</span><span class="id"> /eqP/nesym/eqP</span><span class="id"> yNx];</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> WH</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> (_<span class="id"> :</span> (<span class="gallina-kwd">fun</span><span class="id"> _</span><span class="id"> =&gt;</span><span class="id"> _</span>)<span class="id"> =</span> (<span class="gallina-kwd">fun</span><span class="id"> xy</span><span class="id"> =&gt;</span><span class="id"> Order</span>.<span class="id">min</span><span class="id"> xy</span>.<span class="id">1</span><span class="id"> xy</span>.<span class="id">2</span>)<span class="id"> \o</span><span class="id"> @swap</span><span class="id"> T</span><span class="id"> T</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> continuous_comp;</span><span class="id"> [exact:</span><span class="id"> swap_continuous|exact:</span><span class="id"> WH]</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply/funext</span><span class="id"> =&gt;</span><span class="id"> -[a</span><span class="id"> b/=];</span><span class="id"> have</span><span class="id"> /orP[ab|ba]</span><span class="id"> :=</span><span class="id"> le_total</span><span class="id"> a</span><span class="id"> b</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> min_l</span><span class="id"> //</span><span class="id"> min_r</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> min_r</span><span class="id"> //</span><span class="id"> min_l</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> _</span><span class="id"> U</span><span class="id"> /=;</span><span class="id"> rewrite</span> (<span class="id">min_l</span> (<span class="id">ltW</span><span class="id"> xy</span>))<span class="id"> =&gt;</span><span class="id"> Ux</span>.<br/>
+<span class="id">have</span><span class="id"> [[z</span><span class="id"> xzy]|/forallNP/=</span><span class="id"> xNy]</span><span class="id"> :=</span><span class="id"> pselect</span> (<span class="gallina-kwd">exists</span><span class="id"> z,</span><span class="id"> x</span><span class="id"> &lt;</span><span class="id"> z</span><span class="id"> &lt;</span><span class="id"> y</span>)<span class="id">%O</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists</span> (<span class="id">U</span><span class="id"> `&amp;`</span><span class="id"> `]-oo,</span><span class="id"> z[,</span><span class="id"> `]z,</span><span class="id"> +oo[%classic</span>)<span class="id"> =&gt;</span><span class="id"> /=</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">split;</span><span class="id"> [apply:</span><span class="id"> filterI</span><span class="id"> =&gt;//|];</span><span class="id"> apply:</span><span class="id"> open_nbhs_nbhs</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> split;</span><span class="id"> [exact:</span><span class="id"> lray_open|rewrite</span><span class="id"> set_itvE;</span><span class="id"> case/andP:</span><span class="id"> xzy]</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> split;</span><span class="id"> [exact:</span><span class="id"> rray_open|rewrite</span><span class="id"> set_itvE;</span><span class="id"> case/andP:</span><span class="id"> xzy]</span>.<br/>
+&nbsp;&nbsp;<span class="id">case=&gt;</span><span class="id"> a</span><span class="id"> b</span><span class="id"> /=</span><span class="id"> [[Ua]];</span><span class="id"> rewrite</span><span class="id"> !in_itv</span><span class="id"> andbT</span><span class="id"> /=</span><span class="id"> =&gt;</span><span class="id"> az</span><span class="id"> zb</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> min_l//</span> (<span class="id">ltW</span> (<span class="id">lt_trans</span><span class="id"> az</span><span class="id"> _</span>)).<br/>
+<span class="gallina-kwd">exists</span> (<span class="id">U</span><span class="id"> `&amp;`</span><span class="id"> `]-oo,</span><span class="id"> y[,</span><span class="id"> `]x,</span><span class="id"> +oo[%classic</span>)<span class="id"> =&gt;</span><span class="id"> /=</span>.<br/>
+&nbsp;&nbsp;<span class="id">split;</span><span class="id"> [apply:</span><span class="id"> filterI</span><span class="id"> =&gt;</span><span class="id"> //|];</span><span class="id"> apply:</span><span class="id"> open_nbhs_nbhs</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> split;</span><span class="id"> [exact:</span><span class="id"> lray_open|rewrite</span><span class="id"> set_itvE]</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> split;</span><span class="id"> [exact:</span><span class="id"> rray_open|rewrite</span><span class="id"> set_itvE]</span>.<br/>
+<span class="id">case=&gt;</span><span class="id"> a</span><span class="id"> b</span><span class="id"> /=</span><span class="id"> [[Ua]];</span><span class="id"> rewrite</span><span class="id"> !in_itv</span><span class="id"> andbT</span><span class="id"> /=</span><span class="id"> =&gt;</span><span class="id"> ay</span><span class="id"> xb</span>.<br/>
+<span class="id">rewrite</span><span class="id"> min_l//</span><span class="id"> leNgt;</span><span class="id"> apply:</span><span class="id"> contra_notN</span> (<span class="id">xNy</span><span class="id"> b</span>)<span class="id"> =&gt;</span><span class="id"> ba</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> xb</span> (<span class="id">lt_trans</span><span class="id"> ba</span>).<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> min_fun_continuous</span><span class="id"> {d}</span><span class="id"> {X</span><span class="id"> :</span><span class="id"> topologicalType}</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> orderTopologicalType</span><span class="id"> d}</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">f</span><span class="id"> g</span><span class="id"> :</span><span class="id"> X</span><span class="id"> -&gt;</span><span class="id"> T</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">continuous</span><span class="id"> f</span><span class="id"> -&gt;</span><span class="id"> continuous</span><span class="id"> g</span><span class="id"> -&gt;</span><span class="id"> continuous</span> (<span class="id">f</span><span class="id"> \min</span><span class="id"> g</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> fc</span><span class="id"> gc</span><span class="id"> z;</span><span class="id"> apply:</span><span class="id"> continuous2_cvg;</span><span class="id"> [|exact:</span><span class="id"> fc|exact:</span><span class="id"> gc]</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply</span><span class="id"> min_continuous</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> max_continuous</span><span class="id"> {d}</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> orderTopologicalType</span><span class="id"> d}</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">continuous</span> (<span class="gallina-kwd">fun</span><span class="id"> xy</span><span class="id"> :</span><span class="id"> T</span><span class="id"> *</span><span class="id"> T</span><span class="id"> =&gt;</span><span class="id"> Order</span>.<span class="id">max</span><span class="id"> xy</span>.<span class="id">1</span><span class="id"> xy</span>.<span class="id">2</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">case=&gt;</span><span class="id"> x</span><span class="id"> y;</span><span class="id"> have</span><span class="id"> [&lt;-</span><span class="id"> U|]</span><span class="id"> :=</span><span class="id"> eqVneq</span><span class="id"> x</span><span class="id"> y</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> /=</span><span class="id"> max_r</span><span class="id"> //</span><span class="id"> =&gt;</span><span class="id"> ux;</span><span class="gallina-kwd"> exists</span> (<span class="id">U,</span><span class="id"> U</span>)<span class="id"> =&gt;</span><span class="id"> //=</span><span class="id"> -[a</span><span class="id"> b]</span><span class="id"> [/=</span><span class="id"> Ua</span><span class="id"> Ub]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> have</span><span class="id"> /orP[?|?]/=</span><span class="id"> :=</span><span class="id"> le_total</span><span class="id"> a</span><span class="id"> b;</span><span class="id"> [rewrite</span><span class="id"> max_r|rewrite</span><span class="id"> max_l]</span>.<br/>
+<span class="id">wlog</span><span class="id"> xy</span><span class="id"> :</span><span class="id"> x</span><span class="id"> y</span><span class="id"> /</span> (<span class="id">x</span><span class="id"> &lt;</span><span class="id"> y</span>)<span class="id">%O</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> WH</span><span class="id"> /[dup]</span><span class="id"> /lt_total/orP[|yx</span><span class="id"> /eqP/nesym/eqP</span><span class="id"> yNx];</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> WH</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> (_<span class="id"> :</span> (<span class="gallina-kwd">fun</span><span class="id"> _</span><span class="id"> =&gt;</span><span class="id"> _</span>)<span class="id"> =</span> (<span class="gallina-kwd">fun</span><span class="id"> xy</span><span class="id"> =&gt;</span><span class="id"> Order</span>.<span class="id">max</span><span class="id"> xy</span>.<span class="id">1</span><span class="id"> xy</span>.<span class="id">2</span>)<span class="id"> \o</span><span class="id"> @swap</span><span class="id"> T</span><span class="id"> T</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> continuous_comp;</span><span class="id"> [exact:</span><span class="id"> swap_continuous|exact:</span><span class="id"> WH]</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply/funext</span><span class="id"> =&gt;</span><span class="id"> -[a</span><span class="id"> b]</span><span class="id"> /=;</span><span class="id"> have</span><span class="id"> /orP</span><span class="id"> [ab|ba]</span><span class="id"> :=</span><span class="id"> le_total</span><span class="id"> a</span><span class="id"> b</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> max_r</span><span class="id"> //</span><span class="id"> max_l</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> max_l</span><span class="id"> //</span><span class="id"> max_r</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> _</span><span class="id"> U</span><span class="id"> /=;</span><span class="id"> rewrite</span> (<span class="id">max_r</span> (<span class="id">ltW</span><span class="id"> xy</span>))<span class="id"> =&gt;</span><span class="id"> Ux</span>.<br/>
+<span class="id">have</span><span class="id"> [[z</span><span class="id"> xzy]|/forallNP</span><span class="id"> /=</span><span class="id"> xNy]</span><span class="id"> :=</span><span class="id"> pselect</span> (<span class="gallina-kwd">exists</span><span class="id"> z,</span><span class="id"> x</span><span class="id"> &lt;</span><span class="id"> z</span><span class="id"> &lt;</span><span class="id"> y</span>)<span class="id">%O</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists</span> (<span class="id">`]-oo,</span><span class="id"> z[%classic,</span><span class="id"> U</span><span class="id"> `&amp;`</span><span class="id"> `]z,</span><span class="id"> +oo[</span>)<span class="id"> =&gt;</span><span class="id"> /=</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">split;</span><span class="id"> [|apply:</span><span class="id"> filterI</span><span class="id"> =&gt;//];</span><span class="id"> apply:</span><span class="id"> open_nbhs_nbhs</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> split;</span><span class="id"> [exact:</span><span class="id"> lray_open|rewrite</span><span class="id"> set_itvE;</span><span class="id"> case/andP:</span><span class="id"> xzy]</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> split;</span><span class="id"> [exact:</span><span class="id"> rray_open|rewrite</span><span class="id"> set_itvE;</span><span class="id"> case/andP:</span><span class="id"> xzy]</span>.<br/>
+&nbsp;&nbsp;<span class="id">case=&gt;</span><span class="id"> a</span><span class="id"> b</span><span class="id"> /=</span><span class="id"> []</span><span class="id"> +</span><span class="id"> [];</span><span class="id"> rewrite</span><span class="id"> !in_itv</span><span class="id"> andbT</span><span class="id"> /=</span><span class="id"> =&gt;</span><span class="id"> az</span><span class="id"> Ub</span><span class="id"> zb</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span> (<span class="id">max_r</span> (<span class="id">ltW</span> (<span class="id">lt_trans</span><span class="id"> az</span><span class="id"> _</span>))).<br/>
+<span class="gallina-kwd">exists</span> (<span class="id">`]-oo,</span><span class="id"> y[%classic,</span><span class="id"> U</span><span class="id"> `&amp;`</span><span class="id"> `]x,</span><span class="id"> +oo[</span>)<span class="id"> =&gt;</span><span class="id"> /=</span>.<br/>
+&nbsp;&nbsp;<span class="id">split;</span><span class="id"> [|apply:</span><span class="id"> filterI</span><span class="id"> =&gt;</span><span class="id"> //];</span><span class="id"> apply:</span><span class="id"> open_nbhs_nbhs</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> split;</span><span class="id"> [exact:</span><span class="id"> lray_open|rewrite</span><span class="id"> set_itvE]</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> split;</span><span class="id"> [exact:</span><span class="id"> rray_open|rewrite</span><span class="id"> set_itvE]</span>.<br/>
+<span class="id">case=&gt;</span><span class="id"> a</span><span class="id"> b</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> !in_itv</span><span class="id"> /=</span><span class="id"> andbT</span><span class="id"> =&gt;</span><span class="id"> [/=]</span><span class="id"> [ay]</span><span class="id"> [Ub]</span><span class="id"> xb</span>.<br/>
+<span class="id">rewrite</span><span class="id"> max_r//</span><span class="id"> leNgt;</span><span class="id"> apply:</span><span class="id"> contra_notN</span> (<span class="id">xNy</span><span class="id"> b</span>)<span class="id"> =&gt;</span><span class="id"> ba</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> xb</span> (<span class="id">lt_trans</span><span class="id"> ba</span>).<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> max_fun_continuous</span><span class="id"> {d}</span><span class="id"> {X</span><span class="id"> :</span><span class="id"> topologicalType}</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> orderTopologicalType</span><span class="id"> d}</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">f</span><span class="id"> g</span><span class="id"> :</span><span class="id"> X</span><span class="id"> -&gt;</span><span class="id"> T</span>)<span class="id">:</span><br/>
+&nbsp;&nbsp;<span class="id">continuous</span><span class="id"> f</span><span class="id"> -&gt;</span><span class="id"> continuous</span><span class="id"> g</span><span class="id"> -&gt;</span><span class="id"> continuous</span> (<span class="id">f</span><span class="id"> \max</span><span class="id"> g</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> fc</span><span class="id"> gc</span><span class="id"> z;</span><span class="id"> apply:</span><span class="id"> continuous2_cvg;</span><span class="id"> [|exact:</span><span class="id"> fc|exact:</span><span class="id"> gc]</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply</span><span class="id"> max_continuous</span>.<br/>
+Qed.</div></details>
+]</span></div>
+
+      <div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/">a fork of coq2html</a></div>
+    </div>
+  </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,474 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module mathcomp.analysis.topology_theory.uniform_structure</title>
+<meta name="description" content="Documentation of Coq module mathcomp.analysis.topology_theory.uniform_structure" />
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="init()">
+
+  <main>
+    <div class="sidebar">
+      <h2>Files</h2>
+      
+    </div>
+
+  <div class="coq">
+
+    <div class="content">
+      <p><a href="./index.html">Top</a></p>
+      <h1 class="title">Module mathcomp.analysis.topology_theory.uniform_structure</h1>
+<span class="vernacular">From</span><span class="id"> HB</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> structures</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> all_ssreflect</span><span class="id"> all_algebra</span><span class="id"> all_classical</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> topology_structure</span>.<br/>
+<br/>
+<div class="ssrdoc md">
+# Uniform Spaces
+This file provides uniform spaces, and their theory. It also includes
+complete spaces, which extends uniform in the hierarchy.
+
+## Mathematical structures
+### Uniform
+```
+                     nbhs_ ent == neighborhoods defined using entourages
+                   uniformType == interface type for uniform spaces: a
+                                  type equipped with entourages
+                                  The HB class is Uniform.
+                  puniformType == a pointed and uniform space
+                     entourage == set of entourages in a uniform space
+                   split_ent E == when E is an entourage, split_ent E is
+                                  an entourage E' such that E' \o E' is
+                                  included in E when seen as a relation
+        countable_uniformity T == T's entourage has a countable base
+                                  This is equivalent to `T` being
+                                  metrizable.
+             unif_continuous f == f is uniformly continuous
+               entourage_ ball == entourages defined using balls
+```
+## Factories
+```
+                Nbhs_isUniform == factory to build a topological space
+                                  from a mixin for a uniform space
+
+```
+### Complete uniform spaces
+```
+                     cauchy F &lt;-&gt; the set of sets F is a cauchy filter
+                                  (entourage definition)
+                  completeType == interface type for a complete uniform
+                                  space structure
+                                  The HB class is Complete.
+```
+</div>
+<br/>
+<span class="gallina-kwd">Set</span><span class="vernacular"> Implicit</span><span class="vernacular"> Arguments</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Strict</span><span class="vernacular"> Implicit</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Printing</span><span class="vernacular"> Implicit</span><span class="vernacular"> Defensive</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> classical_set_scope</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ring_scope</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> nbhs_</span><span class="id"> {T</span><span class="id"> T'}</span> (<span class="id">ent</span><span class="id"> :</span><span class="id"> set_system</span> (<span class="id">T</span><span class="id"> *</span><span class="id"> T'</span>)) (<span class="id">x</span><span class="id"> :</span><span class="id"> T</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">filter_from</span><span class="id"> ent</span> (<span class="gallina-kwd">fun</span><span class="id"> A</span><span class="id"> =&gt;</span><span class="id"> xsection</span><span class="id"> A</span><span class="id"> x</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> nbhs_E</span><span class="id"> {T</span><span class="id"> T'}</span> (<span class="id">ent</span><span class="id"> :</span><span class="id"> set_system</span> (<span class="id">T</span><span class="id"> *</span><span class="id"> T'</span>))<span class="id"> x</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">nbhs_</span><span class="id"> ent</span><span class="id"> x</span><span class="id"> =</span><span class="id"> filter_from</span><span class="id"> ent</span> (<span class="gallina-kwd">fun</span><span class="id"> A</span><span class="id"> =&gt;</span><span class="id"> xsection</span><span class="id"> A</span><span class="id"> x</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> relation_scope</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">mixin</span><span class="vernacular"> Record</span><span class="id"> Nbhs_isUniform_mixin</span><span class="id"> M</span><span class="id"> of</span><span class="id"> Nbhs</span><span class="id"> M</span><span class="id"> :=</span><span class="id"> {</span><br/>
+&nbsp;&nbsp;<span class="id">entourage</span><span class="id"> :</span><span class="id"> set_system</span> (<span class="id">M</span><span class="id"> *</span><span class="id"> M</span>)<span class="id">;</span><br/>
+&nbsp;&nbsp;<span class="id">entourage_filter</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> entourage;</span><br/>
+&nbsp;&nbsp;<span class="id">entourage_diagonal_subproof</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">forall</span><span class="id"> A,</span><span class="id"> entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> diagonal</span><span class="id"> `&lt;=`</span><span class="id"> A;</span><br/>
+&nbsp;&nbsp;<span class="id">entourage_inv_subproof</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> A,</span><span class="id"> entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> entourage</span><span class="id"> A^-1;</span><br/>
+&nbsp;&nbsp;<span class="id">entourage_split_ex_subproof</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">forall</span><span class="id"> A,</span><span class="id"> entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="gallina-kwd"> exists2</span><span class="id"> B,</span><span class="id"> entourage</span><span class="id"> B</span><span class="id"> &amp;</span><span class="id"> B</span><span class="id"> \;</span><span class="id"> B</span><span class="id"> `&lt;=`</span><span class="id"> A;</span><br/>
+&nbsp;&nbsp;<span class="id">nbhsE_subproof</span><span class="id"> :</span><span class="id"> nbhs</span><span class="id"> =</span><span class="id"> nbhs_</span><span class="id"> entourage;</span><br/>
+<span class="id">}</span>.<br/>
+<br/>
+<span class="id">#[short</span>(<span class="id">type=</span><span class="id">&quot;uniformType&quot;</span>)<span class="id">]</span><br/>
+<span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> Uniform</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">{T</span><span class="id"> of</span><span class="id"> Topological</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> Nbhs_isUniform_mixin</span><span class="id"> T}</span>.<br/>
+<br/>
+<span class="id">#[short</span>(<span class="id">type=</span><span class="id">&quot;puniformType&quot;</span>)<span class="id">]</span><br/>
+<span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> PointedUniform</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">{T</span><span class="id"> of</span><span class="id"> PointedTopological</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> Nbhs_isUniform_mixin</span><span class="id"> T}</span>.<br/>
+<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">factory</span><span class="vernacular"> Record</span><span class="id"> Nbhs_isUniform</span><span class="id"> M</span><span class="id"> of</span><span class="id"> Nbhs</span><span class="id"> M</span><span class="id"> :=</span><span class="id"> {</span><br/>
+&nbsp;&nbsp;<span class="id">entourage</span><span class="id"> :</span><span class="id"> set_system</span> (<span class="id">M</span><span class="id"> *</span><span class="id"> M</span>)<span class="id">;</span><br/>
+&nbsp;&nbsp;<span class="id">entourage_filter</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> entourage;</span><br/>
+&nbsp;&nbsp;<span class="id">entourage_diagonal</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> A,</span><span class="id"> entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> diagonal</span><span class="id"> `&lt;=`</span><span class="id"> A;</span><br/>
+&nbsp;&nbsp;<span class="id">entourage_inv</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> A,</span><span class="id"> entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> entourage</span><span class="id"> A^-1;</span><br/>
+&nbsp;&nbsp;<span class="id">entourage_split_ex</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">forall</span><span class="id"> A,</span><span class="id"> entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="gallina-kwd"> exists2</span><span class="id"> B,</span><span class="id"> entourage</span><span class="id"> B</span><span class="id"> &amp;</span><span class="id"> B</span><span class="id"> \;</span><span class="id"> B</span><span class="id"> `&lt;=`</span><span class="id"> A;</span><br/>
+&nbsp;&nbsp;<span class="id">nbhsE</span><span class="id"> :</span><span class="id"> nbhs</span><span class="id"> =</span><span class="id"> nbhs_</span><span class="id"> entourage;</span><br/>
+<span class="id">}</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Close</span><span class="vernacular"> Scope</span><span class="id"> relation_scope</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">builders</span><span class="vernacular"> Context</span><span class="id"> M</span><span class="id"> of</span><span class="id"> Nbhs_isUniform</span><span class="id"> M</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> nbhs_filter</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> M</span>)<span class="id"> :</span><span class="id"> ProperFilter</span> (<span class="id">nbhs</span><span class="id"> p</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> nbhsE</span><span class="id"> nbhs_E;</span><span class="id"> apply:</span><span class="id"> filter_from_proper;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> A</span><span class="id"> entA;</span><span class="gallina-kwd"> exists</span><span class="id"> p;</span><span class="id"> apply/mem_set;</span><span class="id"> apply:</span><span class="id"> entourage_diagonal</span><span class="id"> entA</span><span class="id"> _</span><span class="id"> _</span>.<br/>
+<span class="id">apply:</span><span class="id"> filter_from_filter</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span><span class="id"> setT;</span><span class="id"> exact:</span><span class="id"> @filterT</span><span class="id"> entourage_filter</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> A</span><span class="id"> B</span><span class="id"> entA</span><span class="id"> entB;</span><span class="gallina-kwd"> exists</span> (<span class="id">A</span><span class="id"> `&amp;`</span><span class="id"> B</span>)<span class="id">;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> xsectionI</span>.<br/>
+<span class="id">exact:</span> (<span class="id">@filterI</span><span class="id"> _</span><span class="id"> _</span><span class="id"> entourage_filter</span>).<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> nbhs_singleton</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> M</span>)<span class="id"> A</span><span class="id"> :</span><span class="id"> nbhs</span><span class="id"> p</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> A</span><span class="id"> p</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> nbhsE</span><span class="id"> nbhs_E</span> <span class="id"> =&gt;</span><span class="id"> -</span><span class="id"> [B</span><span class="id"> entB</span><span class="id"> sBpA]</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply/sBpA/mem_set;</span><span class="id"> exact:</span><span class="id"> entourage_diagonal</span><span class="id"> entB</span><span class="id"> _</span><span class="id"> _</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> nbhs_nbhs</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> M</span>)<span class="id"> A</span><span class="id"> :</span><span class="id"> nbhs</span><span class="id"> p</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> nbhs</span><span class="id"> p</span> (<span class="id">nbhs^~</span><span class="id"> A</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> nbhsE</span><span class="id"> nbhs_E</span><span class="id"> =&gt;</span><span class="id"> -</span><span class="id"> [B</span><span class="id"> entB</span><span class="id"> sBpA]</span>.<br/>
+<span class="id">have</span><span class="id"> /entourage_split_ex[C</span><span class="id"> entC</span><span class="id"> sC2B]</span><span class="id"> :=</span><span class="id"> entB</span>.<br/>
+<span class="gallina-kwd">exists</span><span class="id"> C</span><span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> q</span><span class="id"> Cpq;</span><span class="id"> rewrite</span><span class="id"> nbhs_E;</span><span class="gallina-kwd"> exists</span><span class="id"> C</span><span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> r</span><span class="id"> Cqr</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply/sBpA/mem_set/sC2B;</span><span class="gallina-kwd"> exists</span><span class="id"> q;</span><span class="id"> exact/set_mem</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Nbhs_isNbhsTopological</span>.<span class="id">Build</span><span class="id"> M</span><br/>
+&nbsp;&nbsp;<span class="id">nbhs_filter</span><span class="id"> nbhs_singleton</span><span class="id"> nbhs_nbhs</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Nbhs_isUniform_mixin</span>.<span class="id">Build</span><span class="id"> M</span><br/>
+&nbsp;&nbsp;<span class="id">entourage_filter</span><span class="id"> entourage_diagonal</span><span class="id"> entourage_inv</span><span class="id"> entourage_split_ex</span><span class="id"> nbhsE</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="gallina-kwd">end</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> relation_scope</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">factory</span><span class="vernacular"> Record</span><span class="id"> isUniform</span><span class="id"> M</span><span class="id"> of</span><span class="id"> Choice</span><span class="id"> M</span><span class="id"> :=</span><span class="id"> {</span><br/>
+&nbsp;&nbsp;<span class="id">entourage</span><span class="id"> :</span><span class="id"> set_system</span> (<span class="id">M</span><span class="id"> *</span><span class="id"> M</span>)<span class="id">;</span><br/>
+&nbsp;&nbsp;<span class="id">entourage_filter</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> entourage;</span><br/>
+&nbsp;&nbsp;<span class="id">entourage_diagonal</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> A,</span><span class="id"> entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> diagonal</span><span class="id"> `&lt;=`</span><span class="id"> A;</span><br/>
+&nbsp;&nbsp;<span class="id">entourage_inv</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> A,</span><span class="id"> entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> entourage</span><span class="id"> A^-1;</span><br/>
+&nbsp;&nbsp;<span class="id">entourage_split_ex</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">forall</span><span class="id"> A,</span><span class="id"> entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="gallina-kwd"> exists2</span><span class="id"> B,</span><span class="id"> entourage</span><span class="id"> B</span><span class="id"> &amp;</span><span class="id"> B</span><span class="id"> \;</span><span class="id"> B</span><span class="id"> `&lt;=`</span><span class="id"> A;</span><br/>
+<span class="id">}</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Close</span><span class="vernacular"> Scope</span><span class="id"> relation_scope</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">builders</span><span class="vernacular"> Context</span><span class="id"> M</span><span class="id"> of</span><span class="id"> isUniform</span><span class="id"> M</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> @hasNbhs</span>.<span class="id">Build</span><span class="id"> M</span> (<span class="id">nbhs_</span><span class="id"> entourage</span>).<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> @Nbhs_isUniform</span>.<span class="id">Build</span><span class="id"> M</span><span class="id"> entourage</span><br/>
+&nbsp;&nbsp;<span class="id">entourage_filter</span><span class="id"> entourage_diagonal</span><span class="id"> entourage_inv</span><span class="id"> entourage_split_ex</span><span class="id"> erefl</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="gallina-kwd">end</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> nbhs_entourageE</span><span class="id"> {M</span><span class="id"> :</span><span class="id"> uniformType}</span><span class="id"> :</span><span class="id"> nbhs_</span> (<span class="id">@entourage</span><span class="id"> M</span>)<span class="id"> =</span><span class="id"> nbhs</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -Nbhs_isUniform_mixin</span>.<span class="id">nbhsE_subproof</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> entourage_sym</span><span class="id"> {X</span><span class="id"> Y</span><span class="id"> :</span><span class="id"> Type}</span><span class="id"> E</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> X</span>) (<span class="id">y</span><span class="id"> :</span><span class="id"> Y</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">E</span> (<span class="id">x,</span><span class="id"> y</span>)<span class="id"> &lt;-&gt;</span> (<span class="id">E</span><span class="id"> ^-1</span>)<span class="id">%relation</span> (<span class="id">y,</span><span class="id"> x</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> filter_from_entourageE</span><span class="id"> {M</span><span class="id"> :</span><span class="id"> uniformType}</span><span class="id"> x</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">filter_from</span> (<span class="id">@entourage</span><span class="id"> M</span>) (<span class="gallina-kwd">fun</span><span class="id"> A</span><span class="id"> =&gt;</span><span class="id"> xsection</span><span class="id"> A</span><span class="id"> x</span>)<span class="id"> =</span><span class="id"> nbhs</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -nbhs_entourageE</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Module</span><span class="vernacular"> Export</span><span class="id"> NbhsEntourage</span>.<br/>
+<span class="vernacular">Definition</span><span class="id"> nbhs_simpl</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;(<span class="id">nbhs_simpl,@filter_from_entourageE,@nbhs_entourageE</span>).<br/>
+<span class="vernacular">End</span><span class="id"> NbhsEntourage</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> nbhsP</span><span class="id"> {M</span><span class="id"> :</span><span class="id"> uniformType}</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> M</span>)<span class="id"> P</span><span class="id"> :</span><span class="id"> nbhs</span><span class="id"> x</span><span class="id"> P</span><span class="id"> &lt;-&gt;</span><span class="id"> nbhs_</span><span class="id"> entourage</span><span class="id"> x</span><span class="id"> P</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> nbhs_simpl</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> filter_inv</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> Type}</span> (<span class="id">F</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">set</span> (<span class="id">T</span><span class="id"> *</span><span class="id"> T</span>)))<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">Filter</span><span class="id"> F</span><span class="id"> -&gt;</span><span class="id"> Filter</span><span class="id"> [set</span><span class="id"> V^-1</span><span class="id"> |</span><span class="id"> V</span><span class="gallina-kwd"> in</span><span class="id"> F]%relation</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> FF;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> /=</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="gallina-kwd"> exists</span><span class="id"> [set:</span><span class="id"> T</span><span class="id"> *</span><span class="id"> T]</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> filterT</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> P</span><span class="id"> Q</span><span class="id"> [R</span><span class="id"> FR</span><span class="id"> &lt;-]</span><span class="id"> [S</span><span class="id"> FS</span><span class="id"> &lt;-];</span><span class="gallina-kwd"> exists</span> (<span class="id">R</span><span class="id"> `&amp;`</span><span class="id"> S</span>)<span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> filterI</span>.<br/>
+<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> P</span><span class="id"> Q</span><span class="id"> PQ</span><span class="id"> [R</span><span class="id"> FR</span><span class="id"> RP];</span><span class="gallina-kwd"> exists</span><span class="id"> Q^-1%relation</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> first</span><span class="id"> last</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> eqEsubset;</span><span class="id"> split;</span><span class="id"> case</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> filterS</span><span class="id"> FR;</span><span class="id"> case=&gt;</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> /=</span><span class="id"> ?;</span><span class="id"> apply:</span><span class="id"> PQ;</span><span class="id"> rewrite</span><span class="id"> -RP</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Section</span><span class="id"> uniformType1</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> relation_scope</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {M</span><span class="id"> :</span><span class="id"> uniformType}</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> entourage_refl</span> (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">M</span><span class="id"> *</span><span class="id"> M</span>))<span class="id"> x</span><span class="id"> :</span><span class="id"> entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> A</span> (<span class="id">x,</span><span class="id"> x</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> entA;</span><span class="id"> exact:</span><span class="id"> entourage_diagonal_subproof</span><span class="id"> entA</span><span class="id"> _</span><span class="id"> _</span>. Qed.</div></details>
+<br/>
+<span class="id">Global</span><span class="vernacular"> Instance</span><span class="id"> entourage_filter'</span><span class="id"> :</span><span class="id"> Filter</span> (<span class="id">@entourage</span><span class="id"> M</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">exact:</span><span class="id"> entourage_filter</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> entourageT</span><span class="id"> :</span><span class="id"> entourage</span><span class="id"> [set:</span><span class="id"> M</span><span class="id"> *</span><span class="id"> M]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact:</span><span class="id"> filterT</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> entourage_inv</span> (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">M</span><span class="id"> *</span><span class="id"> M</span>))<span class="id"> :</span><span class="id"> entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> entourage</span><span class="id"> A^-1</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact:</span><span class="id"> entourage_inv_subproof</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> entourage_split_ex</span> (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">M</span><span class="id"> *</span><span class="id"> M</span>))<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="gallina-kwd"> exists2</span><span class="id"> B,</span><span class="id"> entourage</span><span class="id"> B</span><span class="id"> &amp;</span><span class="id"> B</span><span class="id"> \;</span><span class="id"> B</span><span class="id"> `&lt;=`</span><span class="id"> A</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact:</span><span class="id"> entourage_split_ex_subproof</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> split_ent</span> (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">M</span><span class="id"> *</span><span class="id"> M</span>))<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">get</span> (<span class="id">entourage</span><span class="id"> `&amp;`</span><span class="id"> [set</span><span class="id"> B</span><span class="id"> |</span><span class="id"> B</span><span class="id"> \;</span><span class="id"> B</span><span class="id"> `&lt;=`</span><span class="id"> A]</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> split_entP</span> (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">M</span><span class="id"> *</span><span class="id"> M</span>))<span class="id"> :</span><span class="id"> entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">entourage</span> (<span class="id">split_ent</span><span class="id"> A</span>)<span class="id"> /\</span><span class="id"> split_ent</span><span class="id"> A</span><span class="id"> \;</span><span class="id"> split_ent</span><span class="id"> A</span><span class="id"> `&lt;=`</span><span class="id"> A</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move/entourage_split_ex/exists2P/getPex</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> entourage_split_ent</span> (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">M</span><span class="id"> *</span><span class="id"> M</span>))<span class="id"> :</span><span class="id"> entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">entourage</span> (<span class="id">split_ent</span><span class="id"> A</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> /split_entP</span><span class="id"> []</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> subset_split_ent</span> (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">M</span><span class="id"> *</span><span class="id"> M</span>))<span class="id"> :</span><span class="id"> entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">split_ent</span><span class="id"> A</span><span class="id"> \;</span><span class="id"> split_ent</span><span class="id"> A</span><span class="id"> `&lt;=`</span><span class="id"> A</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> /split_entP</span><span class="id"> []</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> entourage_split</span> (<span class="id">z</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> M</span>)<span class="id"> A</span><span class="id"> :</span><span class="id"> entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">split_ent</span><span class="id"> A</span> (<span class="id">x,</span><span class="id"> z</span>)<span class="id"> -&gt;</span><span class="id"> split_ent</span><span class="id"> A</span> (<span class="id">z,</span><span class="id"> y</span>)<span class="id"> -&gt;</span><span class="id"> A</span> (<span class="id">x,</span><span class="id"> y</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> /subset_split_ent</span><span class="id"> sA</span><span class="id"> ?</span><span class="id"> ?;</span><span class="id"> apply:</span><span class="id"> sA;</span><span class="gallina-kwd"> exists</span><span class="id"> z</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> nbhs_entourage</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> M</span>)<span class="id"> A</span><span class="id"> :</span><span class="id"> entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> nbhs</span><span class="id"> x</span> (<span class="id">xsection</span><span class="id"> A</span><span class="id"> x</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?;</span><span class="id"> apply/nbhsP;</span><span class="gallina-kwd"> exists</span><span class="id"> A</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> cvg_entourageP</span><span class="id"> F</span> (<span class="id">FF</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> F</span>) (<span class="id">p</span><span class="id"> :</span><span class="id"> M</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">F</span><span class="id"> --&gt;</span><span class="id"> p</span><span class="id"> &lt;-&gt;</span><span class="gallina-kwd"> forall</span><span class="id"> A,</span><span class="id"> entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> \forall</span><span class="id"> q</span><span class="id"> \near</span><span class="id"> F,</span><span class="id"> A</span> (<span class="id">p,</span><span class="id"> q</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> -filter_fromP</span><span class="id"> [X</span><span class="gallina-kwd"> in</span><span class="id"> filter_from</span><span class="id"> _</span><span class="id"> X]</span>(_<span class="id"> :</span><span class="id"> _</span><span class="id"> =</span><span class="id"> @xsection</span><span class="id"> M</span><span class="id"> M</span><span class="id"> ^~</span><span class="id"> p</span>)<span class="id">//</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> filter_from_entourageE</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply/funext</span><span class="id"> =&gt;</span><span class="id"> E;</span><span class="id"> apply/seteqP;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> [|]</span><span class="id"> ?</span><span class="id"> /xsectionP</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> cvg_entourage</span><span class="id"> {F}</span><span class="id"> {FF</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> F}</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> M</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">F</span><span class="id"> --&gt;</span><span class="id"> x</span><span class="id"> -&gt;</span><span class="gallina-kwd"> forall</span><span class="id"> A,</span><span class="id"> entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> \forall</span><span class="id"> y</span><span class="id"> \near</span><span class="id"> F,</span><span class="id"> A</span> (<span class="id">x,</span><span class="id"> y</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move/cvg_entourageP</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> cvg_app_entourageP</span><span class="id"> T</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> M</span>)<span class="id"> F</span> (<span class="id">FF</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> F</span>)<span class="id"> p</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">f</span><span class="id"> @</span><span class="id"> F</span><span class="id"> --&gt;</span><span class="id"> p</span><span class="id"> &lt;-&gt;</span><span class="gallina-kwd"> forall</span><span class="id"> A,</span><span class="id"> entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> \forall</span><span class="id"> t</span><span class="id"> \near</span><span class="id"> F,</span><span class="id"> A</span> (<span class="id">p,</span><span class="id"> f</span><span class="id"> t</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact:</span><span class="id"> cvg_entourageP</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> entourage_invI</span> (<span class="id">E</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">M</span><span class="id"> *</span><span class="id"> M</span>))<span class="id"> :</span><span class="id"> entourage</span><span class="id"> E</span><span class="id"> -&gt;</span><span class="id"> entourage</span> (<span class="id">E</span><span class="id"> `&amp;`</span><span class="id"> E^-1</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?;</span><span class="id"> apply:</span><span class="id"> filterI;</span><span class="id"> last</span><span class="id"> exact:</span><span class="id"> entourage_inv</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> split_ent_subset</span> (<span class="id">E</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">M</span><span class="id"> *</span><span class="id"> M</span>))<span class="id"> :</span><span class="id"> entourage</span><span class="id"> E</span><span class="id"> -&gt;</span><span class="id"> split_ent</span><span class="id"> E</span><span class="id"> `&lt;=`</span><span class="id"> E</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> entE;</span><span class="id"> case=&gt;</span><span class="id"> x</span><span class="id"> y</span><span class="id"> splitxy;</span><span class="id"> apply:</span><span class="id"> subset_split_ent</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="gallina-kwd"> exists</span><span class="id"> y</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> entourage_refl;</span><span class="id"> exact:</span><span class="id"> entourage_split_ent</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> uniformType1</span>.<br/>
+<br/>
+<span class="id">Global</span><span class="vernacular"> Instance</span><span class="id"> entourage_pfilter</span><span class="id"> {M</span><span class="id"> :</span><span class="id"> puniformType}</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">ProperFilter</span> (<span class="id">@entourage</span><span class="id"> M</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">apply</span><span class="id"> Build_ProperFilter_ex;</span><span class="id"> last</span><span class="id"> exact:</span><span class="id"> entourage_filter</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> A</span><span class="id"> entA;</span><span class="gallina-kwd"> exists</span> (<span class="id">point,</span><span class="id"> point</span>)<span class="id">;</span><span class="id"> apply:</span><span class="id"> entourage_refl</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">#[global]</span><br/>
+<span class="vernacular">Hint</span><span class="id"> Extern</span><span class="id"> 0</span> (<span class="id">entourage</span> (<span class="id">split_ent</span><span class="id"> _</span>))<span class="id"> =&gt;</span><span class="id"> exact:</span><span class="id"> entourage_split_ent</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<span class="id">#[global]</span><br/>
+<span class="vernacular">Hint</span><span class="id"> Extern</span><span class="id"> 0</span> (<span class="id">entourage</span> (<span class="id">get</span><span class="id"> _</span>))<span class="id"> =&gt;</span><span class="id"> exact:</span><span class="id"> entourage_split_ent</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<span class="id">#[global]</span><br/>
+<span class="vernacular">Hint</span><span class="id"> Extern</span><span class="id"> 0</span> (<span class="id">entourage</span> (<span class="id">_^-1</span>)<span class="id">%relation</span>)<span class="id"> =&gt;</span><span class="id"> exact:</span><span class="id"> entourage_inv</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> entourage_split</span><span class="id"> {M}</span><span class="id"> z</span><span class="id"> {x</span><span class="id"> y</span><span class="id"> A}</span>.<br/>
+<span class="id">#[global]</span><br/>
+<span class="vernacular">Hint</span><span class="id"> Extern</span><span class="id"> 0</span> (<span class="id">nbhs</span><span class="id"> _</span> (<span class="id">xsection</span><span class="id"> _</span><span class="id"> _</span>))<span class="id"> =&gt;</span><span class="id"> exact:</span><span class="id"> nbhs_entourage</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> ent_closure</span><span class="id"> {M</span><span class="id"> :</span><span class="id"> uniformType}</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> M</span>)<span class="id"> E</span><span class="id"> :</span><span class="id"> entourage</span><span class="id"> E</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">closure</span> (<span class="id">xsection</span> (<span class="id">split_ent</span><span class="id"> E</span>)<span class="id"> x</span>)<span class="id"> `&lt;=`</span><span class="id"> xsection</span><span class="id"> E</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">pose</span><span class="id"> E'</span><span class="id"> :=</span> (<span class="id">split_ent</span><span class="id"> E</span>)<span class="id"> `&amp;`</span> (<span class="id">split_ent</span><span class="id"> E</span>)<span class="id">^-1%relation</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> entE</span><span class="id"> z</span><span class="id"> /</span>(_ (<span class="id">xsection</span><span class="id"> E'</span><span class="id"> z</span>))<span class="id">[]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -nbhs_entourageE;</span><span class="gallina-kwd"> exists</span><span class="id"> E'</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> filterI</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> y;</span><span class="id"> rewrite</span><span class="id"> xsectionI</span><span class="id"> =&gt;</span><span class="id"> -[/xsectionP</span><span class="id"> xy</span><span class="id"> [_</span><span class="id"> /xsectionP</span><span class="id"> yz]]</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply/xsectionP;</span><span class="id"> move:</span><span class="id"> xy</span><span class="id"> yz;</span><span class="id"> exact:</span><span class="id"> entourage_split</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> continuous_withinNx</span><span class="id"> {U</span><span class="id"> V</span><span class="id"> :</span><span class="id"> uniformType}</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> U</span><span class="id"> -&gt;</span><span class="id"> V</span>)<span class="id"> x</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">{for</span><span class="id"> x,</span><span class="id"> continuous</span><span class="id"> f}</span><span class="id"> &lt;-&gt;</span><span class="id"> f</span><span class="id"> @</span><span class="id"> x^'</span><span class="id"> --&gt;</span><span class="id"> f</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">split=&gt;</span><span class="id"> -</span><span class="id"> cfx</span><span class="id"> P</span><span class="id"> /=</span><span class="id"> fxP</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> !near_simpl;</span><span class="id"> apply:</span><span class="id"> cvg_within;</span><span class="id"> apply:</span><span class="id"> cfx</span>.<br/>
+<span class="id">rewrite</span><span class="id"> !nbhs_nearE</span><span class="id"> !near_map</span><span class="id"> !near_nbhs</span><span class="gallina-kwd"> in</span><span class="id"> fxP</span><span class="id"> *;</span><span class="id"> have</span><span class="id"> /=</span><span class="id"> :=</span><span class="id"> cfx</span><span class="id"> P</span><span class="id"> fxP</span>.<br/>
+<span class="id">rewrite</span><span class="id"> !near_simpl</span><span class="id"> near_withinE</span><span class="id"> near_simpl</span><span class="id"> =&gt;</span><span class="id"> Pf;</span><span class="id"> near=&gt;</span><span class="id"> y</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> have</span><span class="id"> [-&gt;|]</span><span class="id"> :=</span><span class="id"> eqVneq</span><span class="id"> y</span><span class="id"> x;</span><span class="id"> [by</span><span class="id"> apply:</span><span class="id"> nbhs_singleton|near:</span><span class="id"> y]</span>.<br/>
+<span class="id">Unshelve</span>.<span class="id"> all:</span><span class="gallina-kwd"> by</span><span class="id"> end_near</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> countable_uniformity</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> uniformType</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists</span><span class="id"> R</span><span class="id"> :</span><span class="id"> set_system</span> (<span class="id">T</span><span class="id"> *</span><span class="id"> T</span>)<span class="id">,</span><span class="id"> [/\</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">countable</span><span class="id"> R,</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">R</span><span class="id"> `&lt;=`</span><span class="id"> entourage</span><span class="id"> &amp;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">forall</span><span class="id"> P,</span><span class="id"> entourage</span><span class="id"> P</span><span class="id"> -&gt;</span><span class="gallina-kwd"> exists2</span><span class="id"> Q,</span><span class="id"> R</span><span class="id"> Q</span><span class="id"> &amp;</span><span class="id"> Q</span><span class="id"> `&lt;=`</span><span class="id"> P]</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> countable_uniformityP</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> uniformType}</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">countable_uniformity</span><span class="id"> T</span><span class="id"> &lt;-&gt;</span><span class="gallina-kwd"> exists2</span><span class="id"> f</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> -&gt;</span><span class="id"> set</span> (<span class="id">T</span><span class="id"> *</span><span class="id"> T</span>)<span class="id">,</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="gallina-kwd">forall</span><span class="id"> A,</span><span class="id"> entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="gallina-kwd"> exists</span><span class="id"> N,</span><span class="id"> f</span><span class="id"> N</span><span class="id"> `&lt;=`</span><span class="id"> A</span>)<span class="id"> &amp;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="gallina-kwd">forall</span><span class="id"> n,</span><span class="id"> entourage</span> (<span class="id">f</span><span class="id"> n</span>)).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">split=&gt;</span><span class="id"> [[M</span><span class="id"> []]|[f</span><span class="id"> fsubE</span><span class="id"> entf]]</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> /pfcard_geP[-&gt;</span><span class="id"> _</span><span class="id"> /</span>(_<span class="id"> _</span> (<span class="id">@entourageT</span><span class="id"> _</span>))<span class="id">[]//|/unsquash</span><span class="id"> f</span><span class="id"> eM</span><span class="id"> Msub]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists</span><span class="id"> f;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> n;</span><span class="id"> apply:</span><span class="id"> eM;</span><span class="id"> exact:</span><span class="id"> funS</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> /Msub</span><span class="id"> [Q</span><span class="id"> +</span><span class="id"> ?]</span><span class="id"> =&gt;</span><span class="id"> /</span>(<span class="id">@surj</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> f</span>)<span class="id">[n</span><span class="id"> _</span><span class="id"> fQ];</span><span class="gallina-kwd"> exists</span><span class="id"> n;</span><span class="id"> rewrite</span><span class="id"> fQ</span>.<br/>
+<span class="gallina-kwd">exists</span> (<span class="id">range</span><span class="id"> f</span>)<span class="id">;</span><span class="id"> split;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> card_image_le</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> E</span><span class="id"> [n</span><span class="id"> _]</span><span class="id"> &lt;-;</span><span class="id"> exact:</span><span class="id"> entf</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> E</span><span class="id"> /fsubE</span><span class="id"> [n</span><span class="id"> fnA];</span><span class="gallina-kwd"> exists</span> (<span class="id">f</span><span class="id"> n</span>)<span class="id"> =&gt;</span><span class="id"> //;</span><span class="gallina-kwd"> exists</span><span class="id"> n</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> open_nbhs_entourage</span> (<span class="id">U</span><span class="id"> :</span><span class="id"> uniformType</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> U</span>) (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">U</span><span class="id"> *</span><span class="id"> U</span>))<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">entourage</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> open_nbhs</span><span class="id"> x</span> (<span class="id">xsection</span><span class="id"> A</span><span class="id"> x</span>)<span class="id">^°</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> entA;</span><span class="id"> split;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> open_interior</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> nbhs_singleton;</span><span class="id"> apply:</span><span class="id"> nbhs_interior;</span><span class="id"> apply:</span><span class="id"> nbhs_entourage</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> unif_continuous</span> (<span class="id">U</span><span class="id"> V</span><span class="id"> :</span><span class="id"> uniformType</span>) (<span class="id">f</span><span class="id"> :</span><span class="id"> U</span><span class="id"> -&gt;</span><span class="id"> V</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;(<span class="gallina-kwd">fun</span><span class="id"> xy</span><span class="id"> =&gt;</span> (<span class="id">f</span><span class="id"> xy</span>.<span class="id">1,</span><span class="id"> f</span><span class="id"> xy</span>.<span class="id">2</span>))<span class="id"> @</span><span class="id"> entourage</span><span class="id"> --&gt;</span><span class="id"> entourage</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> entourage_set</span> (<span class="id">U</span><span class="id"> :</span><span class="id"> uniformType</span>) (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span> ((<span class="id">set</span><span class="id"> U</span>)<span class="id"> *</span> (<span class="id">set</span><span class="id"> U</span>)))<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists2</span><span class="id"> B,</span><span class="id"> entourage</span><span class="id"> B</span><span class="id"> &amp;</span><span class="gallina-kwd"> forall</span><span class="id"> PQ,</span><span class="id"> A</span><span class="id"> PQ</span><span class="id"> -&gt;</span><span class="gallina-kwd"> forall</span><span class="id"> p</span><span class="id"> q,</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">PQ</span>.<span class="id">1</span><span class="id"> p</span><span class="id"> -&gt;</span><span class="id"> PQ</span>.<span class="id">2</span><span class="id"> q</span><span class="id"> -&gt;</span><span class="id"> B</span> (<span class="id">p,q</span>).<br/>
+<br/>
+<div class="doc">Complete uniform spaces </div>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> cauchy</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> uniformType}</span> (<span class="id">F</span><span class="id"> :</span><span class="id"> set_system</span><span class="id"> T</span>)<span class="id"> :=</span> (<span class="id">F,</span><span class="id"> F</span>)<span class="id"> --&gt;</span><span class="id"> entourage</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> cvg_cauchy</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> puniformType}</span> (<span class="id">F</span><span class="id"> :</span><span class="id"> set_system</span><span class="id"> T</span>)<span class="id"> :</span><span class="id"> Filter</span><span class="id"> F</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">[cvg</span><span class="id"> F</span><span class="gallina-kwd"> in</span><span class="id"> T]</span><span class="id"> -&gt;</span><span class="id"> cauchy</span><span class="id"> F</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> FF</span><span class="id"> cvF</span><span class="id"> A</span><span class="id"> entA;</span><span class="id"> have</span><span class="id"> /entourage_split_ex</span><span class="id"> [B</span><span class="id"> entB</span><span class="id"> sB2A]</span><span class="id"> :=</span><span class="id"> entA</span>.<br/>
+<span class="gallina-kwd">exists</span> (<span class="id">xsection</span> (<span class="id">B^-1%relation</span>) (<span class="id">lim</span><span class="id"> F</span>)<span class="id">,</span><span class="id"> xsection</span><span class="id"> B</span> (<span class="id">lim</span><span class="id"> F</span>)).<br/>
+&nbsp;&nbsp;<span class="id">split=&gt;</span><span class="id"> /=;</span><span class="id"> apply:</span><span class="id"> cvF;</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> -nbhs_entourageE;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="gallina-kwd"> exists</span><span class="id"> B</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span><span class="id"> B^-1%relation</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> entourage_inv</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> ab</span><span class="id"> [/=</span><span class="id"> /xsectionP</span><span class="id"> Balima</span><span class="id"> /xsectionP</span><span class="id"> Blimb];</span><span class="id"> apply:</span><span class="id"> sB2A</span>.<br/>
+<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span> (<span class="id">lim</span><span class="id"> F</span>).<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">mixin</span><span class="vernacular"> Record</span><span class="id"> Uniform_isComplete</span><span class="id"> T</span><span class="id"> of</span><span class="id"> PointedUniform</span><span class="id"> T</span><span class="id"> :=</span><span class="id"> {</span><br/>
+&nbsp;&nbsp;<span class="id">cauchy_cvg</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">forall</span> (<span class="id">F</span><span class="id"> :</span><span class="id"> set_system</span><span class="id"> T</span>)<span class="id">,</span><span class="id"> ProperFilter</span><span class="id"> F</span><span class="id"> -&gt;</span><span class="id"> cauchy</span><span class="id"> F</span><span class="id"> -&gt;</span><span class="id"> cvg</span><span class="id"> F</span><br/>
+<span class="id">}</span>.<br/>
+<br/>
+<span class="id">#[short</span>(<span class="id">type=</span><span class="id">&quot;completeType&quot;</span>)<span class="id">]</span><br/>
+<span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> Complete</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">{T</span><span class="id"> of</span><span class="id"> Uniform</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> Uniform_isComplete</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> isPointed</span><span class="id"> T}</span>.<br/>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">since=</span><span class="id">&quot;mathcomp-analysis 2.0&quot;</span><span class="id">,</span><span class="id"> note=</span><span class="id">&quot;use cauchy_cvg instead&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Notation</span><span class="id"> complete_ax</span><span class="id"> :=</span><span class="id"> cauchy_cvg</span> (<span class="id">only</span><span class="id"> parsing</span>).<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> completeType1</span>.<br/>
+<br/>
+<span class="vernacular">Context</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> completeType}</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> cauchy_cvgP</span> (<span class="id">F</span><span class="id"> :</span><span class="id"> set_system</span><span class="id"> T</span>) (<span class="id">FF</span><span class="id"> :</span><span class="id"> ProperFilter</span><span class="id"> F</span>)<span class="id"> :</span><span class="id"> cauchy</span><span class="id"> F</span><span class="id"> &lt;-&gt;</span><span class="id"> cvg</span><span class="id"> F</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> split=&gt;</span><span class="id"> [/cauchy_cvg|/cvg_cauchy]</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> completeType1</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> cauchy_cvg</span><span class="id"> {T}</span><span class="id"> F</span><span class="id"> {FF}</span><span class="id"> _</span><span class="id"> :</span><span class="id"> rename</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> cauchy_cvgP</span><span class="id"> {T}</span><span class="id"> F</span><span class="id"> {FF}</span>.<br/>
+
+      <div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/">a fork of coq2html</a></div>
+    </div>
+  </div>
+    </main>
+</body>
+</html>

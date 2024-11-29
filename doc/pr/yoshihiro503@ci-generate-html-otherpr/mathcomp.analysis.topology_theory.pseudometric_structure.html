@@ -1,0 +1,721 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module mathcomp.analysis.topology_theory.pseudometric_structure</title>
+<meta name="description" content="Documentation of Coq module mathcomp.analysis.topology_theory.pseudometric_structure" />
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="init()">
+
+  <main>
+    <div class="sidebar">
+      <h2>Files</h2>
+      
+    </div>
+
+  <div class="coq">
+
+    <div class="content">
+      <p><a href="./index.html">Top</a></p>
+      <h1 class="title">Module mathcomp.analysis.topology_theory.pseudometric_structure</h1>
+<span class="vernacular">From</span><span class="id"> HB</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> structures</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> all_ssreflect</span><span class="id"> all_algebra</span><span class="id"> archimedean</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> all_classical</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> signed</span><span class="id"> reals</span><span class="id"> topology_structure</span><span class="id"> uniform_structure</span>.<br/>
+<br/>
+<div class="ssrdoc md">
+# PseudoMetric Spaces
+This file provides pseudometric spaces, complete pseudometric spaces,
+and the corresponding theory. Note that a classic metric space is simply
+pseudometric + hausdorff. However we will make extensive use of the of the
+non-hausdorff case, such as in our proof of Urysohn's lemma.
+
+## Mathematical structures
+### PseudoMetrics
+```
+               entourage_ ball == entourages defined using balls
+              pseudoMetricType == interface type for pseudo metric space
+                                  structure: a type equipped with balls
+                                  The HB class is PseudoMetric.
+             pseudoPMetricType == a pointed pseudoMetric space
+        discrete_topology dscT == the discrete topology on T, provided
+                                  dscT : discrete_space T
+                      ball x e == ball of center x and radius e
+               nbhs_ball_ ball == nbhs defined using the given balls
+                     nbhs_ball == nbhs defined using balls in a
+                                  pseudometric space
+                  discrete_ent == entourages of the discrete uniformity
+                                  topology
+                 discrete_ball == singleton balls for the discrete metric
+        discrete_topology_type == equip choice types with a discrete
+                                  topology
+```
+`discrete_ent` is equipped with the `Uniform` structure.
+### Factories
+```
+           Nbhs_isPseudoMetric == factory to build a topological space
+                                  from a mixin for a pseudoMetric space
+```
+### Complete Pseudometrics
+```
+                       ball_ N == balls defined by the norm/absolute
+                                  value N
+      completePseudoMetricType == interface type for a complete
+                                  pseudometric space structure
+                                  The HB class is CompletePseudoMetric.
+                  cauchy_ex F &lt;-&gt; the set of sets F is a cauchy filter
+                                  (epsilon-delta definition)
+                cauchy_ball F &lt;-&gt; the set of sets F is a cauchy filter
+                                  (using the near notations)
+```
+</div>
+<br/>
+<span class="vernacular">Import</span><span class="id"> Order</span>.<span class="id">TTheory</span><span class="id"> GRing</span>.<span class="id">Theory</span><span class="id"> Num</span>.<span class="id">Theory</span>.<br/>
+<br/>
+<span class="gallina-kwd">Set</span><span class="vernacular"> Implicit</span><span class="vernacular"> Arguments</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Strict</span><span class="vernacular"> Implicit</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Printing</span><span class="vernacular"> Implicit</span><span class="vernacular"> Defensive</span>.<br/>
+<br/>
+<span class="id">#[local]</span><br/>
+<span class="vernacular">Obligation</span><span class="vernacular"> Tactic</span><span class="id"> :=</span><span class="id"> idtac</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> classical_set_scope</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ring_scope</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> entourage_</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> {T</span><span class="id"> T'}</span> (<span class="id">ball</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> R</span><span class="id"> -&gt;</span><span class="id"> set</span><span class="id"> T'</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">@filter_from</span><span class="id"> R</span><span class="id"> _</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> x]</span> (<span class="gallina-kwd">fun</span><span class="id"> e</span><span class="id"> =&gt;</span><span class="id"> [set</span><span class="id"> xy</span><span class="id"> |</span><span class="id"> ball</span><span class="id"> xy</span>.<span class="id">1</span><span class="id"> e</span><span class="id"> xy</span>.<span class="id">2]</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> entourage_E</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> {T</span><span class="id"> T'}</span> (<span class="id">ball</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> R</span><span class="id"> -&gt;</span><span class="id"> set</span><span class="id"> T'</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">entourage_</span><span class="id"> ball</span><span class="id"> =</span><br/>
+&nbsp;&nbsp;<span class="id">@filter_from</span><span class="id"> R</span><span class="id"> _</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> x]</span> (<span class="gallina-kwd">fun</span><span class="id"> e</span><span class="id"> =&gt;</span><span class="id"> [set</span><span class="id"> xy</span><span class="id"> |</span><span class="id"> ball</span><span class="id"> xy</span>.<span class="id">1</span><span class="id"> e</span><span class="id"> xy</span>.<span class="id">2]</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">mixin</span><span class="vernacular"> Record</span><span class="id"> Uniform_isPseudoMetric</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> numDomainType</span>)<span class="id"> M</span><span class="id"> of</span><span class="id"> Uniform</span><span class="id"> M</span><span class="id"> :=</span><span class="id"> {</span><br/>
+&nbsp;&nbsp;<span class="id">ball</span><span class="id"> :</span><span class="id"> M</span><span class="id"> -&gt;</span><span class="id"> R</span><span class="id"> -&gt;</span><span class="id"> M</span><span class="id"> -&gt;</span><span class="gallina-kwd"> Prop</span><span class="id"> ;</span><br/>
+&nbsp;&nbsp;<span class="id">ball_center_subproof</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> x</span> (<span class="id">e</span><span class="id"> :</span><span class="id"> R</span>)<span class="id">,</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> e</span><span class="id"> -&gt;</span><span class="id"> ball</span><span class="id"> x</span><span class="id"> e</span><span class="id"> x</span><span class="id"> ;</span><br/>
+&nbsp;&nbsp;<span class="id">ball_sym_subproof</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> x</span><span class="id"> y</span> (<span class="id">e</span><span class="id"> :</span><span class="id"> R</span>)<span class="id">,</span><span class="id"> ball</span><span class="id"> x</span><span class="id"> e</span><span class="id"> y</span><span class="id"> -&gt;</span><span class="id"> ball</span><span class="id"> y</span><span class="id"> e</span><span class="id"> x</span><span class="id"> ;</span><br/>
+&nbsp;&nbsp;<span class="id">ball_triangle_subproof</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">forall</span><span class="id"> x</span><span class="id"> y</span><span class="id"> z</span><span class="id"> e1</span><span class="id"> e2,</span><span class="id"> ball</span><span class="id"> x</span><span class="id"> e1</span><span class="id"> y</span><span class="id"> -&gt;</span><span class="id"> ball</span><span class="id"> y</span><span class="id"> e2</span><span class="id"> z</span><span class="id"> -&gt;</span><span class="id"> ball</span><span class="id"> x</span> (<span class="id">e1</span><span class="id"> +</span><span class="id"> e2</span>)<span class="id"> z;</span><br/>
+&nbsp;&nbsp;<span class="id">entourageE_subproof</span><span class="id"> :</span><span class="id"> entourage</span><span class="id"> =</span><span class="id"> entourage_</span><span class="id"> ball</span><br/>
+<span class="id">}</span>.<br/>
+<br/>
+<span class="id">#[short</span>(<span class="id">type=</span><span class="id">&quot;pseudoMetricType&quot;</span>)<span class="id">]</span><br/>
+<span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> PseudoMetric</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> numDomainType</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">{T</span><span class="id"> of</span><span class="id"> Uniform</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> Uniform_isPseudoMetric</span><span class="id"> R</span><span class="id"> T}</span>.<br/>
+<br/>
+<span class="id">#[short</span>(<span class="id">type=</span><span class="id">&quot;pseudoPMetricType&quot;</span>)<span class="id">]</span><br/>
+<span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> PseudoPointedMetric</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> numDomainType</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">{T</span><span class="id"> of</span><span class="id"> Pointed</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> Uniform</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> Uniform_isPseudoMetric</span><span class="id"> R</span><span class="id"> T}</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> discrete_topology</span><span class="id"> T</span> (<span class="id">dsc</span><span class="id"> :</span><span class="id"> discrete_space</span><span class="id"> T</span>)<span class="id"> :</span><span class="gallina-kwd"> Type</span><span class="id"> :=</span><span class="id"> T</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> discrete_uniform</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> nbhsType}</span><span class="id"> {dsc:</span><span class="id"> discrete_space</span><span class="id"> T}</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> discrete_ent</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">set</span> (<span class="id">T</span><span class="id"> *</span><span class="id"> T</span>))<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">globally</span> (<span class="id">range</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span> (<span class="id">x,</span><span class="id"> x</span>))).<br/>
+<br/>
+<span class="id">Program</span><span class="vernacular"> Definition</span><span class="id"> discrete_uniform_structure</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">@isUniform</span>.<span class="id">Build</span> (<span class="id">discrete_topology</span><span class="id"> dsc</span>)<span class="id"> discrete_ent</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span>.<br/>
+<details>
+<summary class="toggleproof">Next Obligation.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> +</span><span class="id"> x</span><span class="id"> x12;</span><span class="id"> apply;</span><span class="gallina-kwd"> exists</span><span class="id"> x</span>.<span class="id">1;</span><span class="id"> rewrite</span><span class="id"> //</span><span class="id"> {2}x12</span><span class="id"> -surjective_pairing</span>.<br/>
+Qed.</div></details>
+<details>
+<summary class="toggleproof">Next Obligation.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> dA</span><span class="id"> x</span><span class="id"> [i</span><span class="id"> _</span><span class="id"> &lt;-];</span><span class="id"> apply:</span><span class="id"> dA;</span><span class="gallina-kwd"> exists</span><span class="id"> i</span>.<br/>
+Qed.</div></details>
+<details>
+<summary class="toggleproof">Next Obligation.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> ?</span><span class="id"> dA;</span><span class="gallina-kwd"> exists</span> (<span class="id">range</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span> (<span class="id">x,</span><span class="id"> x</span>)))<span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> set_compose_diag</span><span class="id"> =&gt;</span><span class="id"> x</span><span class="id"> [i</span><span class="id"> _</span><span class="id"> &lt;-];</span><span class="id"> apply:</span><span class="id"> dA;</span><span class="gallina-kwd"> exists</span><span class="id"> i</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Choice</span>.<span class="id">on</span> (<span class="id">discrete_topology</span><span class="id"> dsc</span>).<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> discrete_uniform_structure</span>.<br/>
+<span class="vernacular">End</span><span class="id"> discrete_uniform</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">P</span><span class="id"> :</span><span class="id"> pnbhsType</span>) (<span class="id">dsc</span><span class="id"> :</span><span class="id"> discrete_space</span><span class="id"> P</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">Pointed</span>.<span class="id">on</span> (<span class="id">discrete_topology</span><span class="id"> dsc</span>).<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> pnbhsType}</span><span class="id"> {dsc:</span><span class="id"> discrete_space</span><span class="id"> T}</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">Pointed</span>.<span class="id">on</span> (<span class="id">discrete_topology</span><span class="id"> dsc</span>).<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">factory</span><span class="vernacular"> Record</span><span class="id"> Nbhs_isPseudoMetric</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> numFieldType</span>)<span class="id"> M</span><span class="id"> of</span><span class="id"> Nbhs</span><span class="id"> M</span><span class="id"> :=</span><span class="id"> {</span><br/>
+&nbsp;&nbsp;<span class="id">ent</span><span class="id"> :</span><span class="id"> set_system</span> (<span class="id">M</span><span class="id"> *</span><span class="id"> M</span>)<span class="id">;</span><br/>
+&nbsp;&nbsp;<span class="id">nbhsE</span><span class="id"> :</span><span class="id"> nbhs</span><span class="id"> =</span><span class="id"> nbhs_</span><span class="id"> ent;</span><br/>
+&nbsp;&nbsp;<span class="id">ball</span><span class="id"> :</span><span class="id"> M</span><span class="id"> -&gt;</span><span class="id"> R</span><span class="id"> -&gt;</span><span class="id"> M</span><span class="id"> -&gt;</span><span class="gallina-kwd"> Prop</span><span class="id"> ;</span><br/>
+&nbsp;&nbsp;<span class="id">ball_center</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> x</span> (<span class="id">e</span><span class="id"> :</span><span class="id"> R</span>)<span class="id">,</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> e</span><span class="id"> -&gt;</span><span class="id"> ball</span><span class="id"> x</span><span class="id"> e</span><span class="id"> x</span><span class="id"> ;</span><br/>
+&nbsp;&nbsp;<span class="id">ball_sym</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> x</span><span class="id"> y</span> (<span class="id">e</span><span class="id"> :</span><span class="id"> R</span>)<span class="id">,</span><span class="id"> ball</span><span class="id"> x</span><span class="id"> e</span><span class="id"> y</span><span class="id"> -&gt;</span><span class="id"> ball</span><span class="id"> y</span><span class="id"> e</span><span class="id"> x</span><span class="id"> ;</span><br/>
+&nbsp;&nbsp;<span class="id">ball_triangle</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">forall</span><span class="id"> x</span><span class="id"> y</span><span class="id"> z</span><span class="id"> e1</span><span class="id"> e2,</span><span class="id"> ball</span><span class="id"> x</span><span class="id"> e1</span><span class="id"> y</span><span class="id"> -&gt;</span><span class="id"> ball</span><span class="id"> y</span><span class="id"> e2</span><span class="id"> z</span><span class="id"> -&gt;</span><span class="id"> ball</span><span class="id"> x</span> (<span class="id">e1</span><span class="id"> +</span><span class="id"> e2</span>)<span class="id"> z;</span><br/>
+&nbsp;&nbsp;<span class="id">entourageE</span><span class="id"> :</span><span class="id"> ent</span><span class="id"> =</span><span class="id"> entourage_</span><span class="id"> ball</span><br/>
+<span class="id">}</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">builders</span><span class="vernacular"> Context</span><span class="id"> R</span><span class="id"> M</span><span class="id"> of</span><span class="id"> Nbhs_isPseudoMetric</span><span class="id"> R</span><span class="id"> M</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> relation_scope</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> ball_le</span><span class="id"> x</span><span class="id"> :</span><span class="id"> {homo</span><span class="id"> ball</span><span class="id"> x</span><span class="id"> :</span><span class="id"> e1</span><span class="id"> e2</span><span class="id"> /</span><span class="id"> e1</span><span class="id"> &lt;=</span><span class="id"> e2</span><span class="id"> &gt;-&gt;</span><span class="id"> e1</span><span class="id"> `&lt;=`</span><span class="id"> e2}</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> e1</span><span class="id"> e2</span><span class="id"> le12</span><span class="id"> y</span><span class="id"> xe1_y</span>.<br/>
+<span class="id">move:</span><span class="id"> le12;</span><span class="id"> rewrite</span><span class="id"> le_eqVlt</span><span class="id"> =&gt;</span><span class="id"> /orP</span><span class="id"> [/eqP</span><span class="id"> &lt;-</span><span class="id"> //|]</span>.<br/>
+<span class="id">rewrite</span><span class="id"> -subr_gt0</span><span class="id"> =&gt;</span><span class="id"> lt12</span>.<br/>
+<span class="id">rewrite</span><span class="id"> -[e2]</span>(<span class="id">subrK</span><span class="id"> e1</span>)<span class="id">;</span><span class="id"> apply:</span><span class="id"> ball_triangle</span><span class="id"> xe1_y</span>.<br/>
+<span class="id">suff</span><span class="id"> :</span><span class="id"> ball</span><span class="id"> x</span> (<span class="id">PosNum</span><span class="id"> lt12</span>)<span class="id">%:num</span><span class="id"> x</span><span class="gallina-kwd"> by</span><span class="id"> []</span>.<br/>
+<span class="id">exact:</span><span class="id"> ball_center</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> entourage_filter_subproof</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> ent</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> entourageE;</span><span class="id"> apply:</span><span class="id"> filter_from_filter;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="gallina-kwd"> exists</span><span class="id"> 1</span><span class="id"> =&gt;</span><span class="id"> /=</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> _</span><span class="id"> _</span><span class="id"> /posnumP[e1]</span><span class="id"> /posnumP[e2];</span><span class="gallina-kwd"> exists</span> (<span class="id">Num</span>.<span class="id">min</span><span class="id"> e1</span><span class="id"> e2</span>)<span class="id">%:num</span><span class="id"> =&gt;</span><span class="id"> //=</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> subsetI;</span><span class="id"> split=&gt;</span><span class="id"> ?;</span><span class="id"> apply:</span><span class="id"> ball_le;</span><br/>
+&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> num_le//</span><span class="id"> ge_min</span><span class="id"> lexx</span><span class="id"> ?orbT</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> ball_sym_subproof</span><span class="id"> A</span><span class="id"> :</span><span class="id"> ent</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> diagonal</span><span class="id"> `&lt;=`</span><span class="id"> A</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> entourageE;</span><span class="id"> move=&gt;</span><span class="id"> [e</span><span class="id"> egt0</span><span class="id"> sbeA]</span><span class="id"> xy</span><span class="id"> xey</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> sbeA;</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> xey;</span><span class="id"> exact:</span><span class="id"> ball_center</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> ball_triangle_subproof</span><span class="id"> A</span><span class="id"> :</span><span class="id"> ent</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> ent</span><span class="id"> A^-1</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> entourageE</span><span class="id"> =&gt;</span><span class="id"> -</span><span class="id"> [e</span><span class="id"> egt0</span><span class="id"> sbeA]</span>.<br/>
+<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span><span class="id"> e</span><span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> xy</span><span class="id"> xye;</span><span class="id"> apply:</span><span class="id"> sbeA;</span><span class="id"> exact:</span><span class="id"> ball_sym</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> entourageE_subproof</span><span class="id"> A</span><span class="id"> :</span><span class="id"> ent</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="gallina-kwd"> exists2</span><span class="id"> B,</span><span class="id"> ent</span><span class="id"> B</span><span class="id"> &amp;</span><span class="id"> B</span><span class="id"> \;</span><span class="id"> B</span><span class="id"> `&lt;=`</span><span class="id"> A</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> entourageE;</span><span class="id"> move=&gt;</span><span class="id"> [_/posnumP[e]</span><span class="id"> sbeA]</span>.<br/>
+<span class="gallina-kwd">exists</span><span class="id"> [set</span><span class="id"> xy</span><span class="id"> |</span><span class="id"> ball</span><span class="id"> xy</span>.<span class="id">1</span> (<span class="id">e%:num</span><span class="id"> /</span><span class="id"> 2</span>)<span class="id"> xy</span>.<span class="id">2]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span> (<span class="id">e%:num</span><span class="id"> /</span><span class="id"> 2</span>)<span class="id"> =&gt;</span><span class="id"> /=</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> xy</span><span class="id"> [z</span><span class="id"> xzhe</span><span class="id"> zyhe];</span><span class="id"> apply:</span><span class="id"> sbeA</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> [e%:num]splitr;</span><span class="id"> exact:</span><span class="id"> ball_triangle</span><span class="id"> zyhe</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Nbhs_isUniform</span>.<span class="id">Build</span><span class="id"> M</span><br/>
+&nbsp;&nbsp;<span class="id">entourage_filter_subproof</span><span class="id"> ball_sym_subproof</span><span class="id"> ball_triangle_subproof</span><br/>
+&nbsp;&nbsp;<span class="id">entourageE_subproof</span><span class="id"> nbhsE</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Uniform_isPseudoMetric</span>.<span class="id">Build</span><span class="id"> R</span><span class="id"> M</span><br/>
+&nbsp;&nbsp;<span class="id">ball_center</span><span class="id"> ball_sym</span><span class="id"> ball_triangle</span><span class="id"> entourageE</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="gallina-kwd">end</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> entourage_ballE</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> {M</span><span class="id"> :</span><span class="id"> pseudoMetricType</span><span class="id"> R}</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">entourage_</span> (<span class="id">@ball</span><span class="id"> R</span><span class="id"> M</span>)<span class="id"> =</span><span class="id"> entourage</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> entourageE_subproof</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> entourage_from_ballE</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> {M</span><span class="id"> :</span><span class="id"> pseudoMetricType</span><span class="id"> R}</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">@filter_from</span><span class="id"> R</span><span class="id"> _</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> :</span><span class="id"> R</span><span class="id"> |</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> x]</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="gallina-kwd">fun</span><span class="id"> e</span><span class="id"> =&gt;</span><span class="id"> [set</span><span class="id"> xy</span><span class="id"> |</span><span class="id"> @ball</span><span class="id"> R</span><span class="id"> M</span><span class="id"> xy</span>.<span class="id">1</span><span class="id"> e</span><span class="id"> xy</span>.<span class="id">2]</span>)<span class="id"> =</span><span class="id"> entourage</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -entourage_ballE</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> entourage_ball</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span> (<span class="id">M</span><span class="id"> :</span><span class="id"> pseudoMetricType</span><span class="id"> R</span>)<br/>
+&nbsp;&nbsp;(<span class="id">e</span><span class="id"> :</span><span class="id"> {posnum</span><span class="id"> R}</span>)<span class="id"> :</span><span class="id"> entourage</span><span class="id"> [set</span><span class="id"> xy</span><span class="id"> :</span><span class="id"> M</span><span class="id"> *</span><span class="id"> M</span><span class="id"> |</span><span class="id"> ball</span><span class="id"> xy</span>.<span class="id">1</span><span class="id"> e%:num</span><span class="id"> xy</span>.<span class="id">2]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -entourage_ballE;</span><span class="gallina-kwd"> exists</span><span class="id"> e%:num</span><span class="id"> =&gt;</span><span class="id"> /=</span>. Qed.</div></details>
+<span class="id">#[global]</span><span class="vernacular"> Hint</span><span class="id"> Resolve</span><span class="id"> entourage_ball</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> nbhs_ball_</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> {T</span><span class="id"> T'}</span> (<span class="id">ball</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> R</span><span class="id"> -&gt;</span><span class="id"> set</span><span class="id"> T'</span>)<br/>
+&nbsp;&nbsp;(<span class="id">x</span><span class="id"> :</span><span class="id"> T</span>)<span class="id"> :=</span><span class="id"> @filter_from</span><span class="id"> R</span><span class="id"> _</span><span class="id"> [set</span><span class="id"> e</span><span class="id"> |</span><span class="id"> e</span><span class="id"> &gt;</span><span class="id"> 0]</span> (<span class="id">ball</span><span class="id"> x</span>).<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> nbhs_ball</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> {M</span><span class="id"> :</span><span class="id"> pseudoMetricType</span><span class="id"> R}</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">nbhs_ball_</span> (<span class="id">@ball</span><span class="id"> R</span><span class="id"> M</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> nbhs_ballE</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> {M</span><span class="id"> :</span><span class="id"> pseudoMetricType</span><span class="id"> R}</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">@nbhs_ball</span><span class="id"> R</span><span class="id"> M</span><span class="id"> =</span><span class="id"> nbhs</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> predeq2E</span><span class="id"> =&gt;</span><span class="id"> x</span><span class="id"> P;</span><span class="id"> rewrite</span><span class="id"> -nbhs_entourageE;</span><span class="id"> split</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> [_/posnumP[e]</span><span class="id"> sbxeP];</span><span class="gallina-kwd"> exists</span><span class="id"> [set</span><span class="id"> xy</span><span class="id"> |</span><span class="id"> ball</span><span class="id"> xy</span>.<span class="id">1</span><span class="id"> e%:num</span><span class="id"> xy</span>.<span class="id">2]</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> y</span><span class="id"> /xsectionP/sbxeP</span>.<br/>
+<span class="id">rewrite</span><span class="id"> -entourage_ballE;</span><span class="id"> move=&gt;</span><span class="id"> [A</span><span class="id"> [e</span><span class="id"> egt0</span><span class="id"> sbeA]</span><span class="id"> sAP]</span>.<br/>
+<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span><span class="id"> e</span><span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> ?</span><span class="id"> ?;</span><span class="id"> exact/sAP/xsectionP/sbeA</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> filter_from_ballE</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> {M</span><span class="id"> :</span><span class="id"> pseudoMetricType</span><span class="id"> R}</span><span class="id"> x</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">@filter_from</span><span class="id"> R</span><span class="id"> _</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> :</span><span class="id"> R</span><span class="id"> |</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> x]</span> (<span class="id">@ball</span><span class="id"> R</span><span class="id"> M</span><span class="id"> x</span>)<span class="id"> =</span><span class="id"> nbhs</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -nbhs_ballE</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Module</span><span class="vernacular"> Export</span><span class="id"> NbhsBall</span>.<br/>
+<span class="vernacular">Definition</span><span class="id"> nbhs_simpl</span><span class="id"> :=</span> (<span class="id">nbhs_simpl,@filter_from_ballE,@nbhs_ballE</span>).<br/>
+<span class="vernacular">End</span><span class="id"> NbhsBall</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> nbhs_ballP</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> {M</span><span class="id"> :</span><span class="id"> pseudoMetricType</span><span class="id"> R}</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> M</span>)<span class="id"> P</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">nbhs</span><span class="id"> x</span><span class="id"> P</span><span class="id"> &lt;-&gt;</span><span class="id"> nbhs_ball</span><span class="id"> x</span><span class="id"> P</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> nbhs_simpl</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> ball_center</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span> (<span class="id">M</span><span class="id"> :</span><span class="id"> pseudoMetricType</span><span class="id"> R</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> M</span>)<br/>
+&nbsp;&nbsp;(<span class="id">e</span><span class="id"> :</span><span class="id"> {posnum</span><span class="id"> R}</span>)<span class="id"> :</span><span class="id"> ball</span><span class="id"> x</span><span class="id"> e%:num</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact:</span><span class="id"> ball_center_subproof</span>. Qed.</div></details>
+<span class="id">#[global]</span><span class="vernacular"> Hint</span><span class="id"> Resolve</span><span class="id"> ball_center</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> pseudoMetricType_numDomainType</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> {M</span><span class="id"> :</span><span class="id"> pseudoMetricType</span><span class="id"> R}</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> ballxx</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> M</span>) (<span class="id">e</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> e</span><span class="id"> -&gt;</span><span class="id"> ball</span><span class="id"> x</span><span class="id"> e</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> e_gt0;</span><span class="id"> apply:</span><span class="id"> ball_center</span> (<span class="id">PosNum</span><span class="id"> e_gt0</span>). Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> ball_sym</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> M</span>) (<span class="id">e</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> ball</span><span class="id"> x</span><span class="id"> e</span><span class="id"> y</span><span class="id"> -&gt;</span><span class="id"> ball</span><span class="id"> y</span><span class="id"> e</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact:</span><span class="id"> ball_sym_subproof</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> ball_symE</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> M</span>) (<span class="id">e</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> ball</span><span class="id"> x</span><span class="id"> e</span><span class="id"> y</span><span class="id"> =</span><span class="id"> ball</span><span class="id"> y</span><span class="id"> e</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> propeqE;</span><span class="id"> split;</span><span class="id"> exact/ball_sym</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> ball_triangle</span> (<span class="id">y</span><span class="id"> x</span><span class="id"> z</span><span class="id"> :</span><span class="id"> M</span>) (<span class="id">e1</span><span class="id"> e2</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">ball</span><span class="id"> x</span><span class="id"> e1</span><span class="id"> y</span><span class="id"> -&gt;</span><span class="id"> ball</span><span class="id"> y</span><span class="id"> e2</span><span class="id"> z</span><span class="id"> -&gt;</span><span class="id"> ball</span><span class="id"> x</span> (<span class="id">e1</span><span class="id"> +</span><span class="id"> e2</span>)<span class="id"> z</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact:</span><span class="id"> ball_triangle_subproof</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> nbhsx_ballx</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> M</span>) (<span class="id">eps</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> eps</span><span class="id"> -&gt;</span><span class="id"> nbhs</span><span class="id"> x</span> (<span class="id">ball</span><span class="id"> x</span><span class="id"> eps</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> e0;</span><span class="id"> apply/nbhs_ballP;</span><span class="gallina-kwd"> exists</span><span class="id"> eps</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> open_nbhs_ball</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> M</span>) (<span class="id">eps</span><span class="id"> :</span><span class="id"> {posnum</span><span class="id"> R}</span>)<span class="id"> :</span><span class="id"> open_nbhs</span><span class="id"> x</span> (<span class="id">ball</span><span class="id"> x</span><span class="id"> eps%:num</span>)<span class="id">^°</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">split;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> open_interior</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> nbhs_singleton;</span><span class="id"> apply:</span><span class="id"> nbhs_interior;</span><span class="id"> exact:</span><span class="id"> nbhsx_ballx</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> le_ball</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> M</span>) (<span class="id">e1</span><span class="id"> e2</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> e1</span><span class="id"> &lt;=</span><span class="id"> e2</span><span class="id"> -&gt;</span><span class="id"> ball</span><span class="id"> x</span><span class="id"> e1</span><span class="id"> `&lt;=`</span><span class="id"> ball</span><span class="id"> x</span><span class="id"> e2</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> le12</span><span class="id"> y</span>.<span class="id"> case:</span><span class="id"> comparableP</span><span class="id"> le12</span><span class="id"> =&gt;</span><span class="id"> [lte12</span><span class="id"> _|//|//|-&gt;//]</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -[e2]</span>(<span class="id">subrK</span><span class="id"> e1</span>)<span class="id">;</span><span class="id"> apply/ball_triangle/ballxx;</span><span class="id"> rewrite</span><span class="id"> subr_gt0</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> near_ball</span> (<span class="id">y</span><span class="id"> :</span><span class="id"> M</span>) (<span class="id">eps</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> eps</span><span class="id"> -&gt;</span><span class="id"> \forall</span><span class="id"> y'</span><span class="id"> \near</span><span class="id"> y,</span><span class="id"> ball</span><span class="id"> y</span><span class="id"> eps</span><span class="id"> y'</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact:</span><span class="id"> nbhsx_ballx</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> dnbhs_ball</span> (<span class="id">a</span><span class="id"> :</span><span class="id"> M</span>) (<span class="id">e</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span> (<span class="id">0</span><span class="id"> &lt;</span><span class="id"> e</span>)<span class="id">%R</span><span class="id"> -&gt;</span><span class="id"> a^'</span> (<span class="id">ball</span><span class="id"> a</span><span class="id"> e</span><span class="id"> `\</span><span class="id"> a</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move:</span><span class="id"> e</span><span class="id"> =&gt;</span><span class="id"> _/posnumP[e];</span><span class="id"> rewrite</span><span class="id"> /dnbhs</span><span class="id"> /within</span><span class="id"> /=;</span><span class="id"> near=&gt;</span><span class="id"> r</span><span class="id"> =&gt;</span><span class="id"> ra</span>.<br/>
+<span class="id">split</span><span class="id"> =&gt;</span><span class="id"> //=;</span><span class="id"> last</span><span class="id"> exact/eqP</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> near:</span><span class="id"> r;</span><span class="id"> rewrite</span><span class="id"> near_simpl;</span><span class="id"> exact:</span><span class="id"> near_ball</span>.<br/>
+<span class="id">Unshelve</span>.<span class="id"> all:</span><span class="gallina-kwd"> by</span><span class="id"> end_near</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> fcvg_ballP</span><span class="id"> {F}</span><span class="id"> {FF</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> F}</span> (<span class="id">y</span><span class="id"> :</span><span class="id"> M</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">F</span><span class="id"> --&gt;</span><span class="id"> y</span><span class="id"> &lt;-&gt;</span><span class="gallina-kwd"> forall</span><span class="id"> eps</span><span class="id"> :</span><span class="id"> R,</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> eps</span><span class="id"> -&gt;</span><span class="id"> \forall</span><span class="id"> y'</span><span class="id"> \near</span><span class="id"> F,</span><span class="id"> ball</span><span class="id"> y</span><span class="id"> eps</span><span class="id"> y'</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -filter_fromP</span><span class="id"> !nbhs_simpl</span><span class="id"> /=</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> __deprecated__cvg_ballPpos</span><span class="id"> {F}</span><span class="id"> {FF</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> F}</span> (<span class="id">y</span><span class="id"> :</span><span class="id"> M</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">F</span><span class="id"> --&gt;</span><span class="id"> y</span><span class="id"> &lt;-&gt;</span><span class="gallina-kwd"> forall</span><span class="id"> eps</span><span class="id"> :</span><span class="id"> {posnum</span><span class="id"> R},</span><span class="id"> \forall</span><span class="id"> y'</span><span class="id"> \near</span><span class="id"> F,</span><span class="id"> ball</span><span class="id"> y</span><span class="id"> eps%:num</span><span class="id"> y'</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">split</span><span class="id"> =&gt;</span><span class="id"> [/fcvg_ballP</span><span class="id"> +</span><span class="id"> eps|pos];</span><span class="id"> first</span><span class="id"> exact</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply/fcvg_ballP=&gt;</span><span class="id"> _/posnumP[eps]</span><span class="id"> //</span>.<br/>
+Qed.</div></details>
+<span class="id">#[deprecated</span>(<span class="id">since=</span><span class="id">&quot;mathcomp-analysis 0.6.0&quot;</span><span class="id">,</span><br/>
+&nbsp;&nbsp;<span class="id">note=</span><span class="id">&quot;use a combination of `cvg_ballP` and `posnumP`&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Notation</span><span class="id"> cvg_ballPpos</span><span class="id"> :=</span><span class="id"> __deprecated__cvg_ballPpos</span> (<span class="id">only</span><span class="id"> parsing</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> fcvg_ball</span><span class="id"> {F}</span><span class="id"> {FF</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> F}</span> (<span class="id">y</span><span class="id"> :</span><span class="id"> M</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">F</span><span class="id"> --&gt;</span><span class="id"> y</span><span class="id"> -&gt;</span><span class="gallina-kwd"> forall</span><span class="id"> eps</span><span class="id"> :</span><span class="id"> R,</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> eps</span><span class="id"> -&gt;</span><span class="id"> \forall</span><span class="id"> y'</span><span class="id"> \near</span><span class="id"> F,</span><span class="id"> ball</span><span class="id"> y</span><span class="id"> eps</span><span class="id"> y'</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move/fcvg_ballP</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> cvg_ballP</span><span class="id"> {T}</span><span class="id"> {F}</span><span class="id"> {FF</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> F}</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> M</span>)<span class="id"> y</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">f</span><span class="id"> @</span><span class="id"> F</span><span class="id"> --&gt;</span><span class="id"> y</span><span class="id"> &lt;-&gt;</span><span class="gallina-kwd"> forall</span><span class="id"> eps</span><span class="id"> :</span><span class="id"> R,</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> eps</span><span class="id"> -&gt;</span><span class="id"> \forall</span><span class="id"> x</span><span class="id"> \near</span><span class="id"> F,</span><span class="id"> ball</span><span class="id"> y</span><span class="id"> eps</span> (<span class="id">f</span><span class="id"> x</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact:</span><span class="id"> fcvg_ballP</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> cvg_ball</span><span class="id"> {T}</span><span class="id"> {F}</span><span class="id"> {FF</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> F}</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> M</span>)<span class="id"> y</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">f</span><span class="id"> @</span><span class="id"> F</span><span class="id"> --&gt;</span><span class="id"> y</span><span class="id"> -&gt;</span><span class="gallina-kwd"> forall</span><span class="id"> eps</span><span class="id"> :</span><span class="id"> R,</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> eps</span><span class="id"> -&gt;</span><span class="id"> \forall</span><span class="id"> x</span><span class="id"> \near</span><span class="id"> F,</span><span class="id"> ball</span><span class="id"> y</span><span class="id"> eps</span> (<span class="id">f</span><span class="id"> x</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact:</span><span class="id"> fcvg_ball</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> cvgi_ballP</span><span class="id"> T</span><span class="id"> {F}</span><span class="id"> {FF</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> F}</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> M</span><span class="id"> -&gt;</span><span class="gallina-kwd"> Prop</span>)<span class="id"> y</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">f</span><span class="id"> `@</span><span class="id"> F</span><span class="id"> --&gt;</span><span class="id"> y</span><span class="id"> &lt;-&gt;</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">forall</span><span class="id"> eps</span><span class="id"> :</span><span class="id"> R,</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> eps</span><span class="id"> -&gt;</span><span class="id"> \forall</span><span class="id"> x</span><span class="id"> \near</span><span class="id"> F,</span><span class="gallina-kwd"> exists</span><span class="id"> z,</span><span class="id"> f</span><span class="id"> x</span><span class="id"> z</span><span class="id"> /\</span><span class="id"> ball</span><span class="id"> y</span><span class="id"> eps</span><span class="id"> z</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">split=&gt;</span><span class="id"> [Fy</span><span class="id"> _/posnumP[eps]</span><span class="id"> |Fy</span><span class="id"> P]</span><span class="id"> /=;</span><span class="id"> first</span><span class="id"> exact/Fy/nbhsx_ballx</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> /nbhs_ballP[_</span><span class="id"> /posnumP[eps]</span><span class="id"> subP]</span>.<br/>
+<span class="id">rewrite</span><span class="id"> near_simpl</span><span class="id"> near_mapi;</span><span class="id"> near=&gt;</span><span class="id"> x</span>.<br/>
+<span class="id">have</span><span class="id"> [//|z</span><span class="id"> [fxz</span><span class="id"> yz]]</span><span class="id"> :=</span><span class="id"> near</span> (<span class="id">Fy</span><span class="id"> _</span> (<span class="id">gt0</span><span class="id"> eps</span>))<span class="id"> x</span>.<br/>
+<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span><span class="id"> z</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> apply:</span><span class="id"> subP</span>.<br/>
+<span class="id">Unshelve</span>.<span class="id"> all:</span><span class="id"> end_near</span>. Qed.</div></details>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">since=</span><span class="id">&quot;mathcomp-analysis 1.6.0&quot;</span><span class="id">,</span><span class="id"> note=</span><span class="id">&quot;use `cvgi_ballP` instead&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Definition</span><span class="id"> cvg_toi_locally</span><span class="id"> :=</span><span class="id"> @cvgi_ballP</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> cvgi_ball</span><span class="id"> T</span><span class="id"> {F}</span><span class="id"> {FF</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> F}</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> M</span><span class="id"> -&gt;</span><span class="gallina-kwd"> Prop</span>)<span class="id"> y</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">f</span><span class="id"> `@</span><span class="id"> F</span><span class="id"> --&gt;</span><span class="id"> y</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">forall</span><span class="id"> eps</span><span class="id"> :</span><span class="id"> R,</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> eps</span><span class="id"> -&gt;</span><span class="id"> F</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span><span class="gallina-kwd"> exists</span><span class="id"> z,</span><span class="id"> f</span><span class="id"> x</span><span class="id"> z</span><span class="id"> /\</span><span class="id"> ball</span><span class="id"> y</span><span class="id"> eps</span><span class="id"> z]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move/cvgi_ballP</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> pseudoMetricType_numDomainType</span>.<br/>
+<br/>
+<span class="id">#[global]</span><span class="vernacular"> Hint</span><span class="id"> Resolve</span><span class="id"> nbhsx_ballx</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<br/>
+<span class="id">Global</span><span class="vernacular"> Instance</span><span class="id"> entourage_proper_filter</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><br/>
+&nbsp;&nbsp;<span class="id">{M</span><span class="id"> :</span><span class="id"> pseudoPMetricType</span><span class="id"> R}</span><span class="id"> :</span><span class="id"> ProperFilter</span> (<span class="id">@entourage</span><span class="id"> M</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">apply:</span><span class="id"> Build_ProperFilter_ex;</span><span class="id"> rewrite</span><span class="id"> -entourage_ballE</span><span class="id"> =&gt;</span><span class="id"> A</span><span class="id"> [_/posnumP[e]</span><span class="id"> sbeA]</span>.<br/>
+<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span> (<span class="id">point,</span><span class="id"> point</span>)<span class="id">;</span><span class="id"> apply:</span><span class="id"> sbeA;</span><span class="id"> apply:</span><span class="id"> ballxx</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Arguments</span><span class="id"> nbhsx_ballx</span><span class="id"> {R</span><span class="id"> M}</span><span class="id"> x</span><span class="id"> eps</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> near_ball</span><span class="id"> {R</span><span class="id"> M}</span><span class="id"> y</span><span class="id"> eps</span>.<br/>
+<br/>
+<span class="id">#[deprecated</span>(<span class="id">since=</span><span class="id">&quot;mathcomp-analysis 0.6.0&quot;</span><span class="id">,</span><span class="id"> note=</span><span class="id">&quot;renamed `cvg_ball`&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Notation</span><span class="id"> app_cvg_locally</span><span class="id"> :=</span><span class="id"> cvg_ball</span> (<span class="id">only</span><span class="id"> parsing</span>).<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> pseudoMetricType_numFieldType</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numFieldType}</span><span class="id"> {M</span><span class="id"> :</span><span class="id"> pseudoMetricType</span><span class="id"> R}</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> ball_split</span> (<span class="id">z</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> M</span>) (<span class="id">e</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">ball</span><span class="id"> x</span> (<span class="id">e</span><span class="id"> /</span><span class="id"> 2</span>)<span class="id"> z</span><span class="id"> -&gt;</span><span class="id"> ball</span><span class="id"> z</span> (<span class="id">e</span><span class="id"> /</span><span class="id"> 2</span>)<span class="id"> y</span><span class="id"> -&gt;</span><span class="id"> ball</span><span class="id"> x</span><span class="id"> e</span><span class="id"> y</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> /ball_triangle</span><span class="id"> h</span><span class="id"> /h;</span><span class="id"> rewrite</span><span class="id"> -splitr</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> ball_splitr</span> (<span class="id">z</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> M</span>) (<span class="id">e</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">ball</span><span class="id"> z</span> (<span class="id">e</span><span class="id"> /</span><span class="id"> 2</span>)<span class="id"> x</span><span class="id"> -&gt;</span><span class="id"> ball</span><span class="id"> z</span> (<span class="id">e</span><span class="id"> /</span><span class="id"> 2</span>)<span class="id"> y</span><span class="id"> -&gt;</span><span class="id"> ball</span><span class="id"> x</span><span class="id"> e</span><span class="id"> y</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> /ball_sym</span><span class="id"> /ball_split;</span><span class="id"> apply</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> ball_splitl</span> (<span class="id">z</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> M</span>) (<span class="id">e</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">ball</span><span class="id"> x</span> (<span class="id">e</span><span class="id"> /</span><span class="id"> 2</span>)<span class="id"> z</span><span class="id"> -&gt;</span><span class="id"> ball</span><span class="id"> y</span> (<span class="id">e</span><span class="id"> /</span><span class="id"> 2</span>)<span class="id"> z</span><span class="id"> -&gt;</span><span class="id"> ball</span><span class="id"> x</span><span class="id"> e</span><span class="id"> y</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> bxz</span><span class="id"> /ball_sym</span><span class="id"> /</span>(<span class="id">ball_split</span><span class="id"> bxz</span>). Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> pseudoMetricType_numFieldType</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> entourages</span>.<br/>
+<span class="vernacular">Variable</span><span class="id"> R</span><span class="id"> :</span><span class="id"> numDomainType</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> unif_continuousP</span> (<span class="id">U</span><span class="id"> V</span><span class="id"> :</span><span class="id"> pseudoMetricType</span><span class="id"> R</span>) (<span class="id">f</span><span class="id"> :</span><span class="id"> U</span><span class="id"> -&gt;</span><span class="id"> V</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">unif_continuous</span><span class="id"> f</span><span class="id"> &lt;-&gt;</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">forall</span><span class="id"> e,</span><span class="id"> e</span><span class="id"> &gt;</span><span class="id"> 0</span><span class="id"> -&gt;</span><span class="gallina-kwd"> exists2</span><span class="id"> d,</span><span class="id"> d</span><span class="id"> &gt;</span><span class="id"> 0</span><span class="id"> &amp;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">forall</span><span class="id"> x,</span><span class="id"> ball</span><span class="id"> x</span>.<span class="id">1</span><span class="id"> d</span><span class="id"> x</span>.<span class="id">2</span><span class="id"> -&gt;</span><span class="id"> ball</span> (<span class="id">f</span><span class="id"> x</span>.<span class="id">1</span>)<span class="id"> e</span> (<span class="id">f</span><span class="id"> x</span>.<span class="id">2</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">have</span><span class="id"> fappF</span><span class="id"> :</span><span class="id"> Filter</span> ((<span class="gallina-kwd">fun</span><span class="id"> xy</span><span class="id"> =&gt;</span> (<span class="id">f</span><span class="id"> xy</span>.<span class="id">1,</span><span class="id"> f</span><span class="id"> xy</span>.<span class="id">2</span>))<span class="id"> @</span><span class="id"> entourage_</span><span class="id"> ball</span>).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> entourage_ballE;</span><span class="id"> apply:</span><span class="id"> fmap_filter</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /unif_continuous</span><span class="id"> -!entourage_ballE</span><span class="id"> filter_fromP</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> entourages</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> countable_uniformity_metric</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realType}</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> pseudoMetricType</span><span class="id"> R}</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">countable_uniformity</span><span class="id"> T</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">apply/countable_uniformityP</span>.<br/>
+<span class="gallina-kwd">exists</span> (<span class="gallina-kwd">fun</span><span class="id"> n</span><span class="id"> =&gt;</span><span class="id"> [set</span><span class="id"> xy</span><span class="id"> :</span><span class="id"> T</span><span class="id"> *</span><span class="id"> T</span><span class="id"> |</span><span class="id"> ball</span><span class="id"> xy</span>.<span class="id">1</span><span class="id"> n</span>.<span class="id">+1%:R^-1</span><span class="id"> xy</span>.<span class="id">2]</span>)<span class="id">;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> n;</span><span class="id"> exact:</span> (<span class="id">entourage_ball</span><span class="id"> _</span><span class="id"> n</span>.<span class="id">+1%:R^-1%:pos</span>).<br/>
+<span class="id">move=&gt;</span><span class="id"> E;</span><span class="id"> rewrite</span><span class="id"> -entourage_ballE</span><span class="id"> =&gt;</span><span class="id"> -[e</span><span class="id"> e0</span><span class="id"> subE]</span>.<br/>
+<span class="gallina-kwd">exists</span><span class="id"> `|Num</span>.<span class="id">floor</span><span class="id"> e^-1|%N;</span><span class="id"> apply:</span><span class="id"> subset_trans</span><span class="id"> subE</span><span class="id"> =&gt;</span><span class="id"> xy;</span><span class="id"> apply:</span><span class="id"> le_ball</span>.<br/>
+<span class="id">rewrite</span><span class="id"> /=</span><span class="id"> -[leRHS]invrK</span><span class="id"> lef_pV2</span><span class="id"> ?posrE</span><span class="id"> ?invr_gt0//</span><span class="id"> -natr1</span>.<br/>
+<span class="id">rewrite</span><span class="id"> natr_absz</span><span class="id"> ger0_norm;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -floor_ge_int</span><span class="id"> ?invr_ge0</span><span class="id"> ?num_real</span><span class="id"> //</span><span class="id"> ltW</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> intrD1</span><span class="id"> ltW//</span><span class="id"> lt_succ_floor</span><span class="id"> ?num_real</span>.<br/>
+Qed.</div></details>
+<br/>
+<div class="doc">Specific pseudoMetric spaces </div>
+<br/>
+<span class="vernacular">Section</span><span class="id"> discrete_pseudoMetric</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> nbhsType}</span><span class="id"> {dsc</span><span class="id"> :</span><span class="id"> discrete_space</span><span class="id"> T}</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> discrete_ball</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> T</span>) (<span class="id">eps</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> y</span><span class="id"> :</span><span class="gallina-kwd"> Prop</span><span class="id"> :=</span><span class="id"> x</span><span class="id"> =</span><span class="id"> y</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> discrete_ball_center</span><span class="id"> x</span> (<span class="id">eps</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> eps</span><span class="id"> -&gt;</span><span class="id"> discrete_ball</span><span class="id"> x</span><span class="id"> eps</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
+<br/>
+<span class="id">Program</span><span class="vernacular"> Definition</span><span class="id"> discrete_pseudometric_structure</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">@Uniform_isPseudoMetric</span>.<span class="id">Build</span><span class="id"> R</span> (<span class="id">discrete_topology</span><span class="id"> dsc</span>)<span class="id"> discrete_ball</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;_<span class="id"> _</span><span class="id"> _</span><span class="id"> _</span>.<br/>
+<details>
+<summary class="toggleproof">Next Obligation.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> done</span>. Qed.</div></details>
+<details>
+<summary class="toggleproof">Next Obligation.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> -&gt;</span>. Qed.</div></details>
+<details>
+<summary class="toggleproof">Next Obligation.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> -&gt;</span><span class="id"> -&gt;</span>. Qed.</div></details>
+<details>
+<summary class="toggleproof">Next Obligation.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> predeqE</span><span class="id"> =&gt;</span><span class="id"> P;</span><span class="id"> split;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> case=&gt;</span><span class="id"> e</span><span class="id"> _</span><span class="id"> leP;</span><span class="id"> move=&gt;</span><span class="id"> [a</span><span class="id"> b]</span><span class="id"> [i</span><span class="id"> _]</span><span class="id"> [-&gt;</span><span class="id"> -&gt;];</span><span class="id"> apply:</span><span class="id"> leP</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> entP;</span><span class="gallina-kwd"> exists</span><span class="id"> 1</span><span class="id"> =&gt;</span><span class="id"> //=</span><span class="id"> z</span><span class="id"> z12;</span><span class="id"> apply:</span><span class="id"> entP;</span><span class="gallina-kwd"> exists</span><span class="id"> z</span>.<span class="id">1</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> {2}z12</span><span class="id"> -surjective_pairing</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> discrete_pseudometric_structure</span>.<br/>
+<span class="vernacular">End</span><span class="id"> discrete_pseudoMetric</span>.<br/>
+<br/>
+<div class="doc">we use `discrete_topology` to equip choice types with a discrete topology </div>
+<span class="vernacular">Section</span><span class="id"> discrete_topology</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> discrete_subproof</span> (<span class="id">P</span><span class="id"> :</span><span class="id"> choiceType</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">discrete_space</span> (<span class="id">principal_filter_type</span><span class="id"> P</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> discrete_topology_type</span> (<span class="id">P</span><span class="id"> :</span><span class="gallina-kwd"> Type</span>)<span class="id"> :</span><span class="gallina-kwd"> Type</span><span class="id"> :=</span><span class="id"> P</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">P</span><span class="id"> :</span><span class="id"> choiceType</span>)<span class="id"> :=</span><span class="id"> Choice</span>.<span class="id">copy</span><br/>
+&nbsp;&nbsp;(<span class="id">discrete_topology_type</span><span class="id"> P</span>) (<span class="id">discrete_topology</span> (<span class="id">discrete_subproof</span><span class="id"> P</span>)).<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">P</span><span class="id"> :</span><span class="id"> choiceType</span>)<span class="id"> :=</span><span class="id"> Filtered</span>.<span class="id">copy</span><br/>
+&nbsp;&nbsp;(<span class="id">discrete_topology_type</span><span class="id"> P</span>) (<span class="id">discrete_topology</span> (<span class="id">discrete_subproof</span><span class="id"> P</span>)).<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span>  (<span class="id">P</span><span class="id"> :</span><span class="id"> choiceType</span>)<span class="id"> :=</span><span class="id"> Uniform</span>.<span class="id">copy</span><br/>
+&nbsp;&nbsp;(<span class="id">discrete_topology_type</span><span class="id"> P</span>) (<span class="id">discrete_topology</span> (<span class="id">discrete_subproof</span><span class="id"> P</span>)).<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">P</span><span class="id"> :</span><span class="id"> pointedType</span>)<span class="id"> :=</span><span class="id"> Pointed</span>.<span class="id">copy</span><br/>
+&nbsp;&nbsp;(<span class="id">discrete_topology_type</span><span class="id"> P</span>) (<span class="id">discrete_topology</span> (<span class="id">discrete_subproof</span><span class="id"> P</span>)).<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> R</span> (<span class="id">P</span><span class="id"> :</span><span class="id"> choiceType</span>)<span class="id"> :</span><span class="id"> @PseudoMetric</span><span class="id"> R</span><span class="id"> _</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">PseudoMetric</span>.<span class="id">copy</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">discrete_topology_type</span><span class="id"> P</span>) (<span class="id">discrete_topology</span> (<span class="id">discrete_subproof</span><span class="id"> P</span>)).<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> discrete_topology</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> discrete_space_discrete</span> (<span class="id">P</span><span class="id"> :</span><span class="id"> choiceType</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">discrete_space</span> (<span class="id">discrete_topology_type</span><span class="id"> P</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">apply/funext</span><span class="id"> =&gt;</span><span class="id"> /=</span><span class="id"> x;</span><span class="id"> apply/funext</span><span class="id"> =&gt;</span><span class="id"> A;</span><span class="id"> apply/propext;</span><span class="id"> split</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> [E</span><span class="id"> hE</span><span class="id"> EA]</span><span class="id"> _</span><span class="id"> -&gt;;</span><span class="id"> apply/EA/xsectionP/hE;</span><span class="gallina-kwd"> exists</span><span class="id"> x</span>.<br/>
+<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> h;</span><span class="gallina-kwd"> exists</span><span class="id"> diagonal;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> -[a</span><span class="id"> b]</span><span class="id"> [t</span><span class="id"> _]</span><span class="id"> [&lt;-</span><span class="id"> &lt;-]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> y</span><span class="id"> /xsectionP/=</span><span class="id"> xy;</span><span class="id"> exact:</span><span class="id"> h</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> zmodType</span>)<span class="id"> :=</span><span class="id"> isPointed</span>.<span class="id">Build</span><span class="id"> R</span><span class="id"> 0</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> ball_</span><br/>
+&nbsp;&nbsp;(<span class="id">R</span><span class="id"> :</span><span class="id"> numDomainType</span>) (<span class="id">V</span><span class="id"> :</span><span class="id"> zmodType</span>) (<span class="id">norm</span><span class="id"> :</span><span class="id"> V</span><span class="id"> -&gt;</span><span class="id"> R</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> V</span>) (<span class="id">e</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">[set</span><span class="id"> y</span><span class="id"> |</span><span class="id"> norm</span> (<span class="id">x</span><span class="id"> -</span><span class="id"> y</span>)<span class="id"> &lt;</span><span class="id"> e]</span>.<br/>
+<span class="vernacular">Arguments</span><span class="id"> ball_</span><span class="id"> {R}</span><span class="id"> {V}</span><span class="id"> norm</span><span class="id"> x</span><span class="id"> e%_R</span><span class="id"> y</span><span class="id"> /</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> subset_ball_prop_in_itv</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realDomainType</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> e</span><span class="id"> P</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">ball_</span><span class="id"> Num</span>.<span class="id">Def</span>.<span class="id">normr</span><span class="id"> x</span><span class="id"> e</span><span class="id"> `&lt;=`</span><span class="id"> P</span><span class="id"> &lt;-&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">{in</span><span class="id"> `]</span>(<span class="id">x</span><span class="id"> -</span><span class="id"> e</span>)<span class="id">,</span> (<span class="id">x</span><span class="id"> +</span><span class="id"> e</span>)<span class="id">[,</span><span class="gallina-kwd"> forall</span><span class="id"> y,</span><span class="id"> P</span><span class="id"> y}</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> split=&gt;</span><span class="id"> exP</span><span class="id"> y</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> ?in_itv</span> (<span class="id">ltr_distlC,</span><span class="id"> =^~ltr_distlC</span>)<span class="id">;</span><span class="id"> apply:</span><span class="id"> exP</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> subset_ball_prop_in_itvcc</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realDomainType</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> e</span><span class="id"> P</span><span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> e</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">ball_</span><span class="id"> Num</span>.<span class="id">Def</span>.<span class="id">normr</span><span class="id"> x</span> (<span class="id">2</span><span class="id"> *</span><span class="id"> e</span>)<span class="id"> `&lt;=`</span><span class="id"> P</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">{in</span><span class="id"> `[</span>(<span class="id">x</span><span class="id"> -</span><span class="id"> e</span>)<span class="id">,</span> (<span class="id">x</span><span class="id"> +</span><span class="id"> e</span>)<span class="id">],</span><span class="gallina-kwd"> forall</span><span class="id"> y,</span><span class="id"> P</span><span class="id"> y}</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> e_gt0</span><span class="id"> PP</span><span class="id"> y;</span><span class="id"> rewrite</span><span class="id"> in_itv/=</span><span class="id"> -ler_distlC</span><span class="id"> =&gt;</span><span class="id"> ye;</span><span class="id"> apply:</span><span class="id"> PP</span><span class="id"> =&gt;</span><span class="id"> /=</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span> (<span class="id">le_lt_trans</span><span class="id"> ye</span>)<span class="id">//</span><span class="id"> ltr_pMl//</span><span class="id"> ltr1n</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">Global</span><span class="vernacular"> Instance</span><span class="id"> ball_filter</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realDomainType</span>) (<span class="id">t</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> Filter</span><br/>
+&nbsp;&nbsp;<span class="id">[set</span><span class="id"> P</span><span class="id"> |</span><span class="gallina-kwd"> exists2</span><span class="id"> i</span><span class="id"> :</span><span class="id"> R,</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> i</span><span class="id"> &amp;</span><span class="id"> ball_</span><span class="id"> Num</span>.<span class="id">norm</span><span class="id"> t</span><span class="id"> i</span><span class="id"> `&lt;=`</span><span class="id"> P]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">apply:</span><span class="id"> Build_Filter;</span><span class="id"> [by</span><span class="gallina-kwd"> exists</span><span class="id"> 1</span><span class="id"> |</span><span class="id"> move=&gt;</span><span class="id"> P</span><span class="id"> Q</span><span class="id"> |</span><span class="id"> move=&gt;</span><span class="id"> P</span><span class="id"> Q</span><span class="id"> PQ];</span><span class="id"> rewrite</span><span class="id"> /mkset</span>.<br/>
+<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> -[x</span><span class="id"> x0</span><span class="id"> xP]</span><span class="id"> [y</span><span class="id"> ?</span><span class="id"> yQ];</span><span class="gallina-kwd"> exists</span> (<span class="id">Num</span>.<span class="id">min</span><span class="id"> x</span><span class="id"> y</span>)<span class="id">;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> lt_min</span><span class="id"> x0</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> z</span><span class="id"> tz;</span><span class="id"> split</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> xP;</span><span class="id"> rewrite</span><span class="id"> /=</span> (<span class="id">lt_le_trans</span><span class="id"> tz</span>)<span class="id"> //</span><span class="id"> ge_min</span><span class="id"> lexx</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> yQ;</span><span class="id"> rewrite</span><span class="id"> /=</span> (<span class="id">lt_le_trans</span><span class="id"> tz</span>)<span class="id"> //</span><span class="id"> ge_min</span><span class="id"> lexx</span><span class="id"> orbT</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> -[x</span><span class="id"> ?</span><span class="id"> xP];</span><span class="gallina-kwd"> exists</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> apply:</span> (<span class="id">subset_trans</span><span class="id"> xP</span>).<br/>
+Qed.</div></details>
+<br/>
+<span class="id">#[global]</span><span class="vernacular"> Hint</span><span class="id"> Extern</span><span class="id"> 0</span> (<span class="id">Filter</span><span class="id"> [set</span><span class="id"> P</span><span class="id"> |</span><span class="gallina-kwd"> exists2</span><span class="id"> i,</span><span class="id"> _</span><span class="id"> &amp;</span><span class="id"> ball_</span><span class="id"> _</span><span class="id"> _</span><span class="id"> i</span><span class="id"> `&lt;=`</span><span class="id"> P]</span>)<span class="id"> =&gt;</span><br/>
+&nbsp;&nbsp;(<span class="id">apply:</span><span class="id"> ball_filter</span>)<span class="id"> :</span><span class="id"> typeclass_instances</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> pseudoMetric_of_normedDomain</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {K</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> normedZmodType</span><span class="id"> K}</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> ball_norm_center</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>) (<span class="id">e</span><span class="id"> :</span><span class="id"> K</span>)<span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> e</span><span class="id"> -&gt;</span><span class="id"> ball_</span><span class="id"> Num</span>.<span class="id">norm</span><span class="id"> x</span><span class="id"> e</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> subrr</span><span class="id"> normr0</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> ball_norm_symmetric</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> R</span>) (<span class="id">e</span><span class="id"> :</span><span class="id"> K</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">ball_</span><span class="id"> Num</span>.<span class="id">norm</span><span class="id"> x</span><span class="id"> e</span><span class="id"> y</span><span class="id"> -&gt;</span><span class="id"> ball_</span><span class="id"> Num</span>.<span class="id">norm</span><span class="id"> y</span><span class="id"> e</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> distrC</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> ball_norm_triangle</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> z</span><span class="id"> :</span><span class="id"> R</span>) (<span class="id">e1</span><span class="id"> e2</span><span class="id"> :</span><span class="id"> K</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">ball_</span><span class="id"> Num</span>.<span class="id">norm</span><span class="id"> x</span><span class="id"> e1</span><span class="id"> y</span><span class="id"> -&gt;</span><span class="id"> ball_</span><span class="id"> Num</span>.<span class="id">norm</span><span class="id"> y</span><span class="id"> e2</span><span class="id"> z</span><span class="id"> -&gt;</span><span class="id"> ball_</span><span class="id"> Num</span>.<span class="id">norm</span><span class="id"> x</span> (<span class="id">e1</span><span class="id"> +</span><span class="id"> e2</span>)<span class="id"> z</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> /=</span><span class="id"> ?</span><span class="id"> ?;</span><span class="id"> rewrite</span><span class="id"> -</span>(<span class="id">subr0</span><span class="id"> x</span>)<span class="id"> -</span>(<span class="id">subrr</span><span class="id"> y</span>)<span class="id"> opprD</span><span class="id"> opprK</span><span class="id"> addrA</span><span class="id"> -</span>(<span class="id">addrA</span><span class="id"> _</span><span class="id"> y</span>).<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span> (<span class="id">le_lt_trans</span> (<span class="id">ler_normD</span><span class="id"> _</span><span class="id"> _</span>))<span class="id"> //</span><span class="id"> ltrD</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> nbhs_ball_normE</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">@nbhs_ball_</span><span class="id"> K</span><span class="id"> R</span><span class="id"> R</span> (<span class="id">ball_</span><span class="id"> Num</span>.<span class="id">norm</span>)<span class="id"> =</span><span class="id"> nbhs_</span> (<span class="id">entourage_</span> (<span class="id">ball_</span><span class="id"> Num</span>.<span class="id">norm</span>)).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> /nbhs_</span><span class="id"> entourage_E</span><span class="id"> predeq2E</span><span class="id"> =&gt;</span><span class="id"> x</span><span class="id"> A;</span><span class="id"> split</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> [e</span><span class="id"> egt0</span><span class="id"> sbeA]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists</span><span class="id"> [set</span><span class="id"> xy</span><span class="id"> |</span><span class="id"> ball_</span><span class="id"> Num</span>.<span class="id">norm</span><span class="id"> xy</span>.<span class="id">1</span><span class="id"> e</span><span class="id"> xy</span>.<span class="id">2];</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="gallina-kwd"> exists</span><span class="id"> e</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> r</span><span class="id"> /xsectionP;</span><span class="id"> exact:</span><span class="id"> sbeA</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> [E</span><span class="id"> [e</span><span class="id"> egt0</span><span class="id"> sbeE]</span><span class="id"> sEA];</span><span class="gallina-kwd"> exists</span><span class="id"> e</span><span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> ?</span><span class="id"> ?;</span><span class="id"> exact/sEA/xsectionP/sbeE</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> pseudoMetric_of_normedDomain</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> zmodType</span>)<span class="id"> :=</span><span class="id"> Pointed</span>.<span class="id">on</span><span class="id"> R^o</span>.<br/>
+<br/>
+<span class="id">#[short</span>(<span class="id">type=</span><span class="id">&quot;completePseudoMetricType&quot;</span>)<span class="id">]</span><br/>
+<span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> CompletePseudoMetric</span><span class="id"> R</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">{T</span><span class="id"> of</span><span class="id"> Complete</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> PseudoPointedMetric</span><span class="id"> R</span><span class="id"> T}</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> cauchy_ex</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> pseudoMetricType</span><span class="id"> R}</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">F</span><span class="id"> :</span><span class="id"> set_system</span><span class="id"> T</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">forall</span><span class="id"> eps</span><span class="id"> :</span><span class="id"> R,</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> eps</span><span class="id"> -&gt;</span><span class="gallina-kwd"> exists</span><span class="id"> x,</span><span class="id"> F</span> (<span class="id">ball</span><span class="id"> x</span><span class="id"> eps</span>).<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> cauchy_ball</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> pseudoMetricType</span><span class="id"> R}</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">F</span><span class="id"> :</span><span class="id"> set_system</span><span class="id"> T</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">forall</span><span class="id"> e,</span><span class="id"> e</span><span class="id"> &gt;</span><span class="id"> 0</span><span class="id"> -&gt;</span><span class="id"> \forall</span><span class="id"> x</span><span class="id"> &amp;</span><span class="id"> y</span><span class="id"> \near</span><span class="id"> F,</span><span class="id"> ball</span><span class="id"> x</span><span class="id"> e</span><span class="id"> y</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> cauchy_ballP</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> numDomainType</span>) (<span class="id">T</span> <span class="id"> :</span><span class="id"> pseudoMetricType</span><span class="id"> R</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">F</span><span class="id"> :</span><span class="id"> set_system</span><span class="id"> T</span>) (<span class="id">FF</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> F</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">cauchy_ball</span><span class="id"> F</span><span class="id"> &lt;-&gt;</span><span class="id"> cauchy</span><span class="id"> F</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">split=&gt;</span><span class="id"> cauchyF;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> _/posnumP[eps];</span><span class="id"> apply/cauchyF/entourage_ball</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> U;</span><span class="id"> rewrite</span><span class="id"> -entourage_ballE</span><span class="id"> =&gt;</span><span class="id"> -</span><span class="id"> [_/posnumP[eps]</span><span class="id"> xyepsU]</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> near</span><span class="id"> do</span><span class="id"> apply:</span><span class="id"> xyepsU;</span><span class="id"> apply:</span><span class="id"> cauchyF</span>.<br/>
+<span class="id">Unshelve</span>.<span class="id"> all:</span><span class="gallina-kwd"> by</span><span class="id"> end_near</span>. Qed.</div></details>
+<span class="vernacular">Arguments</span><span class="id"> cauchy_ballP</span><span class="id"> {R</span><span class="id"> T}</span><span class="id"> F</span><span class="id"> {FF}</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> cauchy_exP</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> numFieldType</span>) (<span class="id">T</span><span class="id"> :</span><span class="id"> pseudoMetricType</span><span class="id"> R</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">F</span><span class="id"> :</span><span class="id"> set_system</span><span class="id"> T</span>) (<span class="id">FF</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> F</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">cauchy_ex</span><span class="id"> F</span><span class="id"> -&gt;</span><span class="id"> cauchy</span><span class="id"> F</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> Fc</span><span class="id"> A;</span><span class="id"> rewrite</span><span class="id"> !nbhs_simpl</span><span class="id"> /=</span><span class="id"> -entourage_ballE</span><span class="id"> =&gt;</span><span class="id"> -[_/posnumP[e]</span><span class="id"> sdeA]</span>.<br/>
+<span class="id">have</span><span class="id"> /Fc</span><span class="id"> [z</span><span class="id"> /=</span><span class="id"> Fze]</span><span class="id"> :=</span><span class="id"> [gt0</span><span class="id"> of</span><span class="id"> e%:num</span><span class="id"> /</span><span class="id"> 2];</span><span class="id"> near=&gt;</span><span class="id"> x</span><span class="id"> y;</span><span class="id"> apply:</span><span class="id"> sdeA</span><span class="id"> =&gt;</span><span class="id"> /=</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply:</span> (<span class="id">@ball_splitr</span><span class="id"> _</span><span class="id"> _</span><span class="id"> z</span>)<span class="id">;</span><span class="id"> [near:</span><span class="id"> x|near:</span><span class="id"> y]</span>.<br/>
+<span class="id">Unshelve</span>.<span class="id"> all:</span><span class="gallina-kwd"> by</span><span class="id"> end_near</span>. Qed.</div></details>
+<span class="vernacular">Arguments</span><span class="id"> cauchy_exP</span><span class="id"> {R</span><span class="id"> T}</span><span class="id"> F</span><span class="id"> {FF}</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> cauchyP</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> numFieldType</span>) (<span class="id">T</span><span class="id"> :</span><span class="id"> pseudoMetricType</span><span class="id"> R</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">F</span><span class="id"> :</span><span class="id"> set_system</span><span class="id"> T</span>) (<span class="id">PF</span><span class="id"> :</span><span class="id"> ProperFilter</span><span class="id"> F</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">cauchy</span><span class="id"> F</span><span class="id"> &lt;-&gt;</span><span class="id"> cauchy_ex</span><span class="id"> F</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">split=&gt;</span><span class="id"> [Fcauchy</span><span class="id"> _/posnumP[e]</span><span class="id"> |/cauchy_exP//]</span>.<br/>
+<span class="id">near</span><span class="id"> F</span><span class="id"> =&gt;</span><span class="id"> x;</span><span class="gallina-kwd"> exists</span><span class="id"> x;</span><span class="id"> near:</span><span class="id"> x;</span><span class="id"> apply:</span> (<span class="id">@nearP_dep</span><span class="id"> _</span><span class="id"> _</span><span class="id"> F</span><span class="id"> F</span>).<br/>
+<span class="id">exact/Fcauchy/entourage_ball</span>.<br/>
+<span class="id">Unshelve</span>.<span class="id"> all:</span><span class="gallina-kwd"> by</span><span class="id"> end_near</span>. Qed.</div></details>
+<span class="vernacular">Arguments</span><span class="id"> cauchyP</span><span class="id"> {R</span><span class="id"> T}</span><span class="id"> F</span><span class="id"> {PF}</span>.<br/>
+
+      <div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/">a fork of coq2html</a></div>
+    </div>
+  </div>
+    </main>
+</body>
+</html>

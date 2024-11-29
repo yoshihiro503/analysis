@@ -1,0 +1,464 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module mathcomp.classical.classical_orders</title>
+<meta name="description" content="Documentation of Coq module mathcomp.classical.classical_orders" />
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="init()">
+
+  <main>
+    <div class="sidebar">
+      <h2>Files</h2>
+      
+    </div>
+
+  <div class="coq">
+
+    <div class="content">
+      <p><a href="./index.html">Top</a></p>
+      <h1 class="title">Module mathcomp.classical.classical_orders</h1>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> all_ssreflect</span><span class="id"> ssralg</span><span class="id"> ssrnum</span><span class="id"> interval</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> mathcomp_extra</span><span class="id"> boolp</span><span class="id"> classical_sets</span>.<br/>
+<span class="vernacular">From</span><span class="id"> HB</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> structures</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> functions</span><span class="id"> set_interval</span>.<br/>
+<br/>
+<div class="ssrdoc md">
+# classical orders
+
+This file provides some additional order theory that requires stronger
+axioms than mathcomp's own orders expect.
+```
+    same_prefix n == two elements in a product space agree up n
+   first_diff x y == the first occurrence where x n != y n, or None
+      big_lexi_le == the (countably) infinite lexicographical ordering
+   big_lexi_order == an alias for attaching this order type
+ start_with n x y == x for the first n values, then switches to y
+```
+
+</div>
+<br/>
+<span class="gallina-kwd">Set</span><span class="vernacular"> Implicit</span><span class="vernacular"> Arguments</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Strict</span><span class="vernacular"> Implicit</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Printing</span><span class="vernacular"> Implicit</span><span class="vernacular"> Defensive</span>.<br/>
+<span class="vernacular">Import</span><span class="id"> Order</span>.<span class="id">TTheory</span><span class="id"> GRing</span>.<span class="id">Theory</span><span class="id"> Num</span>.<span class="id">Def</span><span class="id"> Num</span>.<span class="id">Theory</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> classical_set_scope</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> big_lexi_order</span><span class="id"> {I</span><span class="id"> :</span><span class="id"> Type}</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> I</span><span class="id"> -&gt;</span><span class="gallina-kwd"> Type</span>)<span class="id"> :</span><span class="gallina-kwd"> Type</span><span class="id"> :=</span><span class="gallina-kwd"> forall</span><span class="id"> i,</span><span class="id"> T</span><span class="id"> i</span>.<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">I</span><span class="id"> :</span><span class="gallina-kwd"> Type</span>) (<span class="id">K</span><span class="id"> :</span><span class="id"> I</span><span class="id"> -&gt;</span><span class="id"> choiceType</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">Choice</span>.<span class="id">on</span> (<span class="id">big_lexi_order</span><span class="id"> K</span>).<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> big_lexi_le</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {K</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> -&gt;</span><span class="id"> eqType}</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> same_prefix</span><span class="id"> n</span> (<span class="id">t1</span><span class="id"> t2</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> n,</span><span class="id"> K</span><span class="id"> n</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">forall</span><span class="id"> m,</span> (<span class="id">m</span><span class="id"> &lt;</span><span class="id"> n</span>)<span class="id">%O</span><span class="id"> -&gt;</span><span class="id"> t1</span><span class="id"> m</span><span class="id"> =</span><span class="id"> t2</span><span class="id"> m</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> same_prefix0</span><span class="id"> t1</span><span class="id"> t2</span><span class="id"> :</span><span class="id"> same_prefix</span><span class="id"> 0</span><span class="id"> t1</span><span class="id"> t2</span><br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
+<span class="vernacular">Hint</span><span class="id"> Resolve</span><span class="id"> same_prefix0</span><span class="id"> :</span><span class="id"> core</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> same_prefix_sym</span><span class="id"> n</span><span class="id"> t1</span><span class="id"> t2</span><span class="id"> :</span><span class="id"> same_prefix</span><span class="id"> n</span><span class="id"> t1</span><span class="id"> t2</span><span class="id"> &lt;-&gt;</span><span class="id"> same_prefix</span><span class="id"> n</span><span class="id"> t2</span><span class="id"> t1</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /same_prefix;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> +</span><span class="id"> m</span><span class="id"> mn</span><span class="id"> =&gt;</span><span class="id"> /</span>(_<span class="id"> m</span><span class="id"> mn</span>). Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> same_prefix_leq</span><span class="id"> n</span><span class="id"> m</span><span class="id"> t1</span><span class="id"> t2</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">n</span><span class="id"> &lt;=</span><span class="id"> m</span><span class="id"> -&gt;</span><span class="id"> same_prefix</span><span class="id"> m</span><span class="id"> t1</span><span class="id"> t2</span><span class="id"> -&gt;</span><span class="id"> same_prefix</span><span class="id"> n</span><span class="id"> t1</span><span class="id"> t2</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> nm</span><span class="id"> +</span><span class="id"> r</span><span class="id"> rn;</span><span class="id"> apply</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move:</span><span class="id"> nm;</span><span class="id"> rewrite</span><span class="id"> leq_eqVlt</span><span class="id"> =&gt;</span><span class="id"> /predU1P[&lt;-//|];</span><span class="id"> exact:</span><span class="id"> ltn_trans</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> same_prefix_refl</span><span class="id"> n</span><span class="id"> x</span><span class="id"> :</span><span class="id"> same_prefix</span><span class="id"> n</span><span class="id"> x</span><span class="id"> x</span><br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> same_prefix_trans</span><span class="id"> n</span><span class="id"> x</span><span class="id"> y</span><span class="id"> z</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">same_prefix</span><span class="id"> n</span><span class="id"> x</span><span class="id"> y</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">same_prefix</span><span class="id"> n</span><span class="id"> y</span><span class="id"> z</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">same_prefix</span><span class="id"> n</span><span class="id"> x</span><span class="id"> z</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> +</span><span class="id"> +</span><span class="id"> m</span><span class="id"> mn</span><span class="id"> =&gt;</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> mn</span>)<span class="id"> -&gt;;</span><span class="id"> exact</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> first_diff</span> (<span class="id">t1</span><span class="id"> t2</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> n,</span><span class="id"> K</span><span class="id"> n</span>)<span class="id"> :</span><span class="id"> option</span><span class="id"> nat</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">xget</span><span class="id"> None</span> (<span class="id">Some</span><span class="id"> @`</span><span class="id"> [set</span><span class="id"> n</span><span class="id"> |</span><span class="id"> same_prefix</span><span class="id"> n</span><span class="id"> t1</span><span class="id"> t2</span><span class="id"> /\</span><span class="id"> t1</span><span class="id"> n</span><span class="id"> !=</span><span class="id"> t2</span><span class="id"> n]</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> first_diff_sym</span><span class="id"> t1</span><span class="id"> t2</span><span class="id"> :</span><span class="id"> first_diff</span><span class="id"> t1</span><span class="id"> t2</span><span class="id"> =</span><span class="id"> first_diff</span><span class="id"> t2</span><span class="id"> t1</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> /first_diff</span><span class="id"> /=;</span><span class="id"> congr</span> (<span class="id">xget</span><span class="id"> _</span> (<span class="id">image</span><span class="id"> _</span><span class="id"> _</span>)).<br/>
+<span class="id">under</span><span class="id"> eq_set</span><span class="id"> do</span><span class="id"> rewrite</span><span class="id"> eq_sym</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply/seteqP;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> z/=</span><span class="id"> []</span><span class="id"> /same_prefix_sym</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> first_diff_unique</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> n,</span><span class="id"> K</span><span class="id"> n</span>)<span class="id"> n</span><span class="id"> m</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">same_prefix</span><span class="id"> n</span><span class="id"> x</span><span class="id"> y</span><span class="id"> -&gt;</span><span class="id"> x</span><span class="id"> n</span><span class="id"> !=</span><span class="id"> y</span><span class="id"> n</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">same_prefix</span><span class="id"> m</span><span class="id"> x</span><span class="id"> y</span><span class="id"> -&gt;</span><span class="id"> x</span><span class="id"> m</span><span class="id"> !=</span><span class="id"> y</span><span class="id"> m</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">n</span><span class="id"> =</span><span class="id"> m</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> nfx</span><span class="id"> xyn</span><span class="id"> mfx</span><span class="id"> xym;</span><span class="id"> apply/eqP;</span><span class="id"> rewrite</span><span class="id"> eq_le</span><span class="id"> 2!leNgt;</span><span class="id"> apply/andP;</span><span class="id"> split</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply/negP</span><span class="id"> =&gt;</span><span class="id"> /nfx;</span><span class="id"> exact/eqP</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply/negP</span><span class="id"> =&gt;</span><span class="id"> /mfx;</span><span class="id"> exact/eqP</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> first_diff_SomeP</span><span class="id"> x</span><span class="id"> y</span><span class="id"> n</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">first_diff</span><span class="id"> x</span><span class="id"> y</span><span class="id"> =</span><span class="id"> Some</span><span class="id"> n</span><span class="id"> &lt;-&gt;</span><span class="id"> same_prefix</span><span class="id"> n</span><span class="id"> x</span><span class="id"> y</span><span class="id"> /\</span><span class="id"> x</span><span class="id"> n</span><span class="id"> !=</span><span class="id"> y</span><span class="id"> n</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">split</span><span class="id"> =&gt;</span><span class="id"> [|[pfx</span><span class="id"> xNy]];</span><span class="id"> rewrite</span><span class="id"> /first_diff</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> case:</span><span class="id"> xgetP=&gt;</span><span class="id"> //=</span><span class="id"> -[m</span><span class="id"> -&gt;|//]</span><span class="id"> [p</span><span class="id"> +</span><span class="id"> &lt;-[]]</span><span class="id"> =&gt;</span><span class="id"> /[swap]</span><span class="id"> -&gt;</span>.<br/>
+<span class="id">case:</span><span class="id"> xgetP</span><span class="id"> =&gt;</span><span class="id"> /=;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> /</span>(_ (<span class="id">Some</span><span class="id"> n</span>))<span class="id">/forall2NP/</span>(_<span class="id"> n</span>)<span class="id">[/not_andP[]|]</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> [m|?</span><span class="id"> []//]</span><span class="id"> -&gt;</span><span class="id"> [p</span><span class="id"> [pxy</span><span class="id"> xyp]]</span><span class="id"> &lt;-;</span><span class="id"> rewrite</span> (<span class="id">@first_diff_unique</span><span class="id"> x</span><span class="id"> y</span><span class="id"> n</span><span class="id"> p</span>).<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> first_diff_NoneP</span><span class="id"> t1</span><span class="id"> t2</span><span class="id"> :</span><span class="id"> t1</span><span class="id"> =</span><span class="id"> t2</span><span class="id"> &lt;-&gt;</span><span class="id"> first_diff</span><span class="id"> t1</span><span class="id"> t2</span><span class="id"> =</span><span class="id"> None</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> /first_diff;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> [-&gt;|]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> case:</span><span class="id"> xgetP</span><span class="id"> =&gt;</span><span class="id"> //=</span><span class="id"> -[n|//]</span><span class="id"> -&gt;</span><span class="id"> [m</span><span class="id"> []];</span><span class="id"> rewrite</span><span class="id"> eqxx</span>.<br/>
+<span class="id">case:</span><span class="id"> xgetP</span><span class="id"> =&gt;</span><span class="id"> [?</span><span class="id"> -&gt;</span><span class="id"> [i</span><span class="id"> /=]</span><span class="id"> [?]</span><span class="id"> ?</span><span class="id"> &lt;-//|/=</span><span class="id"> R</span><span class="id"> _]</span>.<br/>
+<span class="id">apply/functional_extensionality_dep</span>.<br/>
+<span class="id">suff</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> n</span><span class="id"> x,</span><span class="id"> x</span><span class="id"> &lt;</span><span class="id"> n</span><span class="id"> -&gt;</span><span class="id"> t1</span><span class="id"> x</span><span class="id"> =</span><span class="id"> t2</span><span class="id"> x</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> +</span><span class="id"> n</span><span class="id"> =&gt;</span><span class="id"> /</span>(_<span class="id"> n</span>.<span class="id">+1</span>)<span class="id">/</span>(_<span class="id"> n</span>)<span class="id">;</span><span class="id"> exact</span>.<br/>
+<span class="id">elim</span><span class="id"> =&gt;</span><span class="id"> [//|n</span><span class="id"> ih</span><span class="id"> x];</span><span class="id"> rewrite</span><span class="id"> ltnS</span><span class="id"> leq_eqVlt</span><span class="id"> =&gt;</span><span class="id"> /predU1P[-&gt;|xn];</span><span class="id"> last</span><span class="id"> exact:</span><span class="id"> ih</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> have</span><span class="id"> /forall2NP/</span>(_<span class="id"> n</span>)<span class="id">[/not_andP[//|/negP/negPn/eqP]|]</span><span class="id"> :=</span><span class="id"> R</span> (<span class="id">Some</span><span class="id"> n</span>).<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> first_diff_lt</span><span class="id"> a</span><span class="id"> x</span><span class="id"> y</span><span class="id"> n</span><span class="id"> m</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">n</span><span class="id"> &lt;</span><span class="id"> m</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">first_diff</span><span class="id"> a</span><span class="id"> x</span><span class="id"> =</span><span class="id"> Some</span><span class="id"> n</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">first_diff</span><span class="id"> a</span><span class="id"> y</span><span class="id"> =</span><span class="id"> Some</span><span class="id"> m</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">first_diff</span><span class="id"> x</span><span class="id"> y</span><span class="id"> =</span><span class="id"> Some</span><span class="id"> n</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> nm</span><span class="id"> /first_diff_SomeP</span><span class="id"> [xpfx</span><span class="id"> xE]</span><span class="id"> /first_diff_SomeP</span><span class="id"> [ypfx</span><span class="id"> yE]</span>.<br/>
+<span class="id">apply/first_diff_SomeP;</span><span class="id"> split;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -</span>(<span class="id">ypfx</span><span class="id"> _</span><span class="id"> nm</span>)<span class="id"> eq_sym</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> o</span><span class="id"> /[dup]</span><span class="id"> on</span><span class="id"> /xpfx</span><span class="id"> &lt;-;</span><span class="id"> exact/ypfx/</span>(<span class="id">ltn_trans</span><span class="id"> on</span>).<br/>
+Qed.</div></details>
+<span class="vernacular">Arguments</span><span class="id"> first_diff_lt</span><span class="id"> a</span><span class="id"> {x</span><span class="id"> y</span><span class="id"> n</span><span class="id"> m}</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> first_diff_eq</span><span class="id"> a</span><span class="id"> x</span><span class="id"> y</span><span class="id"> n</span><span class="id"> m</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">first_diff</span><span class="id"> a</span><span class="id"> x</span><span class="id"> =</span><span class="id"> Some</span><span class="id"> n</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">first_diff</span><span class="id"> a</span><span class="id"> y</span><span class="id"> =</span><span class="id"> Some</span><span class="id"> n</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">first_diff</span><span class="id"> x</span><span class="id"> y</span><span class="id"> =</span><span class="id"> Some</span><span class="id"> m</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">n</span><span class="id"> &lt;=</span><span class="id"> m</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">case/first_diff_SomeP</span><span class="id"> =&gt;</span><span class="id"> axPfx</span><span class="id"> axn</span><span class="id"> /first_diff_SomeP[ayPfx</span><span class="id"> ayn]</span>.<br/>
+<span class="id">case/first_diff_SomeP</span><span class="id"> =&gt;</span><span class="id"> xyPfx;</span><span class="id"> apply:</span><span class="id"> contraNleq</span><span class="id"> =&gt;</span><span class="id"> mn</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -</span>(<span class="id">ayPfx</span><span class="id"> _</span><span class="id"> mn</span>)<span class="id"> -</span>(<span class="id">axPfx</span><span class="id"> _</span><span class="id"> mn</span>).<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> first_diff_dfwith</span> (<span class="id">x</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> n</span><span class="id"> :</span><span class="id"> nat,</span><span class="id"> K</span><span class="id"> n</span>)<span class="id"> i</span><span class="id"> b</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">x</span><span class="id"> i</span><span class="id"> !=</span><span class="id"> b</span><span class="id"> &lt;-&gt;</span><span class="id"> first_diff</span><span class="id"> x</span> (<span class="id">dfwith</span><span class="id"> x</span><span class="id"> i</span><span class="id"> b</span>)<span class="id"> =</span><span class="id"> Some</span><span class="id"> i</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">split</span><span class="id"> =&gt;</span><span class="id"> [xBn|/first_diff_SomeP[_]];</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> dfwithin</span>.<br/>
+<span class="id">apply/first_diff_SomeP;</span><span class="id"> split;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> dfwithin</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> n</span><span class="id"> ni;</span><span class="id"> rewrite</span><span class="id"> dfwithout//</span><span class="id"> gt_eqF</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> big_lexi_le</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">R</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> n,</span><span class="id"> K</span><span class="id"> n</span><span class="id"> -&gt;</span><span class="id"> K</span><span class="id"> n</span><span class="id"> -&gt;</span><span class="id"> bool</span>) (<span class="id">t1</span><span class="id"> t2</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> n,</span><span class="id"> K</span><span class="id"> n</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">if</span><span class="id"> first_diff</span><span class="id"> t1</span><span class="id"> t2</span><span class="id"> is</span><span class="id"> Some</span><span class="id"> n</span><span class="gallina-kwd"> then</span><span class="id"> R</span><span class="id"> n</span> (<span class="id">t1</span><span class="id"> n</span>) (<span class="id">t2</span><span class="id"> n</span>)<span class="gallina-kwd"> else</span><span class="id"> true</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> big_lexi_le_reflexive</span><span class="id"> R</span><span class="id"> :</span><span class="id"> reflexive</span> (<span class="id">big_lexi_le</span><span class="id"> R</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> x;</span><span class="id"> rewrite</span><span class="id"> /big_lexi_le</span><span class="id"> /=</span><span class="id"> /first_diff</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> case:</span><span class="id"> xgetP</span><span class="id"> =&gt;</span><span class="id"> //=</span><span class="id"> -[n</span><span class="id"> _|//]</span><span class="id"> [m</span><span class="id"> []];</span><span class="id"> rewrite</span><span class="id"> eqxx</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> big_lexi_le_anti</span><span class="id"> R</span><span class="id"> :</span> (<span class="gallina-kwd">forall</span><span class="id"> n,</span><span class="id"> antisymmetric</span> (<span class="id">R</span><span class="id"> n</span>))<span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">antisymmetric</span> (<span class="id">big_lexi_le</span><span class="id"> R</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> antiR</span><span class="id"> x</span><span class="id"> y</span><span class="id"> /andP[xy</span><span class="id"> yx];</span><span class="id"> apply/first_diff_NoneP;</span><span class="id"> move:</span><span class="id"> xy</span><span class="id"> yx</span>.<br/>
+<span class="id">rewrite</span><span class="id"> /big_lexi_le</span><span class="id"> first_diff_sym</span>.<br/>
+<span class="id">case</span><span class="id"> E</span><span class="id"> :</span> (<span class="id">first_diff</span><span class="id"> y</span><span class="id"> x</span>)<span class="id"> =&gt;</span><span class="id"> [n|]//</span><span class="id"> Rxy</span><span class="id"> Ryx</span>.<br/>
+<span class="id">case/first_diff_SomeP</span><span class="id"> :</span><span class="id"> E</span><span class="id"> =&gt;</span><span class="id"> _</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> contra_neqP</span><span class="id"> =&gt;</span><span class="id"> _;</span><span class="id"> apply/antiR;</span><span class="id"> rewrite</span><span class="id"> Ryx</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> big_lexi_le_trans</span><span class="id"> R</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="gallina-kwd">forall</span><span class="id"> n,</span><span class="id"> transitive</span> (<span class="id">R</span><span class="id"> n</span>))<span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;(<span class="gallina-kwd">forall</span><span class="id"> n,</span><span class="id"> antisymmetric</span> (<span class="id">R</span><span class="id"> n</span>))<span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">transitive</span> (<span class="id">big_lexi_le</span><span class="id"> R</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> Rtrans</span><span class="id"> Ranti</span><span class="id"> y</span><span class="id"> x</span><span class="id"> z;</span><span class="id"> rewrite</span><span class="id"> /big_lexi_le</span><span class="id"> /=</span>.<br/>
+<span class="id">case</span><span class="id"> Ep</span><span class="id"> :</span> (<span class="id">first_diff</span><span class="id"> x</span><span class="id"> y</span>)<span class="id"> =&gt;</span><span class="id"> [p|];</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> move/first_diff_NoneP</span><span class="id"> :</span><span class="id"> Ep</span><span class="id"> -&gt;</span>.<br/>
+<span class="id">case</span><span class="id"> Er</span><span class="id"> :</span> (<span class="id">first_diff</span><span class="id"> x</span><span class="id"> z</span>)<span class="id"> =&gt;</span><span class="id"> [r|];</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> move/first_diff_NoneP</span><span class="id"> :</span><span class="id"> Er</span><span class="id"> -&gt;</span>.<br/>
+<span class="id">case</span><span class="id"> Eq</span><span class="id"> :</span> (<span class="id">first_diff</span><span class="id"> y</span><span class="id"> z</span>)<span class="id"> =&gt;</span><span class="id"> [q|];</span><span class="id"> first</span><span class="id"> last</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move:</span><span class="id"> Ep</span><span class="id"> Er;</span><span class="id"> move/first_diff_NoneP:</span><span class="id"> Eq</span><span class="id"> =&gt;</span><span class="id"> -&gt;</span><span class="id"> -&gt;</span><span class="id"> [-&gt;]</span>.<br/>
+<span class="id">have</span><span class="id"> [pq|qp|pqE]:=</span><span class="id"> ltgtP</span><span class="id"> p</span><span class="id"> q</span>.<br/>
+<span class="id">-</span><span class="id"> move:</span><span class="id"> Er</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> (<span class="id">first_diff_lt</span><span class="id"> y</span><span class="id"> pq</span>)<span class="id">//</span><span class="id"> 1?first_diff_sym//</span><span class="id"> =&gt;</span><span class="id"> -[&lt;-]</span><span class="id"> ?</span><span class="id"> _</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> case/first_diff_SomeP</span><span class="id"> :</span><span class="id"> Eq</span><span class="id"> =&gt;</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> pq</span>)<span class="id"> &lt;-</span>.<br/>
+<span class="id">-</span><span class="id"> move:</span><span class="id"> Er</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> first_diff_sym</span> (<span class="id">first_diff_lt</span><span class="id"> y</span><span class="id"> qp</span>)<span class="id">//</span><span class="id"> 1?first_diff_sym//</span><span class="id"> =&gt;</span><span class="id"> -[&lt;-]</span><span class="id"> _</span><span class="id"> ?</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> case/first_diff_SomeP:</span><span class="id"> Ep</span><span class="id"> =&gt;</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> qp</span>)<span class="id"> -&gt;</span>.<br/>
+<span class="id">-</span><span class="id"> move:</span><span class="id"> Ep</span><span class="id"> Eq;</span><span class="id"> rewrite</span><span class="id"> pqE</span><span class="id"> =&gt;</span><span class="id"> Eqx</span><span class="id"> Eqz</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> first_diff_sym</span><span class="gallina-kwd"> in</span><span class="id"> Eqx;</span><span class="id"> have</span><span class="id"> :=</span><span class="id"> first_diff_eq</span><span class="id"> Eqx</span><span class="id"> Eqz</span><span class="id"> Er</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> leq_eqVlt</span><span class="id"> =&gt;</span><span class="id"> /predU1P[-&gt;|qr];</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> Rtrans</span>.<br/>
+&nbsp;&nbsp;<span class="id">case/first_diff_SomeP</span><span class="id"> :</span><span class="id"> Er</span><span class="id"> =&gt;</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> qr</span>)<span class="id"> -&gt;</span><span class="id"> _</span><span class="id"> qzy</span><span class="id"> qyz</span>.<br/>
+&nbsp;&nbsp;<span class="id">case/first_diff_SomeP</span><span class="id"> :</span><span class="id"> Eqz</span><span class="id"> =&gt;</span><span class="id"> _;</span><span class="id"> apply:</span><span class="id"> contra_neqP</span><span class="id"> =&gt;</span><span class="id"> _</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply/Ranti/andP;</span><span class="id"> split</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> big_lexi_le_total</span><span class="id"> R</span><span class="id"> :</span> (<span class="gallina-kwd">forall</span><span class="id"> n,</span><span class="id"> total</span> (<span class="id">R</span><span class="id"> n</span>))<span class="id"> -&gt;</span><span class="id"> total</span> (<span class="id">big_lexi_le</span><span class="id"> R</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> Rtotal</span><span class="id"> x</span><span class="id"> y</span>.<br/>
+<span class="id">case</span><span class="id"> E</span><span class="id"> :</span> (<span class="id">first_diff</span><span class="id"> x</span><span class="id"> y</span>)<span class="id"> =&gt;</span><span class="id"> [n|];</span><span class="id"> first</span><span class="id"> last</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move/first_diff_NoneP</span><span class="id"> :</span><span class="id"> E</span><span class="id"> -&gt;;</span><span class="id"> rewrite</span><span class="id"> big_lexi_le_reflexive</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /big_lexi_le</span><span class="id"> E</span><span class="id"> first_diff_sym</span><span class="id"> E;</span><span class="id"> exact:</span><span class="id"> Rtotal</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> start_with</span><span class="id"> n</span> (<span class="id">t1</span><span class="id"> t2</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> n,</span><span class="id"> K</span><span class="id"> n</span>) (<span class="id">i</span><span class="id"> :</span><span class="id"> nat</span>)<span class="id"> :</span><span class="id"> K</span><span class="id"> i</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">if</span> (<span class="id">i</span><span class="id"> &lt;</span><span class="id"> n</span>)<span class="id">%O</span><span class="gallina-kwd"> then</span><span class="id"> t1</span><span class="id"> i</span><span class="gallina-kwd"> else</span><span class="id"> t2</span><span class="id"> i</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> start_with_prefix</span><span class="id"> n</span><span class="id"> x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> same_prefix</span><span class="id"> n</span><span class="id"> x</span> (<span class="id">start_with</span><span class="id"> n</span><span class="id"> x</span><span class="id"> y</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> r</span><span class="id"> rn;</span><span class="id"> rewrite</span><span class="id"> /start_with</span><span class="id"> rn</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> big_lexi_le</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> big_lexi_porder</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {d}</span><span class="id"> {K</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> -&gt;</span><span class="id"> porderType</span><span class="id"> d}</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> Rn</span><span class="id"> n</span> (<span class="id">k1</span><span class="id"> k2</span><span class="id"> :</span><span class="id"> K</span><span class="id"> n</span>)<span class="id"> :=</span> (<span class="id">k1</span><span class="id"> &lt;=</span><span class="id"> k2</span>)<span class="id">%O</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> big_lexi_ord_reflexive</span><span class="id"> :</span><span class="id"> reflexive</span> (<span class="id">big_lexi_le</span><span class="id"> Rn</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact:</span><span class="id"> big_lexi_le_reflexive</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> big_lexi_ord_anti</span><span class="id"> :</span><span class="id"> antisymmetric</span> (<span class="id">big_lexi_le</span><span class="id"> Rn</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> apply:</span><span class="id"> big_lexi_le_anti</span><span class="id"> =&gt;</span><span class="id"> n;</span><span class="id"> exact:</span><span class="id"> le_anti</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> big_lexi_ord_trans</span><span class="id"> :</span><span class="id"> transitive</span> (<span class="id">big_lexi_le</span><span class="id"> Rn</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> apply:</span><span class="id"> big_lexi_le_trans</span><span class="id"> =&gt;</span><span class="id"> n;</span><span class="id"> [exact:</span><span class="id"> le_trans|exact:</span><span class="id"> le_anti]</span>. Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Order</span>.<span class="id">Le_isPOrder</span>.<span class="id">Build</span><span class="id"> d</span> (<span class="id">big_lexi_order</span><span class="id"> K</span>)<br/>
+&nbsp;&nbsp;<span class="id">big_lexi_ord_reflexive</span><span class="id"> big_lexi_ord_anti</span><span class="id"> big_lexi_ord_trans</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> leEbig_lexi_order</span> (<span class="id">a</span><span class="id"> b</span><span class="id"> :</span><span class="id"> big_lexi_order</span><span class="id"> K</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="id">a</span><span class="id"> &lt;=</span><span class="id"> b</span>)<span class="id">%O</span><span class="id"> =</span><span class="gallina-kwd"> if</span><span class="id"> first_diff</span><span class="id"> a</span><span class="id"> b</span><span class="id"> is</span><span class="id"> Some</span><span class="id"> n</span><span class="gallina-kwd"> then</span> (<span class="id">a</span><span class="id"> n</span><span class="id"> &lt;=</span><span class="id"> b</span><span class="id"> n</span>)<span class="id">%O</span><span class="gallina-kwd"> else</span><span class="id"> true</span>.<br/>
+<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> big_lexi_porder</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> big_lexi_total</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {d}</span><span class="id"> {K</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> -&gt;</span><span class="id"> orderType</span><span class="id"> d}</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> big_lexi_ord_total</span><span class="id"> :</span><span class="id"> total</span> (<span class="id">@Order</span>.<span class="id">le</span><span class="id"> _</span> (<span class="id">big_lexi_order</span><span class="id"> K</span>)).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> apply:</span><span class="id"> big_lexi_le_total</span><span class="id"> =&gt;</span><span class="id"> ?;</span><span class="id"> exact:</span><span class="id"> le_total</span>. Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Order</span>.<span class="id">POrder_isTotal</span>.<span class="id">Build</span><span class="id"> _</span><br/>
+&nbsp;&nbsp;(<span class="id">big_lexi_order</span><span class="id"> K</span>)<span class="id"> big_lexi_ord_total</span>.<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> big_lexi_total</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> big_lexi_bottom</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {d}</span><span class="id"> {K</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> -&gt;</span><span class="id"> bPOrderType</span><span class="id"> d}</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> b</span><span class="id"> :</span><span class="id"> big_lexi_order</span><span class="id"> K</span><span class="id"> :=</span> (<span class="id">fun=&gt;</span><span class="id"> \bot</span>)<span class="id">%O</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> big_lex_bot</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> big_lexi_order</span><span class="id"> K</span>)<span class="id"> :</span> (<span class="id">b</span><span class="id"> &lt;=</span><span class="id"> x</span>)<span class="id">%O</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> leEbig_lexi_order;</span><span class="id"> case:</span><span class="id"> first_diff</span><span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> ?;</span><span class="id"> exact:</span><span class="id"> Order</span>.<span class="id">le0x</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> @Order</span>.<span class="id">hasBottom</span>.<span class="id">Build</span><span class="id"> _</span><br/>
+&nbsp;&nbsp;(<span class="id">big_lexi_order</span><span class="id"> K</span>)<span class="id"> b</span><span class="id"> big_lex_bot</span>.<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> big_lexi_bottom</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> big_lexi_top</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {d}</span><span class="id"> {K</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> -&gt;</span><span class="id"> tPOrderType</span><span class="id"> d}</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> t</span><span class="id"> :</span><span class="id"> big_lexi_order</span><span class="id"> K</span><span class="id"> :=</span> (<span class="id">fun=&gt;</span><span class="id"> \top</span>)<span class="id">%O</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> big_lex_top</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> big_lexi_order</span><span class="id"> K</span>)<span class="id"> :</span> (<span class="id">x</span><span class="id"> &lt;=</span><span class="id"> t</span>)<span class="id">%O</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> leEbig_lexi_order;</span><span class="id"> case:</span><span class="id"> first_diff</span><span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> ?;</span><span class="id"> exact:</span><span class="id"> Order</span>.<span class="id">lex1</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> @Order</span>.<span class="id">hasTop</span>.<span class="id">Build</span><span class="id"> _</span><br/>
+&nbsp;&nbsp;(<span class="id">big_lexi_order</span><span class="id"> K</span>)<span class="id"> t</span><span class="id"> big_lex_top</span>.<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> big_lexi_top</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> big_lexi_intervals</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {d}</span><span class="id"> {K</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> -&gt;</span><span class="id"> orderType</span><span class="id"> d}</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> big_lexi_order_prefix_lt</span> (<span class="id">b</span><span class="id"> a</span><span class="id"> x:</span><span class="id"> big_lexi_order</span><span class="id"> K</span>)<span class="id"> n</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="id">a</span><span class="id"> &lt;</span><span class="id"> b</span>)<span class="id">%O</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">first_diff</span><span class="id"> a</span><span class="id"> b</span><span class="id"> =</span><span class="id"> Some</span><span class="id"> n</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">same_prefix</span><span class="id"> n</span>.<span class="id">+1</span><span class="id"> x</span><span class="id"> b</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;(<span class="id">a</span><span class="id"> &lt;</span><span class="id"> x</span>)<span class="id">%O</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> +</span><span class="id"> /[dup]</span><span class="id"> abD</span><span class="id"> /first_diff_SomeP[pfa</span><span class="id"> abN]</span>.<br/>
+<span class="id">case</span><span class="id"> E1</span><span class="id"> :</span> (<span class="id">first_diff</span><span class="id"> a</span><span class="id"> x</span>)<span class="id"> =&gt;</span><span class="id"> [m|];</span><span class="id"> first</span><span class="id"> last</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move/first_diff_NoneP</span><span class="id"> :</span><span class="id"> E1</span><span class="id"> &lt;-</span><span class="id"> =&gt;</span><span class="id"> _/</span>(_<span class="id"> n</span> (<span class="id">ltnSn</span><span class="id"> _</span>))<span class="id">/eqP/negPn;</span><span class="id"> rewrite</span><span class="id"> abN</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> ab</span><span class="id"> pfx;</span><span class="id"> rewrite</span><span class="id"> lt_neqAle;</span><span class="id"> apply/andP;</span><span class="id"> split</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply/eqP</span><span class="id"> =&gt;</span><span class="id"> /first_diff_NoneP;</span><span class="id"> rewrite</span><span class="id"> E1</span>.<br/>
+<span class="id">move:</span><span class="id"> ab;</span><span class="id"> rewrite</span><span class="id"> lt_neqAle</span><span class="id"> =&gt;</span><span class="id"> /andP[ba]</span>.<br/>
+<span class="id">rewrite</span><span class="id"> 2!leEbig_lexi_order</span><span class="id"> E1</span><span class="id"> abD</span>.<br/>
+<span class="id">suff</span><span class="id"> :</span><span class="id"> n</span><span class="id"> =</span><span class="id"> m</span><span class="gallina-kwd"> by</span><span class="id"> have</span><span class="id"> :=</span><span class="id"> pfx</span><span class="id"> n</span> (<span class="id">ltnSn</span><span class="id"> _</span>)<span class="id"> =&gt;</span><span class="id"> /[swap]</span><span class="id"> -&gt;</span><span class="id"> -&gt;</span>.<br/>
+<span class="id">apply:</span> (<span class="id">@first_diff_unique</span><span class="id"> _</span><span class="id"> a</span><span class="id"> x</span>)<span class="id"> =&gt;</span><span class="id"> //=;</span><span class="id"> [|</span><span class="id"> |by</span><span class="id"> case/first_diff_SomeP</span><span class="id"> :</span><span class="id"> E1</span>..<span class="id">]</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> apply/</span>(<span class="id">same_prefix_trans</span><span class="id"> pfa</span>)<span class="id">/same_prefix_sym;</span><span class="id"> exact:</span><span class="id"> same_prefix_leq</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span> (<span class="id">pfx</span><span class="id"> n</span> (<span class="id">ltnSn</span><span class="id"> _</span>)).<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> big_lexi_order_prefix_gt</span> (<span class="id">b</span><span class="id"> a</span><span class="id"> x</span><span class="id"> :</span><span class="id"> big_lexi_order</span><span class="id"> K</span>)<span class="id"> n</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="id">b</span><span class="id"> &lt;</span><span class="id"> a</span>)<span class="id">%O</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">first_diff</span><span class="id"> a</span><span class="id"> b</span><span class="id"> =</span><span class="id"> Some</span><span class="id"> n</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">same_prefix</span><span class="id"> n</span>.<span class="id">+1</span><span class="id"> x</span><span class="id"> b</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;(<span class="id">x</span><span class="id"> &lt;</span><span class="id"> a</span>)<span class="id">%O</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> +</span><span class="id"> /[dup]</span><span class="id"> abD</span><span class="id"> /first_diff_SomeP[pfa</span><span class="id"> /eqP</span><span class="id"> abN]</span>.<br/>
+<span class="id">case</span><span class="id"> E1</span><span class="id"> :</span> (<span class="id">first_diff</span><span class="id"> x</span><span class="id"> a</span>)<span class="id"> =&gt;</span><span class="id"> [m|];</span><span class="id"> first</span><span class="id"> last</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move/first_diff_NoneP</span><span class="id"> :</span><span class="id"> E1</span><span class="id"> -&gt;</span><span class="id"> =&gt;</span><span class="id"> _</span><span class="id"> /</span>(_<span class="id"> n</span> (<span class="id">ltnSn</span><span class="id"> _</span>)).<br/>
+<span class="id">move=&gt;</span><span class="id"> ab</span><span class="id"> pfx;</span><span class="id"> rewrite</span><span class="id"> lt_neqAle;</span><span class="id"> apply/andP;</span><span class="id"> split</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply/negP</span><span class="id"> =&gt;</span><span class="id"> /eqP/first_diff_NoneP;</span><span class="id"> rewrite</span><span class="id"> E1</span>.<br/>
+<span class="id">move:</span><span class="id"> ab;</span><span class="id"> rewrite</span><span class="id"> lt_neqAle</span><span class="id"> =&gt;</span><span class="id"> /andP[ba]</span>.<br/>
+<span class="id">rewrite</span><span class="id"> 2!leEbig_lexi_order</span> (<span class="id">@first_diff_sym</span><span class="id"> _</span><span class="id"> b</span><span class="id"> a</span>)<span class="id"> E1</span><span class="id"> abD</span>.<br/>
+<span class="id">suff</span><span class="id"> :</span><span class="id"> n</span><span class="id"> =</span><span class="id"> m</span><span class="gallina-kwd"> by</span><span class="id"> have</span><span class="id"> :=</span><span class="id"> pfx</span><span class="id"> n</span> (<span class="id">ltnSn</span><span class="id"> _</span>)<span class="id"> =&gt;</span><span class="id"> /[swap]</span><span class="id"> -&gt;</span><span class="id"> -&gt;</span>.<br/>
+<span class="id">apply:</span> (<span class="id">@first_diff_unique</span><span class="id"> _</span><span class="id"> x</span><span class="id"> a</span>)<span class="id"> =&gt;</span><span class="id"> //=;</span><span class="id"> [|</span><span class="id"> |by</span><span class="id"> case/first_diff_SomeP</span><span class="id"> :</span><span class="id"> E1</span>..<span class="id">]</span>.<br/>
+<span class="id">-</span><span class="id"> apply/same_prefix_sym/</span>(<span class="id">same_prefix_trans</span><span class="id"> pfa</span>)<span class="id">/same_prefix_sym</span>.<br/>
+&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> same_prefix_leq</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span> (<span class="id">pfx</span><span class="id"> n</span> (<span class="id">ltnSn</span><span class="id"> _</span>))<span class="id"> eq_sym;</span><span class="id"> exact/eqP</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> big_lexi_order_between</span> (<span class="id">a</span><span class="id"> x</span><span class="id"> b</span><span class="id"> :</span><span class="id"> big_lexi_order</span><span class="id"> K</span>)<span class="id"> n</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="id">a</span><span class="id"> &lt;=</span><span class="id"> x</span><span class="id"> &lt;=</span><span class="id"> b</span>)<span class="id">%O</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">same_prefix</span><span class="id"> n</span><span class="id"> a</span><span class="id"> b</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">same_prefix</span><span class="id"> n</span><span class="id"> x</span><span class="id"> a</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> axb;</span><span class="id"> elim:</span><span class="id"> n</span><span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> n</span><span class="id"> IH</span><span class="id"> pfxSn</span><span class="id"> m</span><span class="id"> mSn</span>.<br/>
+<span class="id">have</span><span class="id"> pfxA</span><span class="id"> :</span><span class="id"> same_prefix</span><span class="id"> n</span><span class="id"> a</span><span class="id"> x</span>.<br/>
+&nbsp;&nbsp;<span class="id">exact/same_prefix_sym/IH/</span>(<span class="id">same_prefix_leq</span><span class="id"> _</span> <span class="id"> pfxSn</span>).<br/>
+<span class="id">have</span><span class="id"> pfxB</span><span class="id"> :</span><span class="id"> same_prefix</span><span class="id"> n</span><span class="id"> x</span><span class="id"> b</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span> (<span class="id">@same_prefix_trans</span><span class="id"> _</span><span class="id"> n</span><span class="id"> x</span><span class="id"> a</span><span class="id"> b</span>)<span class="id">;</span><span class="id"> first</span><span class="id"> exact/same_prefix_sym</span>.<br/>
+&nbsp;&nbsp;<span class="id">exact:</span> (<span class="id">same_prefix_leq</span><span class="id"> _</span> <span class="id"> pfxSn</span>).<br/>
+<span class="id">move:</span><span class="id"> mSn;</span><span class="id"> rewrite</span><span class="id"> ltEnat/=</span><span class="id"> ltnS</span><span class="id"> leq_eqVlt</span><span class="id"> =&gt;</span><span class="id"> /predU1P[-&gt;|];</span><span class="id"> first</span><span class="id"> last</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move:</span><span class="id"> pfxA;</span><span class="id"> rewrite</span><span class="id"> same_prefix_sym;</span><span class="id"> exact</span>.<br/>
+<span class="id">apply:</span><span class="id"> le_anti;</span><span class="id"> apply/andP;</span><span class="id"> split</span>.<br/>
+&nbsp;&nbsp;<span class="id">case/andP:</span><span class="id"> axb</span><span class="id"> =&gt;</span><span class="id"> ?</span><span class="id"> +;</span><span class="id"> rewrite</span><span class="id"> leEbig_lexi_order</span> (<span class="id">pfxSn</span><span class="id"> n</span> (<span class="id">ltnSn</span><span class="id"> _</span>)).<br/>
+&nbsp;&nbsp;<span class="id">case</span><span class="id"> E</span><span class="id"> :</span> (<span class="id">first_diff</span><span class="id"> x</span><span class="id"> b</span>)<span class="id"> =&gt;</span><span class="id"> [r|];</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> move/first_diff_NoneP</span><span class="id"> :</span><span class="id"> E</span><span class="id"> -&gt;</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> xrb;</span><span class="id"> have</span><span class="id"> :</span><span class="id"> n</span><span class="id"> &lt;=</span><span class="id"> r</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> leqNgt;</span><span class="id"> apply/negP=&gt;</span><span class="id"> /[dup]</span><span class="id"> /pfxB</span><span class="id"> xbE</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> case/first_diff_SomeP</span><span class="id"> :</span><span class="id"> E</span><span class="id"> =&gt;</span><span class="id"> _;</span><span class="id"> rewrite</span><span class="id"> xbE</span><span class="id"> eqxx</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> leq_eqVlt</span><span class="id"> =&gt;</span><span class="id"> /predU1P[-&gt;//|nr]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> case/first_diff_SomeP</span><span class="id"> :</span><span class="id"> E</span><span class="id"> =&gt;</span><span class="id"> /</span>(_<span class="id"> n</span><span class="id"> nr</span>)<span class="id"> -&gt;</span>.<br/>
+<span class="id">case/andP</span><span class="id"> :</span><span class="id"> axb</span><span class="id"> =&gt;</span><span class="id"> +</span><span class="id"> ?;</span><span class="id"> rewrite</span><span class="id"> leEbig_lexi_order</span>.<br/>
+<span class="id">case</span><span class="id"> E</span><span class="id"> :</span> (<span class="id">first_diff</span><span class="id"> a</span><span class="id"> x</span>)<span class="id"> =&gt;</span><span class="id"> [r|];</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> move/first_diff_NoneP</span><span class="id"> :</span><span class="id"> E</span><span class="id"> =&gt;</span><span class="id"> &lt;-</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> xrb</span>.<br/>
+<span class="id">have</span><span class="id"> :</span><span class="id"> n</span><span class="id"> &lt;=</span><span class="id"> r</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> leqNgt;</span><span class="id"> apply/negP</span><span class="id"> =&gt;</span><span class="id"> /[dup]</span><span class="id"> /pfxA</span><span class="id"> xbE</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> case/first_diff_SomeP</span><span class="id"> :</span><span class="id"> E</span><span class="id"> =&gt;</span><span class="id"> _;</span><span class="id"> rewrite</span><span class="id"> xbE</span><span class="id"> eqxx</span>.<br/>
+<span class="id">rewrite</span><span class="id"> leq_eqVlt</span><span class="id"> =&gt;</span><span class="id"> /predU1P[-&gt;//|nr]</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> case/first_diff_SomeP</span><span class="id"> :</span><span class="id"> E</span><span class="id"> =&gt;</span><span class="id"> /</span>(_<span class="id"> n</span><span class="id"> nr</span>)<span class="id"> -&gt;</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> big_lexi_order_interval_prefix</span> (<span class="id">i</span><span class="id"> :</span><span class="id"> interval</span> (<span class="id">big_lexi_order</span><span class="id"> K</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">x</span><span class="id"> :</span><span class="id"> big_lexi_order</span><span class="id"> K</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">itv_open_ends</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> x</span><span class="id"> \in</span><span class="id"> i</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists</span><span class="id"> n,</span><span class="id"> same_prefix</span><span class="id"> n</span><span class="id"> x</span><span class="id"> `&lt;=`</span><span class="id"> [set`</span><span class="id"> i]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move:</span><span class="id"> i;</span><span class="id"> case=&gt;</span><span class="id"> [][[]l|[]]</span><span class="id"> [[]r|[]]</span><span class="id"> [][];</span><span class="id"> rewrite</span><span class="id"> ?in_itv</span><span class="id"> /=</span><span class="id"> ?andbT</span>.<br/>
+<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> /andP[lx</span><span class="id"> xr]</span>.<br/>
+&nbsp;&nbsp;<span class="id">case</span><span class="id"> E1</span><span class="id"> :</span> (<span class="id">first_diff</span><span class="id"> l</span><span class="id"> x</span>)<span class="id"> =&gt;</span><span class="id"> [m|];</span><span class="id"> first</span><span class="id"> last</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move:</span><span class="id"> lx;</span><span class="id"> move/first_diff_NoneP</span><span class="id"> :</span><span class="id"> E1</span><span class="id"> -&gt;;</span><span class="id"> rewrite</span><span class="id"> bnd_simp</span>.<br/>
+&nbsp;&nbsp;<span class="id">case</span><span class="id"> E2</span><span class="id"> :</span> (<span class="id">first_diff</span><span class="id"> x</span><span class="id"> r</span>)<span class="id"> =&gt;</span><span class="id"> [n|];</span><span class="id"> first</span><span class="id"> last</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move:</span><span class="id"> xr;</span><span class="id"> move/first_diff_NoneP</span><span class="id"> :</span><span class="id"> E2</span><span class="id"> -&gt;;</span><span class="id"> rewrite</span><span class="id"> bnd_simp</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists</span> (<span class="id">Order</span>.<span class="id">max</span><span class="id"> n</span><span class="id"> m</span>).<span class="id">+1</span><span class="id"> =&gt;</span><span class="id"> p</span><span class="id"> xppfx;</span><span class="id"> rewrite</span><span class="id"> set_itvE</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply/andP;</span><span class="id"> split</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply:</span> (<span class="id">big_lexi_order_prefix_lt</span><span class="id"> lx</span><span class="id"> E1</span>)<span class="id"> =&gt;</span><span class="id"> w</span><span class="id"> wm;</span><span class="id"> apply/esym/xppfx</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move/ltnSE/leq_ltn_trans</span><span class="id"> :</span><span class="id"> wm;</span><span class="id"> apply;</span><span class="id"> rewrite</span><span class="id"> ltnS</span><span class="id"> leq_max</span><span class="id"> leqnn</span><span class="id"> orbT</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> first_diff_sym</span><span class="gallina-kwd"> in</span><span class="id"> E2</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span> (<span class="id">big_lexi_order_prefix_gt</span><span class="id"> xr</span><span class="id"> E2</span>)<span class="id"> =&gt;</span><span class="id"> w</span><span class="id"> wm;</span><span class="id"> apply/esym/xppfx</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move/ltnSE/leq_ltn_trans</span><span class="id"> :</span><span class="id"> wm;</span><span class="id"> apply;</span><span class="id"> rewrite</span><span class="id"> ltnS</span><span class="id"> leq_max</span><span class="id"> leqnn</span>.<br/>
+<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> lx</span>.<br/>
+&nbsp;&nbsp;<span class="id">case</span><span class="id"> E1</span><span class="id"> :</span> (<span class="id">first_diff</span><span class="id"> l</span><span class="id"> x</span>)<span class="id"> =&gt;</span><span class="id"> [m|];</span><span class="id"> first</span><span class="id"> last</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move:</span><span class="id"> lx;</span><span class="id"> move/first_diff_NoneP</span><span class="id"> :</span><span class="id"> E1</span><span class="id"> -&gt;;</span><span class="id"> rewrite</span><span class="id"> bnd_simp</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists</span><span class="id"> m</span>.<span class="id">+1</span><span class="id"> =&gt;</span><span class="id"> p</span><span class="id"> xppfx;</span><span class="id"> rewrite</span><span class="id"> set_itvE</span><span class="id"> /=</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span> (<span class="id">big_lexi_order_prefix_lt</span><span class="id"> lx</span><span class="id"> E1</span>)<span class="id"> =&gt;</span><span class="id"> w</span><span class="id"> wm;</span><span class="id"> exact/esym/xppfx</span>.<br/>
+<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> xr</span>.<br/>
+&nbsp;&nbsp;<span class="id">case</span><span class="id"> E2</span><span class="id"> :</span> (<span class="id">first_diff</span><span class="id"> x</span><span class="id"> r</span>)<span class="id"> =&gt;</span><span class="id"> [n|];</span><span class="id"> first</span><span class="id"> last</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move:</span><span class="id"> xr;</span><span class="id"> move/first_diff_NoneP</span><span class="id"> :</span><span class="id"> E2</span><span class="id"> -&gt;;</span><span class="id"> rewrite</span><span class="id"> bnd_simp</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists</span><span class="id"> n</span>.<span class="id">+1;</span><span class="id"> rewrite</span><span class="id"> first_diff_sym</span><span class="gallina-kwd"> in</span><span class="id"> E2</span><span class="id"> =&gt;</span><span class="id"> p</span><span class="id"> xppfx</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> set_itvE</span><span class="id"> /=</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span> (<span class="id">big_lexi_order_prefix_gt</span><span class="id"> xr</span><span class="id"> E2</span>)<span class="id"> =&gt;</span><span class="id"> w</span><span class="id"> wm;</span><span class="id"> exact/esym/xppfx</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> _;</span><span class="gallina-kwd"> exists</span><span class="id"> 0</span><span class="id"> =&gt;</span><span class="id"> ?</span><span class="id"> ?;</span><span class="id"> rewrite</span><span class="id"> set_itvE</span>.<br/>
+Qed.</div></details>
+<span class="vernacular">End</span><span class="id"> big_lexi_intervals</span>.<br/>
+
+      <div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/">a fork of coq2html</a></div>
+    </div>
+  </div>
+    </main>
+</body>
+</html>
