@@ -149,13 +149,6 @@ Qed.</div></details>
 <span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> cvg_cluster</span><span class="id"> clsAp_q;</span><span class="id"> apply:</span><span class="id"> cvg_within</span>.<br/>
 Qed.</div></details>
 <br/>
-<span class="vernacular">Lemma</span><span class="id"> discrete_hausdorff</span><span class="id"> {dsc</span><span class="id"> :</span><span class="id"> discrete_space</span><span class="id"> T}</span><span class="id"> :</span><span class="id"> hausdorff_space</span>.<br/>
-<details>
-<summary class="toggleproof">Proof.</summary>
-<div class="proofscript">
-<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> p</span><span class="id"> q</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> _</span> (<span class="id">discrete_set1</span><span class="id"> p</span>) (<span class="id">discrete_set1</span><span class="id"> q</span>))<span class="id"> []</span><span class="id"> //</span><span class="id"> x</span><span class="id"> []</span><span class="id"> -&gt;</span><span class="id"> -&gt;</span>.<br/>
-Qed.</div></details>
-<br/>
 <span class="vernacular">Lemma</span><span class="id"> compact_cluster_set1</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> T</span>)<span class="id"> F</span><span class="id"> V</span><span class="id"> :</span><br/>
 &nbsp;&nbsp;<span class="id">hausdorff_space</span><span class="id"> -&gt;</span><span class="id"> compact</span><span class="id"> V</span><span class="id"> -&gt;</span><span class="id"> nbhs</span><span class="id"> x</span><span class="id"> V</span><span class="id"> -&gt;</span><br/>
 &nbsp;&nbsp;<span class="id">ProperFilter</span><span class="id"> F</span><span class="id"> -&gt;</span><span class="id"> F</span><span class="id"> V</span><span class="id"> -&gt;</span><span class="id"> cluster</span><span class="id"> F</span><span class="id"> =</span><span class="id"> [set</span><span class="id"> x]</span><span class="id"> -&gt;</span><span class="id"> F</span><span class="id"> --&gt;</span><span class="id"> x</span>.<br/>
@@ -266,6 +259,14 @@ Qed.</div></details>
 <span class="id">move=&gt;</span><span class="id"> [[P</span><span class="id"> Q]]</span><span class="id"> /=</span><span class="id"> [Px</span><span class="id"> Qx]</span><span class="id"> /=</span><span class="id"> [/open_subspaceW</span><span class="id"> oP</span><span class="id"> /open_subspaceW</span><span class="id"> oQ]</span>.<br/>
 <span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> ?;</span><span class="gallina-kwd"> exists</span> (<span class="id">P,</span><span class="id"> Q</span>)<span class="id">;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //=;</span><span class="id"> [exact:</span><span class="id"> oP</span><span class="id"> |</span><span class="id"> exact:</span><span class="id"> oQ]</span>.<br/>
 Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> discrete_hausdorff</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> discreteTopologicalType}</span><span class="id"> :</span><span class="id"> hausdorff_space</span><span class="id"> T</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> p</span><span class="id"> q</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> _</span> (<span class="id">discrete_set1</span><span class="id"> p</span>) (<span class="id">discrete_set1</span><span class="id"> q</span>))<span class="id"> []</span><span class="id"> //</span><span class="id"> x</span><span class="id"> []</span><span class="id"> -&gt;</span><span class="id"> -&gt;</span>.<br/>
+Qed.</div></details>
+<br/>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> order_hausdorff</span><span class="id"> {d}</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> orderTopologicalType</span><span class="id"> d}</span><span class="id"> :</span><span class="id"> hausdorff_space</span><span class="id"> T</span>.<br/>
 <details>
@@ -697,11 +698,11 @@ Qed.</div></details>
 <span class="vernacular">Definition</span><span class="id"> zero_dimensional</span><span class="id"> T</span><span class="id"> :=</span><br/>
 &nbsp;&nbsp;(<span class="gallina-kwd">forall</span><span class="id"> x</span><span class="id"> y,</span><span class="id"> x</span><span class="id"> !=</span><span class="id"> y</span><span class="id"> -&gt;</span><span class="gallina-kwd"> exists</span><span class="id"> U</span><span class="id"> :</span><span class="id"> set</span><span class="id"> T,</span><span class="id"> [/\</span><span class="id"> clopen</span><span class="id"> U,</span><span class="id"> U</span><span class="id"> x</span><span class="id"> &amp;</span><span class="id"> ~</span><span class="id"> U</span><span class="id"> y]</span>).<br/>
 <br/>
-<span class="vernacular">Lemma</span><span class="id"> discrete_zero_dimension</span><span class="id"> {T}</span><span class="id"> :</span><span class="id"> discrete_space</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> zero_dimensional</span><span class="id"> T</span>.<br/>
+<span class="vernacular">Lemma</span><span class="id"> discrete_zero_dimension</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> discreteTopologicalType}</span><span class="id"> :</span><span class="id"> zero_dimensional</span><span class="id"> T</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
-<span class="id">move=&gt;</span><span class="id"> dctT</span><span class="id"> x</span><span class="id"> y</span><span class="id"> xny;</span><span class="gallina-kwd"> exists</span><span class="id"> [set</span><span class="id"> x];</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> last</span><span class="id"> exact/nesym/eqP</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> x</span><span class="id"> y</span><span class="id"> xny;</span><span class="gallina-kwd"> exists</span><span class="id"> [set</span><span class="id"> x];</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> last</span><span class="id"> exact/nesym/eqP</span>.<br/>
 <span class="gallina-kwd">by</span><span class="id"> split;</span><span class="id"> [exact:</span><span class="id"> discrete_open</span><span class="id"> |</span><span class="id"> exact:</span><span class="id"> discrete_closed]</span>.<br/>
 Qed.</div></details>
 <br/>
@@ -1120,8 +1121,7 @@ Qed.</div></details>
 <span class="id">#[export]</span><span class="id"> HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> {q</span><span class="id"> :</span><span class="id"> Pointed</span><span class="id"> T}</span><span class="id"> :=</span><br/>
 &nbsp;&nbsp;<span class="id">Pointed</span>.<span class="id">copy</span><span class="id"> type</span> (<span class="id">Pointed</span>.<span class="id">Pack</span><span class="id"> q</span>).<br/>
 <br/>
-<span class="vernacular">Lemma</span><span class="id"> countable_uniform_bounded</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> T</span>)<span class="id"> :</span><br/>
-&nbsp;&nbsp;<span class="gallina-kwd">let</span><span class="id"> U</span><span class="id"> :=</span><span class="id"> [the</span><span class="id"> pseudoMetricType</span><span class="id"> R</span><span class="id"> of</span><span class="id"> type]</span><span class="gallina-kwd"> in</span><span class="id"> @ball</span><span class="id"> _</span><span class="id"> U</span><span class="id"> x</span><span class="id"> 2</span><span class="id"> y</span>.<br/>
+<span class="vernacular">Lemma</span><span class="id"> countable_uniform_bounded</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> T</span>)<span class="id"> :</span><span class="id"> @ball</span><span class="id"> _</span><span class="id"> type</span><span class="id"> x</span><span class="id"> 2</span><span class="id"> y</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">

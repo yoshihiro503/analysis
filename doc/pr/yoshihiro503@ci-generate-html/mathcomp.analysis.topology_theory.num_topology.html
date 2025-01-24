@@ -122,6 +122,15 @@ Qed.</div></details>
 <br/>
 <span class="vernacular">Import</span><span class="id"> numFieldTopology</span>.<span class="vernacular">Exports</span>.<br/>
 <br/>
+<span class="vernacular">Lemma</span><span class="id"> in_continuous_mksetP</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> realFieldType}</span><span class="id"> {U</span><span class="id"> :</span><span class="id"> realFieldType}</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">i</span><span class="id"> :</span><span class="id"> interval</span><span class="id"> T</span>) (<span class="id">f</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> U</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">{in</span><span class="id"> i,</span><span class="id"> continuous</span><span class="id"> f}</span><span class="id"> &lt;-&gt;</span><span class="id"> {in</span><span class="id"> [set`</span><span class="id"> i],</span><span class="id"> continuous</span><span class="id"> f}</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> [fi</span><span class="id"> x</span><span class="id"> /set_mem/=|fi</span><span class="id"> x</span><span class="id"> xi];</span><span class="id"> [exact:</span><span class="id"> fi|apply:</span><span class="id"> fi;</span><span class="id"> rewrite</span><span class="id"> inE]</span>.<br/>
+Qed.</div></details>
+<br/>
 <span class="vernacular">Lemma</span><span class="id"> nbhs0_ltW</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realFieldType</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span> (<span class="id">0</span><span class="id"> &lt;</span><span class="id"> x</span>)<span class="id">%R</span><span class="id"> -&gt;</span><br/>
 &nbsp;<span class="id">\forall</span><span class="id"> r</span><span class="id"> \near</span><span class="id"> nbhs</span> (<span class="id">0%R:R</span>)<span class="id">,</span> (<span class="id">r</span><span class="id"> &lt;=</span><span class="id"> x</span>)<span class="id">%R</span>.<br/>
 <details>

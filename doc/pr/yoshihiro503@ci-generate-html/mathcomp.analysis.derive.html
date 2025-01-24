@@ -33,7 +33,7 @@
 <span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> all_ssreflect</span><span class="id"> ssralg</span><span class="id"> ssrnum</span><span class="id"> matrix</span><span class="id"> interval</span>.<br/>
 <span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> mathcomp_extra</span><span class="id"> boolp</span><span class="id"> classical_sets</span><span class="id"> functions</span>.<br/>
 <span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> reals</span><span class="id"> signed</span><span class="id"> topology</span><span class="id"> prodnormedzmodule</span><span class="id"> tvs</span>.<br/>
-<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> normedtype</span><span class="id"> landau</span><span class="id"> forms</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> normedtype</span><span class="id"> landau</span><span class="id"> forms</span><span class="id"> poly</span>.<br/>
 <br/>
 <div class="ssrdoc md">
 # Differentiation
@@ -476,8 +476,8 @@ Qed.</div></details>
 <br/>
 <span class="vernacular">End</span><span class="id"> DifferentialR2</span>.<br/>
 <br/>
-<span class="vernacular">Notation</span> <span class="id">&quot;f ^` ()&quot;</span><span class="id"> :=</span> (<span class="id">derive1</span><span class="id"> f</span>).<br/>
-<span class="vernacular">Notation</span> <span class="id">&quot;f ^` ( n )&quot;</span><span class="id"> :=</span> (<span class="id">derive1n</span><span class="id"> n</span><span class="id"> f</span>).<br/>
+<span class="vernacular">Notation</span> <span class="id">&quot;f ^` ()&quot;</span><span class="id"> :=</span> (<span class="id">derive1</span><span class="id"> f</span>)<span class="id"> :</span><span class="id"> classical_set_scope</span>.<br/>
+<span class="vernacular">Notation</span> <span class="id">&quot;f ^` ( n )&quot;</span><span class="id"> :=</span> (<span class="id">derive1n</span><span class="id"> n</span><span class="id"> f</span>)<span class="id"> :</span><span class="id"> classical_set_scope</span>.<br/>
 <br/>
 <span class="vernacular">Section</span><span class="id"> DifferentialR3</span>.<br/>
 <span class="vernacular">Variable</span><span class="id"> R</span><span class="id"> :</span><span class="id"> numFieldType</span>.<br/>
@@ -687,7 +687,7 @@ Qed.</div></details>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
-<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> df</span><span class="id"> dg;</span><span class="id"> apply/diff_locallyP;</span><span class="id"> rewrite</span><span class="id"> diffD</span><span class="id"> //;</span><span class="id"> have</span><span class="id"> :=</span><span class="id"> dadd</span><span class="id"> df</span><span class="id"> dg</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> df</span><span class="id"> dg;</span><span class="id"> apply/diff_locallyP;</span><span class="id"> rewrite</span><span class="id"> diffD;</span><span class="id"> have</span><span class="id"> :=</span><span class="id"> dadd</span><span class="id"> df</span><span class="id"> dg</span>.<br/>
 Qed.</div></details>
 <br/>
 <span class="id">Global</span><span class="vernacular"> Instance</span><span class="id"> is_diffD</span> (<span class="id">f</span><span class="id"> g</span><span class="id"> df</span><span class="id"> dg</span><span class="id"> :</span><span class="id"> V</span><span class="id"> -&gt;</span><span class="id"> W</span>)<span class="id"> x</span><span class="id"> :</span><br/>
@@ -696,7 +696,7 @@ Qed.</div></details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
 <span class="id">move=&gt;</span><span class="id"> dfx</span><span class="id"> dgx;</span><span class="id"> apply:</span><span class="id"> DiffDef;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> differentiableD</span>.<br/>
-<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> diffD</span><span class="id"> //</span><span class="id"> !diff_val</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> diffD;</span><span class="id"> first</span> (<span class="id">congr</span> (_<span class="id"> +</span><span class="id"> _</span>)<span class="id">;</span><span class="id"> apply:</span><span class="id"> diff_val</span>).<br/>
 Qed.</div></details>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> differentiable_sum</span><span class="id"> n</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> 'I_n</span><span class="id"> -&gt;</span><span class="id"> V</span><span class="id"> -&gt;</span><span class="id"> W</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> V</span>)<span class="id"> :</span><br/>
@@ -746,7 +746,8 @@ Qed.</div></details>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
-<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> /differentiableP</span><span class="id"> df</span><span class="id"> /differentiableP</span><span class="id"> dg;</span><span class="id"> rewrite</span><span class="id"> diff_val</span>. Qed.</div></details>
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> /differentiableP</span><span class="id"> df</span><span class="id"> /differentiableP</span><span class="id"> dg;</span><span class="id"> rewrite</span><span class="id"> [LHS]diff_val</span>.<br/>
+Qed.</div></details>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> differentiableB</span> (<span class="id">f</span><span class="id"> g</span><span class="id"> :</span><span class="id"> V</span><span class="id"> -&gt;</span><span class="id"> W</span>)<span class="id"> x</span><span class="id"> :</span><br/>
 &nbsp;&nbsp;<span class="id">differentiable</span><span class="id"> f</span><span class="id"> x</span><span class="id"> -&gt;</span><span class="id"> differentiable</span><span class="id"> g</span><span class="id"> x</span><span class="id"> -&gt;</span><span class="id"> differentiable</span> (<span class="id">f</span><span class="id"> \-</span><span class="id"> g</span>)<span class="id"> x</span>.<br/>
@@ -836,7 +837,7 @@ Qed.</div></details>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
-<span class="id">have</span><span class="id"> sx_lin</span><span class="id"> :</span><span class="id"> linear</span> (<span class="id"> *:%R</span><span class="id"> ^~</span><span class="id"> x</span><span class="id"> :</span><span class="id"> [the</span><span class="id"> lmodType</span><span class="id"> R</span><span class="id"> of</span><span class="id"> R</span><span class="id"> :</span><span class="id"> Type]</span><span class="id"> -&gt;</span><span class="id"> _</span>).<br/>
+<span class="id">have</span><span class="id"> sx_lin</span><span class="id"> :</span><span class="id"> linear</span> (<span class="id"> *:%R</span><span class="id"> ^~</span><span class="id"> x</span><span class="id"> :</span><span class="id"> R</span><span class="id"> -&gt;</span><span class="id"> _</span>).<br/>
 &nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> u</span><span class="id"> y</span><span class="id"> z;</span><span class="id"> rewrite</span><span class="id"> scalerDl</span><span class="id"> scalerA</span>.<br/>
 <span class="id">pose</span><span class="id"> sxlM</span><span class="id"> :=</span><span class="id"> GRing</span>.<span class="id">isLinear</span>.<span class="id">Build</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> sx_lin</span>.<br/>
 <span class="id">pose</span><span class="id"> sxL</span><span class="id"> :</span><span class="id"> {linear</span><span class="id"> _</span><span class="id"> -&gt;</span><span class="id"> _}</span><span class="id"> :=</span><span class="id"> HB</span>.<span class="id">pack</span> (<span class="id"> *:%R</span><span class="id"> ^~</span><span class="id"> x</span>)<span class="id"> sxlM</span>.<br/>
@@ -1135,7 +1136,8 @@ Qed.</div></details>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
-<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> /differentiableP</span><span class="id"> df</span><span class="id"> /differentiableP</span><span class="id"> dg;</span><span class="id"> rewrite</span><span class="id"> diff_val</span>. Qed.</div></details>
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> /differentiableP</span><span class="id"> df</span><span class="id"> /differentiableP</span><span class="id"> dg;</span><span class="id"> rewrite</span><span class="id"> [LHS]diff_val</span>.<br/>
+Qed.</div></details>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> differentiableM</span> (<span class="id">f</span><span class="id"> g</span><span class="id"> :</span><span class="id"> V</span><span class="id"> -&gt;</span><span class="id"> R</span>)<span class="id"> x</span><span class="id"> :</span><br/>
 &nbsp;&nbsp;<span class="id">differentiable</span><span class="id"> f</span><span class="id"> x</span><span class="id"> -&gt;</span><span class="id"> differentiable</span><span class="id"> g</span><span class="id"> x</span><span class="id"> -&gt;</span><span class="id"> differentiable</span> (<span class="id">f</span><span class="id"> *</span><span class="id"> g</span>)<span class="id"> x</span>.<br/>
@@ -1276,8 +1278,8 @@ Qed.</div></details>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
-<span class="id">pose</span><span class="id"> d</span> (<span class="id">h</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :=</span><span class="id"> h</span><span class="id"> *:</span><span class="id"> f^`</span>()<span class="id"> x</span>.<br/>
-<span class="id">move=&gt;</span><span class="id"> df;</span><span class="id"> have</span><span class="id"> lin_scal</span><span class="id"> :</span><span class="id"> linear</span><span class="id"> d</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ???;</span><span class="id"> rewrite</span><span class="id"> /d</span><span class="id"> scalerDl</span><span class="id"> scalerA</span>.<br/>
+<span class="id">pose</span><span class="id"> d</span> (<span class="id">h</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :=</span><span class="id"> h</span><span class="id"> *:</span> (<span class="id">f^`</span>()<span class="id"> x</span>)<span class="id">%classic</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> df;</span><span class="id"> have</span><span class="id"> lin_scal</span><span class="id"> :</span><span class="id"> linear</span><span class="id"> d</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> ?;</span><span class="id"> rewrite</span><span class="id"> /d</span><span class="id"> scalerDl</span><span class="id"> scalerA</span>.<br/>
 <span class="id">pose</span><span class="id"> scallM</span><span class="id"> :=</span><span class="id"> GRing</span>.<span class="id">isLinear</span>.<span class="id">Build</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> lin_scal</span>.<br/>
 <span class="id">pose</span><span class="id"> scalL</span><span class="id"> :</span><span class="id"> {linear</span><span class="id"> _</span><span class="id"> -&gt;</span><span class="id"> _}</span><span class="id"> :=</span><span class="id"> HB</span>.<span class="id">pack</span><span class="id"> d</span><span class="id"> scallM</span>.<br/>
 <span class="id">rewrite</span><span class="id"> -/d</span><span class="id"> -[d]/</span>(<span class="id">scalL</span><span class="id"> :</span><span class="id"> _</span><span class="id"> -&gt;</span><span class="id"> _</span>).<br/>
@@ -1285,7 +1287,7 @@ Qed.</div></details>
 Qed.</div></details>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> diff1E</span><span class="id"> f</span><span class="id"> x</span><span class="id"> :</span><br/>
-&nbsp;&nbsp;<span class="id">differentiable</span><span class="id"> f</span><span class="id"> x</span><span class="id"> -&gt;</span><span class="id"> 'd</span><span class="id"> f</span><span class="id"> x</span><span class="id"> =</span> (<span class="gallina-kwd">fun</span><span class="id"> h</span><span class="id"> =&gt;</span><span class="id"> h</span><span class="id"> *:</span><span class="id"> f^`</span>()<span class="id"> x</span>)<span class="id"> :&gt;</span> (<span class="id">R</span><span class="id"> -&gt;</span><span class="id"> U</span>).<br/>
+&nbsp;&nbsp;<span class="id">differentiable</span><span class="id"> f</span><span class="id"> x</span><span class="id"> -&gt;</span><span class="id"> 'd</span><span class="id"> f</span><span class="id"> x</span><span class="id"> =</span> (<span class="gallina-kwd">fun</span><span class="id"> h</span><span class="id"> =&gt;</span><span class="id"> h</span><span class="id"> *:</span><span class="id"> f^`</span>()<span class="id">%classic</span><span class="id"> x</span>)<span class="id"> :&gt;</span> (<span class="id">R</span><span class="id"> -&gt;</span><span class="id"> U</span>).<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
@@ -1293,7 +1295,7 @@ Qed.</div></details>
 <span class="id">move=&gt;</span><span class="id"> df;</span><span class="id"> have</span><span class="id"> lin_scal</span><span class="id"> :</span><span class="id"> linear</span><span class="id"> d</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> ?;</span><span class="id"> rewrite</span><span class="id"> /d</span><span class="id"> scalerDl</span><span class="id"> scalerA</span>.<br/>
 <span class="id">pose</span><span class="id"> scallM</span><span class="id"> :=</span><span class="id"> GRing</span>.<span class="id">isLinear</span>.<span class="id">Build</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> lin_scal</span>.<br/>
 <span class="id">pose</span><span class="id"> scalL</span><span class="id"> :</span><span class="id"> {linear</span><span class="id"> _</span><span class="id"> -&gt;</span><span class="id"> _}</span><span class="id"> :=</span><span class="id"> HB</span>.<span class="id">pack</span><span class="id"> d</span><span class="id"> scallM</span>.<br/>
-<span class="id">have</span><span class="id"> -&gt;</span><span class="id"> :</span> (<span class="gallina-kwd">fun</span><span class="id"> h</span><span class="id"> =&gt;</span><span class="id"> h</span><span class="id"> *:</span><span class="id"> f^`</span>()<span class="id"> x</span>)<span class="id"> =</span><span class="id"> scalL</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> derive1E'</span>.<br/>
+<span class="id">have</span><span class="id"> -&gt;</span><span class="id"> :</span> (<span class="gallina-kwd">fun</span><span class="id"> h</span><span class="id"> =&gt;</span><span class="id"> h</span><span class="id"> *:</span><span class="id"> f^`</span>()<span class="id">%classic</span><span class="id"> x</span>)<span class="id"> =</span><span class="id"> scalL</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> derive1E'</span>.<br/>
 <span class="id">apply:</span><span class="id"> diff_unique;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> scalel_continuous</span>.<br/>
 <span class="id">apply/eqaddoE;</span><span class="id"> have</span><span class="id"> /diff_locally</span><span class="id"> -&gt;</span><span class="id"> :=</span><span class="id"> df;</span><span class="id"> congr</span> (_<span class="id"> +</span><span class="id"> _</span><span class="id"> +</span><span class="id"> _</span>).<br/>
 <span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> funeqE</span><span class="id"> =&gt;</span><span class="id"> h</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> -{1}[h]mulr1</span><span class="id"> linearZ</span>.<br/>
@@ -1598,7 +1600,7 @@ Qed.</div></details>
 &nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> scalerDr</span><span class="id"> scalerA</span><span class="id"> mulrC</span><span class="id"> -scalerA</span>.<br/>
 &nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> [_</span><span class="id"> *:</span> (<span class="id">g</span><span class="id"> x</span><span class="id"> *:</span><span class="id"> _</span>)<span class="id">]scalerA</span><span class="id"> mulrC</span><span class="id"> -scalerA</span><span class="id"> /fg</span>.<br/>
 <span class="id">apply:</span><span class="id"> cvgD;</span><span class="id"> last</span><span class="id"> exact:</span><span class="id"> cvgZr</span><span class="id"> df</span>.<br/>
-<span class="id">apply:</span><span class="id"> cvg_comp2</span> (<span class="id">@mul_continuous</span><span class="id"> _</span> (<span class="id">_,</span><span class="id"> _</span>))<span class="id"> =&gt;</span><span class="id"> /=;</span><span class="id"> last</span><span class="id"> exact:</span><span class="id"> dg</span>.<br/>
+<span class="id">apply:</span><span class="id"> cvg_comp2</span> (<span class="id">@scale_continuous</span><span class="id"> _</span><span class="id"> _</span> (<span class="id">_,</span><span class="id"> _</span>))<span class="id"> =&gt;</span><span class="id"> /=;</span><span class="id"> last</span><span class="id"> exact:</span><span class="id"> dg</span>.<br/>
 <span class="id">suff</span><span class="id"> :</span><span class="id"> {for</span><span class="id"> 0,</span><span class="id"> continuous</span> (<span class="gallina-kwd">fun</span><span class="id"> h</span><span class="id"> :</span><span class="id"> R</span><span class="id"> =&gt;</span><span class="id"> f</span>(<span class="id">h</span><span class="id"> *:</span><span class="id"> v</span><span class="id"> +</span><span class="id"> x</span>))<span class="id">}</span>.<br/>
 &nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> /continuous_withinNx;</span><span class="id"> rewrite</span><span class="id"> scale0r</span><span class="id"> add0r</span>.<br/>
 <span class="id">exact/differentiable_continuous/derivable1_diffP/</span>(<span class="id">derivable1P</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span>).<span class="id">1</span>.<br/>
@@ -2021,7 +2023,7 @@ Qed.</div></details>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> derive1_comp</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realFieldType</span>) (<span class="id">f</span><span class="id"> g</span><span class="id"> :</span><span class="id"> R</span><span class="id"> -&gt;</span><span class="id"> R</span>)<span class="id"> x</span><span class="id"> :</span><br/>
 &nbsp;&nbsp;<span class="id">derivable</span><span class="id"> f</span><span class="id"> x</span><span class="id"> 1</span><span class="id"> -&gt;</span><span class="id"> derivable</span><span class="id"> g</span> (<span class="id">f</span><span class="id"> x</span>)<span class="id"> 1</span><span class="id"> -&gt;</span><br/>
-&nbsp;&nbsp;(<span class="id">g</span><span class="id"> \o</span><span class="id"> f</span>)<span class="id">^`</span>()<span class="id"> x</span><span class="id"> =</span><span class="id"> g^`</span>() (<span class="id">f</span><span class="id"> x</span>)<span class="id"> *</span><span class="id"> f^`</span>()<span class="id"> x</span>.<br/>
+&nbsp;&nbsp;(<span class="id">g</span><span class="id"> \o</span><span class="id"> f</span>)<span class="id">^`</span>()<span class="id"> x</span><span class="id"> =</span><span class="id"> g^`</span>()<span class="id">%classic</span> (<span class="id">f</span><span class="id"> x</span>)<span class="id"> *</span><span class="id"> f^`</span>()<span class="id">%classic</span><span class="id"> x</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
@@ -2037,6 +2039,79 @@ Qed.</div></details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
 <span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> Hi</span><span class="id"> &lt;-</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Section</span><span class="id"> derive_horner</span>.<br/>
+<span class="vernacular">Variable</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realFieldType</span>).<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ring_scope</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> horner0_ext</span><span class="id"> :</span><span class="id"> horner</span> (<span class="id">0</span><span class="id"> :</span><span class="id"> {poly</span><span class="id"> R}</span>)<span class="id"> =</span><span class="id"> 0</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> apply/funext</span><span class="id"> =&gt;</span><span class="id"> y</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> horner0</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> hornerD_ext</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> {poly</span><span class="id"> R}</span>)<span class="id"> r</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">horner</span> (<span class="id">p</span><span class="id"> *</span><span class="id"> 'X</span><span class="id"> +</span><span class="id"> r%:P</span>)<span class="id"> =</span><span class="id"> horner</span> (<span class="id">p</span><span class="id"> *</span><span class="id"> 'X</span>)<span class="id"> +</span><span class="id"> horner</span> (<span class="id">r%:P</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> apply/funext</span><span class="id"> =&gt;</span><span class="id"> y</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> !</span>(<span class="id">hornerE,fctE</span>). Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> horner_scale_ext</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> {poly</span><span class="id"> R}</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">horner</span> (<span class="id">p</span><span class="id"> *</span><span class="id"> 'X</span>)<span class="id"> =</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span><span class="id"> p</span>.<span class="id">[x]</span><span class="id"> *</span><span class="id"> x</span>)<span class="id">%R</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> apply/funext</span><span class="id"> =&gt;</span><span class="id"> y;</span><span class="id"> rewrite</span><span class="id"> !hornerE</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> hornerC_ext</span> (<span class="id">r</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> horner</span><span class="id"> r%:P</span><span class="id"> =</span><span class="id"> cst</span><span class="id"> r</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> apply/funext</span><span class="id"> =&gt;</span><span class="id"> y</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> !hornerE</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> derivable_horner</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> {poly</span><span class="id"> R}</span>)<span class="id"> x</span><span class="id"> :</span><span class="id"> derivable</span> (<span class="id">horner</span><span class="id"> p</span>)<span class="id"> x</span><span class="id"> 1</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">elim/poly_ind:</span><span class="id"> p</span><span class="id"> =&gt;</span><span class="id"> [|p</span><span class="id"> r</span><span class="id"> ih];</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> horner0_ext</span>.<br/>
+<span class="id">rewrite</span><span class="id"> hornerD_ext;</span><span class="id"> apply:</span><span class="id"> derivableD</span>.<br/>
+<span class="id">-</span><span class="id"> rewrite</span><span class="id"> horner_scale_ext/=</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> derivableM;</span><span class="id"> [exact:ih|exact:derivable_id]</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> hornerC_ext;</span><span class="id"> exact:</span><span class="id"> derivable_cst</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> derivE</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> {poly</span><span class="id"> R}</span>)<span class="id"> :</span><span class="id"> horner</span> (<span class="id">p^`</span>())<span class="id"> =</span> (<span class="id">horner</span><span class="id"> p</span>)<span class="id">^`</span>()<span class="id">%classic</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">apply/funext</span><span class="id"> =&gt;</span><span class="id"> x;</span><span class="id"> elim/poly_ind:</span><span class="id"> p</span><span class="id"> =&gt;</span><span class="id"> [|p</span><span class="id"> r</span><span class="id"> ih]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> deriv0</span><span class="id"> hornerC</span><span class="id"> horner0_ext</span><span class="id"> derive1_cst</span>.<br/>
+<span class="id">rewrite</span><span class="id"> derivD</span><span class="id"> hornerD</span><span class="id"> hornerD_ext</span>.<br/>
+<span class="id">rewrite</span><span class="id"> derive1E</span><span class="id"> deriveD//;</span><span class="id"> [|exact:</span><span class="id"> derivable_horner</span>..<span class="id">]</span>.<br/>
+<span class="id">rewrite</span><span class="id"> -!derive1E</span><span class="id"> hornerC_ext</span><span class="id"> derive1_cst</span><span class="id"> addr0</span>.<br/>
+<span class="id">rewrite</span><span class="id"> horner_scale_ext</span><span class="id"> derive1E</span><span class="id"> deriveM//;</span><span class="id"> last</span><span class="id"> exact:</span><span class="id"> derivable_horner</span>.<br/>
+<span class="id">rewrite</span><span class="id"> derive_id</span><span class="id"> -derive1E</span><span class="id"> -ih</span><span class="id"> derivC</span><span class="id"> horner0</span><span class="id"> addr0</span><span class="id"> derivM</span><span class="id"> hornerD</span><span class="id"> !hornerE</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> derivX</span><span class="id"> hornerE</span><span class="id"> mulr1</span><span class="id"> addrC</span><span class="id"> mulrC</span><span class="id"> scaler1</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">Global</span><span class="vernacular"> Instance</span><span class="id"> is_derive_poly</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> {poly</span><span class="id"> R}</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">is_derive</span><span class="id"> x</span> (<span class="id">1:R</span>) (<span class="id">horner</span><span class="id"> p</span>)<span class="id"> p^`</span>().<span class="id">[x]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> DeriveDef;</span><span class="id"> [exact:</span><span class="id"> derivable_horner|rewrite</span><span class="id"> derivE</span><span class="id"> derive1E]</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> continuous_horner</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> {poly</span><span class="id"> R}</span>)<span class="id"> :</span><span class="id"> continuous</span> (<span class="id">horner</span><span class="id"> p</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> /=</span><span class="id"> x;</span><span class="id"> apply/differentiable_continuous</span>.<br/>
+<span class="id">exact/derivable1_diffP/derivable_horner</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> derive_horner</span>.<br/>
 
       <div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/">a fork of coq2html</a></div>
     </div>

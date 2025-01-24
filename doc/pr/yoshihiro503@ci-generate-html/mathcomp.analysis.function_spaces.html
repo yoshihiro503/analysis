@@ -154,20 +154,19 @@ separate_points_from_closed f == for a closed set U and point x outside
 <br/>
 <span class="vernacular">Definition</span><span class="id"> product_topology_def</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> I</span><span class="id"> -&gt;</span><span class="id"> topologicalType</span>)<span class="id"> :=</span><br/>
 &nbsp;&nbsp;<span class="id">sup_topology</span> (<span class="gallina-kwd">fun</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> Topological</span>.<span class="id">class</span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">weak_topology</span> (<span class="gallina-kwd">fun</span><span class="id"> f</span><span class="id"> :</span><span class="id"> [the</span><span class="id"> choiceType</span><span class="id"> of</span><span class="gallina-kwd"> forall</span><span class="id"> i,</span><span class="id"> T</span><span class="id"> i]</span><span class="id"> =&gt;</span><span class="id"> f</span><span class="id"> i</span>))).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">weak_topology</span> (<span class="gallina-kwd">fun</span><span class="id"> f</span><span class="id"> :</span> (<span class="gallina-kwd">forall</span><span class="id"> i,</span><span class="id"> T</span><span class="id"> i</span>)<span class="id"> =&gt;</span><span class="id"> f</span><span class="id"> i</span>))).<br/>
 <br/>
 <span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> I</span><span class="id"> -&gt;</span><span class="id"> topologicalType</span>)<span class="id"> :=</span><br/>
 &nbsp;&nbsp;<span class="id">Topological</span>.<span class="id">copy</span> (<span class="id">prod_topology</span><span class="id"> T</span>) (<span class="id">product_topology_def</span><span class="id"> T</span>).<br/>
 <br/>
 <span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> I</span><span class="id"> -&gt;</span><span class="id"> uniformType</span>)<span class="id"> :=</span><br/>
 &nbsp;&nbsp;<span class="id">Uniform</span>.<span class="id">copy</span> (<span class="id">prod_topology</span><span class="id"> T</span>)<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">sup_topology</span> (<span class="gallina-kwd">fun</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> Uniform</span>.<span class="id">class</span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">[the</span><span class="id"> uniformType</span><span class="id"> of</span><span class="id"> weak_topology</span> (<span class="id">@proj</span><span class="id"> _</span><span class="id"> T</span><span class="id"> i</span>)<span class="id">]</span>)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">sup_topology</span> (<span class="gallina-kwd">fun</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> Uniform</span>.<span class="id">class</span> (<span class="id">weak_topology</span> (<span class="id">@proj</span><span class="id"> _</span><span class="id"> T</span><span class="id"> i</span>)))).<br/>
 <br/>
 <span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>) (<span class="id">Ii</span><span class="id"> :</span><span class="id"> countType</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">Tc</span><span class="id"> :</span><span class="id"> Ii</span><span class="id"> -&gt;</span><span class="id"> pseudoMetricType</span><span class="id"> R</span>)<span class="id"> :=</span><span class="id"> PseudoMetric</span>.<span class="id">copy</span> (<span class="id">prod_topology</span><span class="id"> Tc</span>)<br/>
-&nbsp;&nbsp;(<span class="id">sup_pseudometric</span> (<span class="gallina-kwd">fun</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> PseudoMetric</span>.<span class="id">class</span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">[the</span><span class="id"> pseudoMetricType</span><span class="id"> R</span><span class="id"> of</span><span class="id"> weak_topology</span> (<span class="id">@proj</span><span class="id"> _</span><span class="id"> Tc</span><span class="id"> i</span>)<span class="id">]</span>) (<span class="id">countableP</span><span class="id"> _</span>)).<br/>
+&nbsp;&nbsp;(<span class="id">sup_pseudometric</span> (<span class="gallina-kwd">fun</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> PseudoMetric</span>.<span class="id">class</span> (<span class="id">weak_topology</span> (<span class="id">@proj</span><span class="id"> _</span><span class="id"> Tc</span><span class="id"> i</span>)))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">countableP</span><span class="id"> _</span>)).<br/>
 <br/>
 <span class="vernacular">End</span><span class="id"> Product_Topology</span>.<br/>
 <br/>
@@ -375,10 +374,10 @@ Qed.</div></details>
 <span class="vernacular">Hypothesis</span><span class="id"> sepf</span><span class="id"> :</span><span class="id"> separate_points_from_closed</span>.<br/>
 <span class="vernacular">Hypothesis</span><span class="id"> ctsf</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> i,</span><span class="id"> continuous</span> (<span class="id">f_</span><span class="id"> i</span>).<br/>
 <br/>
-<span class="vernacular">Let</span><span class="id"> weakT</span><span class="id"> :=</span><span class="id"> [the</span><span class="id"> topologicalType</span><span class="id"> of</span><br/>
-&nbsp;&nbsp;<span class="id">sup_topology</span> (<span class="gallina-kwd">fun</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> Topological</span>.<span class="id">on</span> (<span class="id">weak_topology</span> (<span class="id">f_</span><span class="id"> i</span>)))<span class="id">]</span>.<br/>
+<span class="vernacular">Let</span><span class="id"> weakT</span><span class="id"> :</span><span class="id"> topologicalType</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">sup_topology</span> (<span class="gallina-kwd">fun</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> Topological</span>.<span class="id">on</span> (<span class="id">weak_topology</span> (<span class="id">f_</span><span class="id"> i</span>))).<br/>
 <br/>
-<span class="vernacular">Let</span><span class="id"> PU</span><span class="id"> :=</span><span class="id"> [the</span><span class="id"> topologicalType</span><span class="id"> of</span><span class="id"> prod_topology</span><span class="id"> U_]</span>.<br/>
+<span class="vernacular">Let</span><span class="id"> PU</span><span class="id"> :</span><span class="id"> topologicalType</span><span class="id"> :=</span><span class="id"> prod_topology</span><span class="id"> U_</span>.<br/>
 <br/>
 <span class="vernacular">Local</span><span class="vernacular"> Notation</span><span class="id"> sup_open</span><span class="id"> :=</span> (<span class="id">@open</span><span class="id"> weakT</span>).<br/>
 <span class="vernacular">Local</span><span class="vernacular"> Notation</span> <span class="id">&quot;'weak_open' i&quot;</span><span class="id"> :=</span> (<span class="id">@open</span><span class="id"> weakT</span>) (<span class="gallina-kwd">at</span><span class="id"> level</span><span class="id"> 0</span>).<br/>
@@ -755,7 +754,7 @@ Qed.</div></details>
 <span class="id">Unshelve</span>.<span class="id"> all:</span><span class="gallina-kwd"> by</span><span class="id"> end_near</span>. Qed.</div></details>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> uniform_entourage</span><span class="id"> :</span><br/>
-&nbsp;&nbsp;<span class="id">@entourage</span><span class="id"> [the</span><span class="id"> uniformType</span><span class="id"> of</span><span class="id"> {uniform`</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> V}]</span><span class="id"> =</span><br/>
+&nbsp;&nbsp;<span class="id">@entourage</span><span class="id"> {uniform`</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> V}</span><span class="id"> =</span><br/>
 &nbsp;&nbsp;<span class="id">filter_from</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">@entourage</span><span class="id"> V</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="gallina-kwd">fun</span><span class="id"> P</span><span class="id"> =&gt;</span><span class="id"> [set</span><span class="id"> fg</span><span class="id"> |</span><span class="gallina-kwd"> forall</span><span class="id"> t</span><span class="id"> :</span><span class="id"> U,</span><span class="id"> A</span><span class="id"> t</span><span class="id"> -&gt;</span><span class="id"> P</span> (<span class="id">fg</span>.<span class="id">1</span><span class="id"> t,</span><span class="id"> fg</span>.<span class="id">2</span><span class="id"> t</span>)<span class="id">]</span>).<br/>
@@ -801,7 +800,7 @@ Qed.</div></details>
 <span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> {U</span><span class="id"> :</span><span class="id"> choiceType}</span><span class="id"> {V</span><span class="id"> :</span><span class="id"> uniformType}</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">fam</span><span class="id"> :</span><span class="id"> set</span><span class="id"> U</span><span class="id"> -&gt;</span><span class="gallina-kwd"> Prop</span>)<span class="id"> :=</span><br/>
 &nbsp;&nbsp;<span class="id">Uniform</span>.<span class="id">copy</span><span class="id"> {family</span><span class="id"> fam,</span><span class="id"> U</span><span class="id"> -&gt;</span><span class="id"> V}</span> (<span class="id">sup_topology</span> (<span class="gallina-kwd">fun</span><span class="id"> k</span><span class="id"> :</span><span class="id"> sigT</span><span class="id"> fam</span><span class="id"> =&gt;</span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">Uniform</span>.<span class="id">class</span><span class="id"> [the</span><span class="id"> uniformType</span><span class="id"> of</span><span class="id"> {uniform`</span><span class="id"> projT1</span><span class="id"> k</span><span class="id"> -&gt;</span><span class="id"> V}]</span>)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">Uniform</span>.<span class="id">class</span><span class="id"> {uniform`</span><span class="id"> projT1</span><span class="id"> k</span><span class="id"> -&gt;</span><span class="id"> V}</span>)).<br/>
 <br/>
 <span class="vernacular">Section</span><span class="id"> UniformCvgLemmas</span>.<br/>
 <span class="vernacular">Context</span><span class="id"> {U</span><span class="id"> :</span><span class="id"> choiceType}</span><span class="id"> {V</span><span class="id"> :</span><span class="id"> uniformType}</span>.<br/>

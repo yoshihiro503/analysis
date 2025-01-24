@@ -34,7 +34,7 @@
 # Compatibility with the real numbers of Coq
 </div>
 <br/>
-<span class="vernacular">From</span><span class="id"> Coq</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> Rdefinitions</span><span class="id"> Raxioms</span><span class="id"> RIneq</span><span class="id"> Rbasic_fun</span><span class="id"> Zwf</span>.<br/>
+<span class="vernacular">From</span><span class="id"> Coq</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> ZArith</span><span class="id"> Rdefinitions</span><span class="id"> Raxioms</span><span class="id"> RIneq</span><span class="id"> Rbasic_fun</span><span class="id"> Zwf</span>.<br/>
 <span class="vernacular">From</span><span class="id"> Coq</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> Epsilon</span><span class="vernacular"> FunctionalExtensionality</span><span class="id"> Ranalysis1</span><span class="id"> Rsqrt_def</span>.<br/>
 <span class="vernacular">From</span><span class="id"> Coq</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> Rtrigo1</span><span class="id"> Reals</span>.<br/>
 <span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> all_ssreflect</span><span class="id"> ssralg</span><span class="id"> poly</span><span class="id"> mxpoly</span><span class="id"> ssrnum</span>.<br/>
@@ -323,8 +323,7 @@ Qed.</div></details>
 <br/>
 <span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Order</span>.<span class="id">POrder_isTotal</span>.<span class="id">Build</span><span class="id"> _</span><span class="id"> R</span><span class="id"> R_total</span>.<br/>
 <br/>
-<span class="vernacular">Lemma</span><span class="id"> Rarchimedean_axiom</span><span class="id"> :</span><br/>
-&nbsp;&nbsp;<span class="id">Num</span>.<span class="id">archimedean_axiom</span><span class="id"> [the</span><span class="id"> numDomainType</span><span class="id"> of</span><span class="id"> R</span><span class="id"> :</span><span class="id"> Type]</span>.<br/>
+<span class="vernacular">Lemma</span><span class="id"> Rarchimedean_axiom</span><span class="id"> :</span><span class="id"> Num</span>.<span class="id">archimedean_axiom</span><span class="id"> R</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
@@ -344,7 +343,7 @@ Qed.</div></details>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply/Rplus_le_compat_r/IHz;</span><span class="id"> split;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> Zlt_le_weak</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> Zlt_pred</span>.<br/>
 &nbsp;&nbsp;<span class="id">apply:</span> (<span class="id">Rle_trans</span><span class="id"> _</span> (<span class="id">IZR</span><span class="id"> 0</span>))<span class="id">;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> IZR_le</span>.<br/>
-&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply/RlebP/</span>(<span class="id">ler0n</span><span class="id"> [the</span><span class="id"> numDomainType</span><span class="id"> of</span><span class="id"> R</span><span class="id"> :</span><span class="id"> Type]</span> (<span class="id">Z</span>.<span class="id">abs_nat</span><span class="id"> z</span>)).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply/RlebP/</span>(<span class="id">ler0n</span><span class="id"> R</span> (<span class="id">Z</span>.<span class="id">abs_nat</span><span class="id"> z</span>)).<br/>
 <span class="id">apply:</span> (<span class="id">Rlt_le_trans</span><span class="id"> _</span> (<span class="id">IZR</span> (<span class="id">up</span><span class="id"> x</span>)<span class="id"> -</span><span class="id"> 1</span>)).<br/>
 &nbsp;&nbsp;<span class="id">apply:</span><span class="id"> Ropp_lt_cancel;</span><span class="id"> rewrite</span><span class="id"> Ropp_involutive</span>.<br/>
 &nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> Ropp_minus_distr</span><span class="id"> /Rminus</span><span class="id"> -opp_IZR</span><span class="id"> -{2}</span>(<span class="id">Z</span>.<span class="id">opp_involutive</span> (<span class="id">up</span><span class="id"> x</span>)).<br/>
@@ -362,7 +361,7 @@ Qed.</div></details>
 &nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> mulrnDr;</span><span class="id"> apply:</span> (<span class="id">Rlt_le_trans</span><span class="id"> _</span><span class="id"> 2</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -{1}[1]Rplus_0_r;</span><span class="id"> apply/Rplus_lt_compat_l/Rlt_0_1</span>.<br/>
 &nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[2]Rplus_0_l;</span><span class="id"> apply:</span><span class="id"> Rplus_le_compat_r</span>.<br/>
-&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply/RlebP/</span>(<span class="id">ler0n</span><span class="id"> [the</span><span class="id"> numDomainType</span><span class="id"> of</span><span class="id"> R</span><span class="id"> :</span><span class="id"> Type]</span> (<span class="id">Z</span>.<span class="id">abs_nat</span><span class="id"> _</span>)).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply/RlebP/</span>(<span class="id">ler0n</span><span class="id"> R</span> (<span class="id">Z</span>.<span class="id">abs_nat</span><span class="id"> _</span>)).<br/>
 <span class="id">apply:</span><span class="id"> Rminus_le</span>.<br/>
 <span class="id">rewrite</span><span class="id"> /Rminus</span><span class="id"> Rplus_assoc</span><span class="id"> [-</span><span class="id"> _</span><span class="id"> +</span><span class="id"> _]Rplus_comm</span><span class="id"> -Rplus_assoc</span><span class="id"> -!/</span>(<span class="id">Rminus</span><span class="id"> _</span><span class="id"> _</span>).<br/>
 <span class="id">exact:</span><span class="id"> Rle_minus</span>.<br/>
@@ -415,8 +414,7 @@ Qed.</div></details>
 <span class="gallina-kwd">by</span><span class="id"> apply:</span> (<span class="id">continuity_eq</span><span class="id"> Hg</span>)<span class="id">;</span><span class="id"> exact:</span><span class="id"> continuity_mult</span>.<br/>
 Qed.</div></details>
 <br/>
-<span class="vernacular">Lemma</span><span class="id"> Rreal_closed_axiom</span><span class="id"> :</span><br/>
-&nbsp;&nbsp;<span class="id">Num</span>.<span class="id">real_closed_axiom</span><span class="id"> [the</span><span class="id"> numDomainType</span><span class="id"> of</span><span class="id"> R</span><span class="id"> :</span><span class="id"> Type]</span>.<br/>
+<span class="vernacular">Lemma</span><span class="id"> Rreal_closed_axiom</span><span class="id"> :</span><span class="id"> Num</span>.<span class="id">real_closed_axiom</span><span class="id"> R</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">

@@ -513,35 +513,43 @@ Notations for composition and inverse (scope: relation_scope):
 <div class="proofscript">
 <span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> inE</span>. Qed.</div></details>
 <br/>
-<span class="vernacular">Lemma</span><span class="id"> preimage_itv_o_infty</span><span class="id"> T</span><span class="id"> d</span> (<span class="id">rT</span><span class="id"> :</span><span class="id"> porderType</span><span class="id"> d</span>) (<span class="id">f</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> rT</span>)<span class="id"> y</span><span class="id"> :</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> preimage_itvoy</span><span class="id"> T</span><span class="id"> d</span> (<span class="id">rT</span><span class="id"> :</span><span class="id"> porderType</span><span class="id"> d</span>) (<span class="id">f</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> rT</span>)<span class="id"> y</span><span class="id"> :</span><br/>
 &nbsp;&nbsp;<span class="id">f</span><span class="id"> @^-1`</span><span class="id"> `]y,</span><span class="id"> +oo[%classic</span><span class="id"> =</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span> (<span class="id">y</span><span class="id"> &lt;</span><span class="id"> f</span><span class="id"> x</span>)<span class="id">%O]</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
 <span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> predeqE</span><span class="id"> =&gt;</span><span class="id"> t;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> [|?];</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> in_itv/=</span><span class="id"> andbT</span>.<br/>
 Qed.</div></details>
+<span class="id">#[deprecated</span>(<span class="id">since=</span><span class="id">&quot;mathcomp-analysis 1.8.0&quot;</span><span class="id">,</span><span class="id"> note=</span><span class="id">&quot;renamed to preimage_itvoy&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Notation</span><span class="id"> preimage_itv_o_infty</span><span class="id"> :=</span><span class="id"> preimage_itvoy</span> (<span class="id">only</span><span class="id"> parsing</span>).<br/>
 <br/>
-<span class="vernacular">Lemma</span><span class="id"> preimage_itv_c_infty</span><span class="id"> T</span><span class="id"> d</span> (<span class="id">rT</span><span class="id"> :</span><span class="id"> porderType</span><span class="id"> d</span>) (<span class="id">f</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> rT</span>)<span class="id"> y</span><span class="id"> :</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> preimage_itvcy</span><span class="id"> T</span><span class="id"> d</span> (<span class="id">rT</span><span class="id"> :</span><span class="id"> porderType</span><span class="id"> d</span>) (<span class="id">f</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> rT</span>)<span class="id"> y</span><span class="id"> :</span><br/>
 &nbsp;&nbsp;<span class="id">f</span><span class="id"> @^-1`</span><span class="id"> `[y,</span><span class="id"> +oo[%classic</span><span class="id"> =</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span> (<span class="id">y</span><span class="id"> &lt;=</span><span class="id"> f</span><span class="id"> x</span>)<span class="id">%O]</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
 <span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> predeqE</span><span class="id"> =&gt;</span><span class="id"> t;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> [|?];</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> in_itv/=</span><span class="id"> andbT</span>.<br/>
 Qed.</div></details>
+<span class="id">#[deprecated</span>(<span class="id">since=</span><span class="id">&quot;mathcomp-analysis 1.8.0&quot;</span><span class="id">,</span><span class="id"> note=</span><span class="id">&quot;renamed to preimage_itvcy&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Notation</span><span class="id"> preimage_itv_c_infty</span><span class="id"> :=</span><span class="id"> preimage_itvcy</span> (<span class="id">only</span><span class="id"> parsing</span>).<br/>
 <br/>
-<span class="vernacular">Lemma</span><span class="id"> preimage_itv_infty_o</span><span class="id"> T</span><span class="id"> d</span> (<span class="id">rT</span><span class="id"> :</span><span class="id"> orderType</span><span class="id"> d</span>) (<span class="id">f</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> rT</span>)<span class="id"> y</span><span class="id"> :</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> preimage_itvNyo</span><span class="id"> T</span><span class="id"> d</span> (<span class="id">rT</span><span class="id"> :</span><span class="id"> orderType</span><span class="id"> d</span>) (<span class="id">f</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> rT</span>)<span class="id"> y</span><span class="id"> :</span><br/>
 &nbsp;&nbsp;<span class="id">f</span><span class="id"> @^-1`</span><span class="id"> `]-oo,</span><span class="id"> y[%classic</span><span class="id"> =</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span> (<span class="id">f</span><span class="id"> x</span><span class="id"> &lt;</span><span class="id"> y</span>)<span class="id">%O]</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
 <span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> predeqE</span><span class="id"> =&gt;</span><span class="id"> t;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> [|?];</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> in_itv</span>. Qed.</div></details>
+<span class="id">#[deprecated</span>(<span class="id">since=</span><span class="id">&quot;mathcomp-analysis 1.8.0&quot;</span><span class="id">,</span><span class="id"> note=</span><span class="id">&quot;renamed to preimage_itvNyo&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Notation</span><span class="id"> preimage_itv_infty_o</span><span class="id"> :=</span><span class="id"> preimage_itvNyo</span> (<span class="id">only</span><span class="id"> parsing</span>).<br/>
 <br/>
-<span class="vernacular">Lemma</span><span class="id"> preimage_itv_infty_c</span><span class="id"> T</span><span class="id"> d</span> (<span class="id">rT</span><span class="id"> :</span><span class="id"> orderType</span><span class="id"> d</span>) (<span class="id">f</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> rT</span>)<span class="id"> y</span><span class="id"> :</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> preimage_itvNyc</span><span class="id"> T</span><span class="id"> d</span> (<span class="id">rT</span><span class="id"> :</span><span class="id"> orderType</span><span class="id"> d</span>) (<span class="id">f</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> rT</span>)<span class="id"> y</span><span class="id"> :</span><br/>
 &nbsp;&nbsp;<span class="id">f</span><span class="id"> @^-1`</span><span class="id"> `]-oo,</span><span class="id"> y]%classic</span><span class="id"> =</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span> (<span class="id">f</span><span class="id"> x</span><span class="id"> &lt;=</span><span class="id"> y</span>)<span class="id">%O]</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
 <span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> predeqE</span><span class="id"> =&gt;</span><span class="id"> t;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> [|?];</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> in_itv</span>. Qed.</div></details>
+<span class="id">#[deprecated</span>(<span class="id">since=</span><span class="id">&quot;mathcomp-analysis 1.8.0&quot;</span><span class="id">,</span><span class="id"> note=</span><span class="id">&quot;renamed to preimage_itvNyc&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Notation</span><span class="id"> preimage_itv_infty_c</span><span class="id"> :=</span><span class="id"> preimage_itvNyc</span> (<span class="id">only</span><span class="id"> parsing</span>).<br/>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> eq_set</span><span class="id"> T</span> (<span class="id">P</span><span class="id"> Q</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="gallina-kwd"> Prop</span>)<span class="id"> :</span> (<span class="gallina-kwd">forall</span><span class="id"> x</span><span class="id"> :</span><span class="id"> T,</span><span class="id"> P</span><span class="id"> x</span><span class="id"> =</span><span class="id"> Q</span><span class="id"> x</span>)<span class="id"> -&gt;</span><br/>
 &nbsp;&nbsp;<span class="id">[set</span><span class="id"> x</span><span class="id"> |</span><span class="id"> P</span><span class="id"> x]</span><span class="id"> =</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span><span class="id"> Q</span><span class="id"> x]</span>.<br/>
@@ -3877,6 +3885,7 @@ Qed.</div></details>
 <span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> qcanon;</span><span class="id"> elim/eqPchoice;</span><span class="id"> elim/choicePpointed</span><span class="id"> =&gt;</span><span class="id"> [[T</span><span class="id"> F]|T];</span><br/>
 &nbsp;&nbsp;&nbsp;<span class="id">[left;</span><span class="gallina-kwd"> exists</span> (<span class="id">Empty</span>.<span class="id">Pack</span><span class="id"> F</span>)<span class="id"> |</span><span class="id"> right;</span><span class="gallina-kwd"> exists</span><span class="id"> T]</span>.<br/>
 Qed.</div></details>
+<br/>
 <span class="vernacular">Lemma</span><span class="id"> Ppointed</span><span class="id"> :</span><span class="id"> quasi_canonical</span><span class="gallina-kwd"> Type</span><span class="id"> pointedType</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
@@ -4790,17 +4799,29 @@ Qed.</div></details>
 <div class="proofscript">
 <span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /ysection/=</span><span class="id"> inE</span>. Qed.</div></details>
 <br/>
+<span class="vernacular">Lemma</span><span class="id"> xsectionE</span><span class="id"> A</span><span class="id"> x</span><span class="id"> :</span><span class="id"> xsection</span><span class="id"> A</span><span class="id"> x</span><span class="id"> =</span> (<span class="gallina-kwd">fun</span><span class="id"> y</span><span class="id"> =&gt;</span> (<span class="id">x,</span><span class="id"> y</span>))<span class="id"> @^-1`</span><span class="id"> A</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> apply/seteqP;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> [y|y]</span><span class="id"> /xsectionP</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> ysectionE</span><span class="id"> A</span><span class="id"> y</span><span class="id"> :</span><span class="id"> ysection</span><span class="id"> A</span><span class="id"> y</span><span class="id"> =</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span> (<span class="id">x,</span><span class="id"> y</span>))<span class="id"> @^-1`</span><span class="id"> A</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> apply/seteqP;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> [x|x]</span><span class="id"> /ysectionP</span>. Qed.</div></details>
+<br/>
 <span class="vernacular">Lemma</span><span class="id"> xsection0</span><span class="id"> x</span><span class="id"> :</span><span class="id"> xsection</span><span class="id"> set0</span><span class="id"> x</span><span class="id"> =</span><span class="id"> set0</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
-<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> predeqE</span><span class="id"> /xsection</span><span class="id"> =&gt;</span><span class="id"> y;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //=;</span><span class="id"> rewrite</span><span class="id"> inE</span>. Qed.</div></details>
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> xsectionE</span><span class="id"> preimage_set0</span>. Qed.</div></details>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> ysection0</span><span class="id"> y</span><span class="id"> :</span><span class="id"> ysection</span><span class="id"> set0</span><span class="id"> y</span><span class="id"> =</span><span class="id"> set0</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
-<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> predeqE</span><span class="id"> /ysection</span><span class="id"> =&gt;</span><span class="id"> x;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //=;</span><span class="id"> rewrite</span><span class="id"> inE</span>. Qed.</div></details>
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> ysectionE</span><span class="id"> preimage_set0</span>. Qed.</div></details>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> in_xsectionX</span><span class="id"> X1</span><span class="id"> X2</span><span class="id"> x</span><span class="id"> :</span><span class="id"> x</span><span class="id"> \in</span><span class="id"> X1</span><span class="id"> -&gt;</span><span class="id"> xsection</span> (<span class="id">X1</span><span class="id"> `*`</span><span class="id"> X2</span>)<span class="id"> x</span><span class="id"> =</span><span class="id"> X2</span>.<br/>
 <details>

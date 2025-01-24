@@ -1,0 +1,532 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module mathcomp.analysis.pi_irrational</title>
+<meta name="description" content="Documentation of Coq module mathcomp.analysis.pi_irrational" />
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="init()">
+
+  <main>
+    <div class="sidebar">
+      <h2>Files</h2>
+      
+    </div>
+
+  <div class="coq">
+
+    <div class="content">
+      <p><a href="./index.html">Top</a></p>
+      <h1 class="title">Module mathcomp.analysis.pi_irrational</h1>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> all_ssreflect</span><span class="id"> all_algebra</span><span class="id"> archimedean</span><span class="id"> finmap</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> mathcomp_extra</span><span class="id"> boolp</span><span class="id"> classical_sets</span><span class="id"> functions</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> cardinality</span><span class="id"> fsbigop</span><span class="id"> signed</span><span class="id"> reals</span><span class="id"> ereal</span><span class="id"> topology</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> normedtype</span><span class="id"> sequences</span><span class="id"> real_interval</span><span class="id"> esum</span><span class="id"> measure</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> lebesgue_measure</span><span class="id"> numfun</span><span class="id"> realfun</span><span class="id"> lebesgue_integral</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> derive</span><span class="id"> charge</span><span class="id"> ftc</span><span class="id"> trigo</span>.<br/>
+<br/>
+<div class="ssrdoc md">
+# Formalisation of A simple proof that pi is irrational by Ivan Niven
+
+Reference:
+- http://projecteuclid.org/download/pdf_1/euclid.bams/1183510788
+
+</div>
+<br/>
+<span class="gallina-kwd">Set</span><span class="vernacular"> Implicit</span><span class="vernacular"> Arguments</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Strict</span><span class="vernacular"> Implicit</span>.<br/>
+<span class="vernacular">Unset</span><span class="vernacular"> Printing</span><span class="vernacular"> Implicit</span><span class="vernacular"> Defensive</span>.<br/>
+<br/>
+<span class="vernacular">Import</span><span class="id"> Order</span>.<span class="id">TTheory</span><span class="id"> GRing</span>.<span class="id">Theory</span><span class="id"> Num</span>.<span class="id">Theory</span>.<br/>
+<span class="vernacular">Import</span><span class="id"> numFieldNormedType</span>.<span class="vernacular">Exports</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> measurable_poly</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realType}</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> {poly</span><span class="id"> R}</span>) (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">measurable_fun</span><span class="id"> A</span> (<span class="id">horner</span><span class="id"> p</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">apply/measurable_funTS;</span><span class="id"> apply:</span><span class="id"> continuous_measurable_fun</span>.<br/>
+<span class="id">exact/continuous_horner</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> rational</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realType}</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :=</span><span class="gallina-kwd"> exists</span><span class="id"> m</span><span class="id"> n,</span><span class="id"> x</span><span class="id"> =</span> (<span class="id">m%:R</span><span class="id"> /</span><span class="id"> n%:R</span>)<span class="id">%R</span>.<br/>
+<br/>
+<span class="vernacular">Module</span><span class="id"> pi_irrational</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ring_scope</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> exp_fact</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>) (<span class="id">r</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="id">r</span><span class="id"> ^+</span><span class="id"> n</span><span class="id"> /</span><span class="id"> n`!%:R</span><span class="id"> @[n</span><span class="id"> --&gt;</span><span class="id"> \oo]</span><span class="id"> --&gt;</span><span class="id"> 0</span>)<span class="id">%classic</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> apply/cvg_series_cvg_0;</span><span class="id"> exact:</span><span class="id"> is_cvg_series_exp_coeff</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Section</span><span class="id"> algebraic_part</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realType}</span>.<br/>
+<span class="vernacular">Variables</span><span class="id"> na</span><span class="id"> nb</span><span class="id"> n</span><span class="id"> :</span><span class="id"> nat</span>.<br/>
+<span class="vernacular">Hypothesis</span><span class="id"> nb0</span><span class="id"> :</span><span class="id"> nb</span><span class="id"> !=</span><span class="id"> 0%N</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> a</span><span class="id"> :</span><span class="id"> R</span><span class="id"> :=</span><span class="id"> na%:R</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> b</span><span class="id"> :</span><span class="id"> R</span><span class="id"> :=</span><span class="id"> nb%:R</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> f</span><span class="id"> :</span><span class="id"> {poly</span><span class="id"> R}</span><span class="id"> :=</span><span class="id"> n`!%:R^-1</span><span class="id"> *:</span> (<span class="id">'X^n</span><span class="id"> *</span> (<span class="id">a%:P</span><span class="id"> -</span><span class="id"> b</span><span class="id"> *:</span><span class="id"> 'X</span>)<span class="id"> ^+</span><span class="id"> n</span>).<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> F</span><span class="id"> :</span><span class="id"> {poly</span><span class="id"> R}</span><span class="id"> :=</span><span class="id"> \sum_</span>(<span class="id">i</span><span class="id"> &lt;</span><span class="id"> n</span>.<span class="id">+1</span>) (<span class="id">-1</span>)<span class="id">^i</span><span class="id"> *:</span><span class="id"> f^`</span>(<span class="id">i</span>.<span class="id">*2</span>).<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> b0</span><span class="id"> :</span><span class="id"> b</span><span class="id"> !=</span><span class="id"> 0</span><br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> pnatr_eq0</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> P1_size</span><span class="id"> :</span><span class="id"> size</span> (<span class="id">a%:P</span><span class="id"> -</span> <span class="id"> b</span><span class="id"> *:</span><span class="id"> 'X</span>)<span class="id"> =</span><span class="id"> 2</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">have</span><span class="id"> hs</span><span class="id"> :</span><span class="id"> size</span> (<span class="id">-</span> (<span class="id">b</span><span class="id"> *:</span><span class="id"> 'X</span>))<span class="id"> =</span><span class="id"> 2%N</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> size_opp</span> <span class="comment">(*&nbsp;TODO:&nbsp;size_opp&nbsp;-&gt;&nbsp;sizeN&nbsp;*)</span><span class="id"> size_scale</span><span class="id"> ?b0//</span><span class="id"> size_polyX</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> addrC</span><span class="id"> size_addl</span><span class="id"> hs</span><span class="id"> ?size_polyC//;</span><span class="id"> case:</span> (<span class="id">a</span><span class="id"> !=</span><span class="id"> 0</span>).<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> P1_lead_coef</span><span class="id"> :</span><span class="id"> lead_coef</span> (<span class="id">a%:P</span><span class="id"> -</span><span class="id"> b</span><span class="id"> *:</span><span class="id"> 'X</span>)<span class="id"> =</span><span class="id"> -</span><span class="id"> b</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> addrC</span><span class="id"> lead_coefDl</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> lead_coefN</span><span class="id"> lead_coefZ</span><span class="id"> lead_coefX</span><span class="id"> mulr1</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> size_opp</span><span class="id"> size_scale</span><span class="id"> ?b0//</span><span class="id"> size_polyX</span><span class="id"> size_polyC;</span><span class="id"> case:</span> (<span class="id">a</span><span class="id"> !=</span><span class="id"> 0</span>).<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> P_size</span><span class="id"> :</span><span class="id"> size</span> ((<span class="id">a%:P</span><span class="id"> -</span> <span class="id"> b*:'X</span>)<span class="id"> ^+</span><span class="id"> n</span>)<span class="id"> =</span><span class="id"> n</span>.<span class="id">+1</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">elim</span><span class="id"> :</span><span class="id"> n</span><span class="id"> =&gt;</span><span class="id"> [|n0</span><span class="id"> Hn0];</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> expr0</span><span class="id"> size_polyC</span><span class="id"> oner_neq0</span>.<br/>
+<span class="id">rewrite</span><span class="id"> exprS</span><span class="id"> size_proper_mul;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> P1_size</span><span class="id"> /=</span><span class="id"> Hn0</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> lead_coef_exp</span><span class="id"> P1_lead_coef</span><span class="id"> -exprS</span><span class="id"> expf_neq0</span><span class="id"> //</span><span class="id"> oppr_eq0</span><span class="id"> b0</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> comp_poly_exprn</span> (<span class="id">p</span><span class="id"> q</span><span class="id"> :</span><span class="id"> {poly</span><span class="id"> R}</span>)<span class="id"> i</span><span class="id"> :</span><span class="id"> p</span><span class="id"> ^+</span><span class="id"> i</span><span class="id"> \Po</span><span class="id"> q</span><span class="id"> =</span> (<span class="id">p</span><span class="id"> \Po</span><span class="id"> q</span>)<span class="id"> ^+</span><span class="id"> i</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">elim:</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> [|i</span><span class="id"> ih];</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> !expr0</span><span class="id"> comp_polyC</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> !exprS</span><span class="id"> comp_polyM</span><span class="id"> ih</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> f_int</span><span class="id"> i</span><span class="id"> :</span><span class="id"> n`!%:R</span><span class="id"> *</span><span class="id"> f`_i</span><span class="id"> \is</span><span class="id"> a</span><span class="id"> Num</span>.<span class="id">int</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> /f</span><span class="id"> coefZ</span><span class="id"> mulrA</span><span class="id"> divff</span><span class="id"> ?mul1r</span><span class="id"> ?pnatr_eq0</span><span class="id"> ?gtn_eqF</span><span class="id"> ?fact_gt0//</span>.<br/>
+<span class="id">apply/polyOverP</span><span class="id"> =&gt;</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> rpredM</span><span class="id"> ?rpredX</span><span class="id"> ?polyOverX//=</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> rpredB</span><span class="id"> ?polyOverC</span><span class="id"> ?polyOverZ</span><span class="id"> ?polyOverX//=</span><span class="id"> nat_int</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> f_small_coef0</span><span class="id"> i</span><span class="id"> :</span> (<span class="id">i</span><span class="id"> &lt;</span><span class="id"> n</span>)<span class="id">%N</span><span class="id"> -&gt;</span><span class="id"> f`_i</span><span class="id"> =</span><span class="id"> 0</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> ni;</span><span class="id"> rewrite</span><span class="id"> /f</span><span class="id"> coefZ;</span><span class="id"> apply/eqP</span>.<br/>
+<span class="id">rewrite</span><span class="id"> mulf_eq0</span><span class="id"> invr_eq0</span><span class="id"> pnatr_eq0</span><span class="id"> gtn_eqF</span><span class="id"> ?fact_gt0//=</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> coefXnM</span><span class="id"> ni</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> derive_f_0_int</span><span class="id"> i</span><span class="id"> :</span><span class="id"> f^`</span>(<span class="id">i</span>).<span class="id">[0]</span><span class="id"> \is</span><span class="id"> a</span><span class="id"> Num</span>.<span class="id">int</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> horner_coef0</span><span class="id"> coef_derivn</span><span class="id"> addn0</span><span class="id"> ffactnn</span>.<br/>
+<span class="id">have</span><span class="id"> [/f_small_coef0</span><span class="id"> -&gt;|/bin_fact</span><span class="id"> &lt;-]</span><span class="id"> :=</span><span class="id"> ltnP</span><span class="id"> i</span><span class="id"> n</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> mul0rn</span><span class="id"> //</span><span class="id"> int_Qint</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> mulnCA</span><span class="id"> -mulr_natl</span><span class="id"> natrM</span><span class="id"> mulrAC</span><span class="id"> rpredM</span><span class="id"> ?f_int</span><span class="id"> ?nat_int</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> F0_int</span><span class="id"> :</span><span class="id"> F</span>.<span class="id">[0]</span><span class="id"> \is</span><span class="id"> a</span><span class="id"> Num</span>.<span class="id">int</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> /F</span><span class="id"> horner_sum</span><span class="id"> rpred_sum</span><span class="id"> //=</span><span class="id"> =&gt;</span> <span class="id"> i</span><span class="id"> _</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> !hornerE</span><span class="id"> rpredM//=</span><span class="id"> -exprnP</span><span class="id"> rpredX//</span><span class="id"> rpredN</span><span class="id"> int_num1</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> pirat</span><span class="id"> :=</span><span class="id"> a</span><span class="id"> /</span><span class="id"> b</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> pf_sym</span><span class="id"> :</span><span class="id"> f</span><span class="id"> \Po</span> (<span class="id">pirat%:P</span><span class="id"> -</span><span class="id"> 'X</span>)<span class="id"> =</span><span class="id"> f</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> /f</span><span class="id"> comp_polyZ;</span><span class="id"> congr</span><span class="id"> *:%R</span>.<br/>
+<span class="id">rewrite</span><span class="id"> comp_polyM</span><span class="id"> !comp_poly_exprn</span><span class="id"> comp_polyB</span><span class="id"> comp_polyC</span><span class="id"> !comp_polyZ</span>.<br/>
+<span class="id">rewrite</span><span class="id"> !comp_polyX</span><span class="id"> scalerBr</span>.<br/>
+<span class="id">have</span><span class="id"> bap</span><span class="id"> :</span><span class="id"> b%:P</span><span class="id"> *</span><span class="id"> pirat%:P</span><span class="id"> =</span><span class="id"> a%:P</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> polyCM</span><span class="id"> mulrC</span><span class="id"> -mulrA</span><span class="id"> -polyCM</span><span class="id"> mulVf</span><span class="id"> ?b0</span><span class="id"> //</span><span class="id"> mulr1</span>.<br/>
+<span class="id">suff</span><span class="id"> -&gt;</span><span class="id"> :</span><span class="id"> a%:P</span><span class="id"> -</span> (<span class="id">b</span><span class="id"> *:</span><span class="id"> pirat%:P</span><span class="id"> -</span><span class="id"> b</span><span class="id"> *:</span><span class="id"> 'X</span>)<span class="id"> =</span><span class="id"> b%:P</span><span class="id"> *</span><span class="id"> 'X</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> exprMn</span><span class="id"> mulrA</span><span class="id"> mulrC;</span><span class="id"> congr</span><span class="id"> *%R</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -exprMn;</span><span class="id"> congr</span> (_<span class="id"> ^+</span><span class="id"> _</span>).<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> mulrBl</span><span class="id"> /pirat</span><span class="id"> mul_polyC</span><span class="id"> -bap</span> (<span class="id">mulrC</span><span class="id"> b%:P</span>)<span class="id">;</span><span class="id"> congr</span> (_<span class="id"> -</span><span class="id"> _</span>)<span class="id">%R</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> mul_polyC</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> mulrC</span><span class="id"> mul_polyC</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -mul_polyC</span><span class="id"> bap</span><span class="id"> opprB</span><span class="id"> addrCA</span><span class="id"> subrr</span><span class="id"> addr0</span><span class="id"> mul_polyC</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> derivn_fpix</span><span class="id"> i</span><span class="id"> :</span><span class="id"> f^`</span>(<span class="id">i</span>)<span class="id"> \Po</span> (<span class="id">pirat%:P</span><span class="id"> -</span><span class="id"> 'X</span>)<span class="id"> =</span> (<span class="id">-1</span>)<span class="id"> ^+</span><span class="id"> i</span><span class="id"> *:</span><span class="id"> f^`</span>(<span class="id">i</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">elim:i</span><span class="id"> ;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> expr0</span><span class="id"> scale1r</span><span class="id"> pf_sym</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> i</span><span class="id"> Hi</span>.<br/>
+<span class="id">rewrite</span><span class="id"> [in</span><span class="id"> RHS]derivnS</span><span class="id"> exprS</span><span class="id"> mulN1r</span><span class="id"> scaleNr</span><span class="id"> -</span>(<span class="id">derivZ</span> ((<span class="id">-1</span>)<span class="id"> ^+</span><span class="id"> i</span>))<span class="id"> -Hi</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> deriv_comp</span><span class="id"> derivB</span><span class="id"> derivX</span><span class="id"> -derivnS</span><span class="id"> derivC</span><span class="id"> sub0r</span><span class="id"> mulrN1</span><span class="id"> opprK</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> FPi_int</span><span class="id"> :</span><span class="id"> F</span>.<span class="id">[pirat]</span><span class="id"> \is</span><span class="id"> a</span><span class="id"> Num</span>.<span class="id">int</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> /F</span><span class="id"> horner_sum</span><span class="id"> rpred_sum</span><span class="id"> //</span><span class="id"> =&gt;</span><span class="id"> i</span><span class="id"> _</span><span class="id"> ;</span><span class="id"> rewrite</span><span class="id"> !hornerE</span><span class="id"> rpredM</span><span class="id"> //=</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -exprnP</span><span class="id"> rpredX//</span> (_<span class="id"> :</span><span class="id"> -1</span><span class="id"> =</span> (<span class="id">-1</span>)<span class="id">%:~R</span>)<span class="id">//</span><span class="id"> intr_int</span>.<br/>
+<span class="id">move:</span> (<span class="id">derivn_fpix</span><span class="id"> i</span>.<span class="id">*2</span>).<br/>
+<span class="id">rewrite</span><span class="id"> -mul2n</span><span class="id"> mulnC</span><span class="id"> exprM</span><span class="id"> sqrr_sign</span><span class="id"> scale1r</span><span class="id"> =&gt;</span><span class="id"> &lt;-</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> horner_comp</span><span class="id"> !hornerE</span><span class="id"> subrr</span><span class="id"> derive_f_0_int</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> D2FDF</span><span class="id"> :</span><span class="id"> F^`</span>(<span class="id">2</span>)<span class="id"> +</span><span class="id"> F</span><span class="id"> =</span><span class="id"> f</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> /F</span><span class="id"> linear_sum</span><span class="id"> /=</span>.<br/>
+<span class="id">rewrite</span> (<span class="id">eq_bigr</span> (<span class="gallina-kwd">fun</span><span class="id"> i</span><span class="id"> :</span><span class="id"> 'I_n</span>.<span class="id">+1</span><span class="id"> =&gt;</span> ((<span class="id">-1</span>)<span class="id">^i</span><span class="id"> *:</span><span class="id"> f^`</span>(<span class="id">i</span>.<span class="id">+1</span>.<span class="id">*2</span>)<span class="id">%N</span>)))<span class="id">;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> i</span><span class="id"> _</span><span class="id"> ;rewrite</span><span class="id"> !derivZ</span>.<br/>
+<span class="id">rewrite</span><span class="id"> [X</span><span class="gallina-kwd"> in</span><span class="id"> _</span><span class="id"> +</span><span class="id"> X]big_ord_recl/=</span>.<br/>
+<span class="id">rewrite</span><span class="id"> -exprnP</span><span class="id"> expr0</span><span class="id"> scale1r</span> (<span class="id">addrC</span><span class="id"> f</span>)<span class="id"> addrA</span><span class="id"> -[X</span><span class="gallina-kwd"> in</span><span class="id"> _</span><span class="id"> =</span><span class="id"> X]add0r</span>.<br/>
+<span class="id">congr</span> (_<span class="id"> +</span><span class="id"> _</span>).<br/>
+<span class="id">rewrite</span><span class="id"> big_ord_recr</span><span class="id"> addrC</span><span class="id"> addrA</span><span class="id"> -big_split</span><span class="id"> big1=&gt;[|</span><span class="id"> i</span><span class="id"> _]</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> add0r</span><span class="id"> /=;</span><span class="id"> apply/eqP;</span><span class="id"> rewrite</span><span class="id"> scaler_eq0</span><span class="id"> -derivnS</span><span class="id"> derivn_poly0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> deriv0</span><span class="id"> eqxx</span><span class="id"> orbT</span>.<br/>
+&nbsp;&nbsp;<span class="id">suff</span><span class="id"> -&gt;</span><span class="id"> :</span><span class="id"> size</span><span class="id"> f</span><span class="id"> =</span> (<span class="id">n</span><span class="id"> +</span><span class="id"> n</span>.<span class="id">+1</span>)<span class="id">%N</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> addnS</span><span class="id"> addnn</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> /f</span><span class="id"> size_scale;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> invr_neq0</span><span class="id"> //</span><span class="id"> pnatr_eq0</span><span class="id"> -lt0n</span> (<span class="id">fact_gt0</span><span class="id"> n</span>).<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> size_monicM</span><span class="id"> ?monicXn</span><span class="id"> //;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -size_poly_eq0</span><span class="id"> P_size</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span> <span class="id"> size_polyXn</span><span class="id"> P_size</span>.<br/>
+<span class="id">rewrite</span><span class="id"> /bump</span><span class="id"> /=</span><span class="id"> -scalerDl</span>.<br/>
+<span class="id">apply/eqP;</span><span class="id"> rewrite</span><span class="id"> scaler_eq0</span><span class="id"> /bump</span><span class="id"> -exprnP</span><span class="id"> add1n</span><span class="id"> exprSr</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> mulrN1</span><span class="id"> addrC</span><span class="id"> subr_eq0</span><span class="id"> eqxx</span><span class="id"> orTb</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> algebraic_part</span>.<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> analytic_part</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realType}</span>.<br/>
+<span class="vernacular">Let</span><span class="id"> mu</span><span class="id"> :=</span><span class="id"> @lebesgue_measure</span><span class="id"> R</span>.<br/>
+<span class="vernacular">Variable</span><span class="id"> na</span><span class="id"> nb</span><span class="id"> :</span><span class="id"> nat</span>.<br/>
+<span class="vernacular">Hypothesis</span><span class="id"> nb0</span><span class="id"> :</span><span class="id"> nb</span><span class="id"> !=</span><span class="id"> 0%N</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> pirat</span><span class="id"> :</span><span class="id"> R</span><span class="id"> :=</span><span class="id"> pirat</span><span class="id"> na</span><span class="id"> nb</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> a</span><span class="id"> :</span><span class="id"> R</span><span class="id"> :=</span><span class="id"> a</span><span class="id"> na</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> b</span><span class="id"> :</span><span class="id"> R</span><span class="id"> :=</span><span class="id"> b</span><span class="id"> nb</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> f</span><span class="id"> :=</span><span class="id"> @f</span><span class="id"> R</span><span class="id"> na</span><span class="id"> nb</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> abx_gt0</span><span class="id"> x</span><span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> x</span><span class="id"> &lt;</span><span class="id"> pirat</span><span class="id"> -&gt;</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> a</span><span class="id"> -</span><span class="id"> b</span><span class="id"> *</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> /andP[x0];</span><span class="id"> rewrite</span><span class="id"> subr_gt0</span>.<br/>
+<span class="id">rewrite</span><span class="id"> /pirat</span><span class="id"> /pirat</span><span class="id"> ltr_pdivlMr</span><span class="id"> 1?mulrC//</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> ltr0n</span><span class="id"> lt0n</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> abx_ge0</span><span class="id"> x</span><span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;=</span><span class="id"> x</span><span class="id"> &lt;=</span><span class="id"> pirat</span><span class="id"> -&gt;</span><span class="id"> 0</span><span class="id"> &lt;=</span><span class="id"> a</span><span class="id"> -</span><span class="id"> b</span><span class="id"> *</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> /andP[x0</span><span class="id"> xpi];</span><span class="id"> rewrite</span><span class="id"> subr_ge0</span>.<br/>
+<span class="id">rewrite</span><span class="id"> -ler_pdivlMl//;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /b</span><span class="id"> ltr0n</span><span class="id"> lt0n</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> mulrC</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> fsin</span><span class="id"> n</span><span class="id"> :=</span><span class="gallina-kwd"> fun</span><span class="id"> x</span><span class="id"> :</span><span class="id"> R</span><span class="id"> =&gt;</span> (<span class="id">f</span><span class="id"> n</span>).<span class="id">[x]</span><span class="id"> *</span><span class="id"> sin</span><span class="id"> x</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> F</span><span class="id"> :=</span><span class="id"> @F</span><span class="id"> R</span><span class="id"> na</span><span class="id"> nb</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> fsin_antiderivative</span><span class="id"> n</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;(<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span> (<span class="id">horner</span> (<span class="id">F</span><span class="id"> n</span>))<span class="id">^`</span>()<span class="id">%classic</span><span class="id"> x</span><span class="id"> *</span><span class="id"> sin</span><span class="id"> x</span><span class="id"> -</span> (<span class="id">F</span><span class="id"> n</span>).<span class="id">[x]</span><span class="id"> *</span><span class="id"> cos</span><span class="id"> x</span>)<span class="id">^`</span>()<span class="id">%classic</span><span class="id"> =</span><br/>
+&nbsp;&nbsp;<span class="id">fsin</span><span class="id"> n</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">apply/funext</span><span class="id"> =&gt;</span><span class="id"> x/=</span>.<br/>
+<span class="id">rewrite</span><span class="id"> derive1E/=</span><span class="id"> deriveD//=;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> derivableM;</span><span class="id"> last</span><span class="id"> exact:</span><span class="id"> ex_derive</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -derivE;</span><span class="id"> exact:</span><span class="id"> derivable_horner</span>.<br/>
+<span class="id">rewrite</span><span class="id"> deriveM//;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -derivE;</span><span class="id"> exact:</span><span class="id"> derivable_horner</span>.<br/>
+<span class="id">rewrite</span><span class="id"> deriveN//=</span><span class="id"> deriveM//</span><span class="id"> !derive_val</span><span class="id"> opprD</span><span class="id"> -addrA</span><span class="id"> addrC</span><span class="id"> !addrA</span>.<br/>
+<span class="id">rewrite</span><span class="id"> scalerN</span><span class="id"> opprK</span><span class="id"> -addrA</span><span class="id"> [X</span><span class="gallina-kwd"> in</span> (_<span class="id"> +</span><span class="id"> X</span><span class="id"> =</span><span class="id"> _</span>)<span class="id">%R]</span>(_<span class="id"> :</span><span class="id"> _</span><span class="id"> =</span><span class="id"> 0%R</span>)<span class="id">;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> addrC</span><span class="id"> derivE</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply/eqP;</span><span class="id"> rewrite</span><span class="id"> subr_eq0</span><span class="id"> [eqbLHS]mulrC</span>.<br/>
+<span class="id">rewrite</span><span class="id"> addr0</span><span class="id"> -derive1E</span>.<br/>
+<span class="id">have</span><span class="id"> :=</span><span class="id"> @D2FDF</span><span class="id"> R</span><span class="id"> na</span><span class="id"> _</span><span class="id"> n</span><span class="id"> nb0</span>.<br/>
+<span class="id">rewrite</span><span class="id"> -/F</span><span class="id"> derivSn</span><span class="id"> /fsin</span><span class="id"> -/f</span><span class="id"> =&gt;</span><span class="id"> &lt;-</span>.<br/>
+<span class="id">rewrite</span><span class="id"> -!derivE</span><span class="id"> derivn1</span>.<br/>
+<span class="id">rewrite</span><span class="id"> [X</span><span class="gallina-kwd"> in</span> (<span class="id">X</span><span class="id"> +</span><span class="id"> _</span><span class="id"> =</span><span class="id"> _</span>)<span class="id">%R]</span>(_<span class="id"> :</span><span class="id"> _</span><span class="id"> =</span> (<span class="id">F</span><span class="id"> n</span>)<span class="id">^`</span>()<span class="id">^`</span>().<span class="id">[x]%R</span><span class="id"> *</span><span class="id"> sin</span><span class="id"> x</span>)<span class="id">%R;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> mulrC</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -mulrDl</span><span class="id"> hornerD</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> intfsin</span><span class="id"> n</span><span class="id"> :=</span><span class="id"> \int[mu]_</span>(<span class="id">x</span><span class="gallina-kwd"> in</span><span class="id"> `[0,</span><span class="id"> pi]</span>) (<span class="id">fsin</span><span class="id"> n</span><span class="id"> x</span>).<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> classical_set_scope</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> cfsin</span><span class="id"> n</span> (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> {within</span><span class="id"> A,</span><span class="id"> continuous</span> (<span class="id">fsin</span><span class="id"> n</span>)<span class="id">}</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">apply/continuous_subspaceT</span><span class="id"> =&gt;</span><span class="id"> /=</span><span class="id"> x</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> cvgM</span><span class="id"> =&gt;</span><span class="id"> /=;</span><span class="id"> [exact:</span><span class="id"> continuous_horner|exact:</span><span class="id"> continuous_sin]</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Goal</span><span class="gallina-kwd"> forall</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> {poly</span><span class="id"> R}</span>)<span class="id"> c,</span><span class="id"> p</span>.<span class="id">[x]</span><span class="id"> @[x</span><span class="id"> --&gt;</span><span class="id"> c^'+]</span><span class="id"> --&gt;</span><span class="id"> p</span>.<span class="id">[c]</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> p</span><span class="id"> c;</span><span class="id"> apply:</span><span class="id"> cvg_at_right_filter;</span><span class="id"> exact:</span><span class="id"> continuous_horner</span>.<br/>
+<br/>
+<span class="vernacular">Let</span><span class="id"> intfsinE</span><span class="id"> n</span><span class="id"> :</span><span class="id"> intfsin</span><span class="id"> n</span><span class="id"> =</span> (<span class="id">F</span><span class="id"> n</span>).<span class="id">[pi]</span><span class="id"> +</span> (<span class="id">F</span><span class="id"> n</span>).<span class="id">[0]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> /intfsin</span><span class="id"> /Rintegral</span>.<br/>
+<span class="id">set</span><span class="id"> h</span><span class="id"> :=</span><span class="gallina-kwd"> fun</span><span class="id"> x</span><span class="id"> =&gt;</span> (<span class="id">derive1</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span> (<span class="id">F</span><span class="id"> n</span>).<span class="id">[x]</span>)<span class="id"> x</span><span class="id"> *</span><span class="id"> sin</span><span class="id"> x</span><span class="id"> -</span> (<span class="id">F</span><span class="id"> n</span>).<span class="id">[x]</span><span class="id"> *</span><span class="id"> cos</span><span class="id"> x</span>).<br/>
+<span class="id">rewrite</span> (<span class="id">@continuous_FTC2</span><span class="id"> _</span><span class="id"> _</span><span class="id"> h</span>).<br/>
+<span class="id">-</span><span class="id"> rewrite</span><span class="id"> /h</span><span class="id"> sin0</span><span class="id"> cospi</span><span class="id"> cos0</span><span class="id"> sinpi</span><span class="id"> !mulr0</span><span class="id"> !add0r</span><span class="id"> mulr1</span><span class="id"> mulrN1</span><span class="id"> !opprK</span><span class="id"> EFinN</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> oppeK</span><span class="id"> -EFinD</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> pi_gt0</span>.<br/>
+<span class="id">-</span><span class="id"> exact:</span><span class="id"> cfsin</span>.<br/>
+<span class="id">-</span><span class="id"> split=&gt;</span><span class="id"> [x</span><span class="id"> x0pi|</span><span class="id"> |]</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> apply:</span><span class="id"> derivableB</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> apply:</span><span class="id"> derivableM</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> rewrite</span><span class="id"> -derivE</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> apply:</span><span class="id"> cvgB</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -derivE;</span><span class="id"> apply:</span><span class="id"> cvgM</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> apply:</span><span class="id"> cvg_at_right_filter;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">[exact:</span><span class="id"> continuous_horner|exact:</span><span class="id"> continuous_sin]</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> cvgM</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> apply:</span><span class="id"> cvg_at_right_filter;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">[exact:</span><span class="id"> continuous_horner|exact:</span><span class="id"> continuous_cos]</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> apply:</span><span class="id"> cvgB</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -derivE;</span><span class="id"> apply:</span><span class="id"> cvgM</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> apply:</span><span class="id"> cvg_at_left_filter;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">[exact:</span><span class="id"> continuous_horner|exact:</span><span class="id"> continuous_sin]</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> cvgM</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> apply:</span><span class="id"> cvg_at_left_filter;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">[exact:</span><span class="id"> continuous_horner|exact:</span><span class="id"> continuous_cos]</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> x</span><span class="id"> x0pi;</span><span class="id"> rewrite</span><span class="id"> fsin_antiderivative</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Hypothesis</span><span class="id"> piratE</span><span class="id"> :</span><span class="id"> pirat</span><span class="id"> =</span><span class="id"> pi</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> intfsin_int</span><span class="id"> n</span><span class="id"> :</span><span class="id"> intfsin</span><span class="id"> n</span><span class="id"> \is</span><span class="id"> a</span><span class="id"> Num</span>.<span class="id">int</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> intfsinE</span><span class="id"> rpredD</span><span class="id"> ?F0_int</span><span class="id"> -?piratE</span><span class="id"> ?FPi_int</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> f0</span><span class="id"> x</span><span class="id"> :</span> (<span class="id">f</span><span class="id"> 0</span>).<span class="id">[x]</span><span class="id"> =</span><span class="id"> 1</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /f</span><span class="id"> /pi_irrational</span>.<span class="id">f</span><span class="id"> fact0</span><span class="id"> !expr0</span><span class="id"> invr1</span><span class="id"> mulr1</span><span class="id"> !hornerE</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> fsin_bounded</span><span class="id"> n</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span> (<span class="id">0</span><span class="id"> &lt;</span><span class="id"> n</span>)<span class="id">%N</span><span class="id"> -&gt;</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> x</span><span class="id"> &lt;</span><span class="id"> pi</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">0</span><span class="id"> &lt;</span><span class="id"> fsin</span><span class="id"> n</span><span class="id"> x</span><span class="id"> &lt;</span> (<span class="id">pi</span><span class="id"> ^+</span><span class="id"> n</span><span class="id"> *</span><span class="id"> a</span><span class="id"> ^+</span><span class="id"> n</span>)<span class="id"> /</span><span class="id"> n`!%:R</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> n0</span><span class="id"> /andP[x0</span><span class="id"> xpi]</span>.<br/>
+<span class="id">have</span><span class="id"> sinx0</span><span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> sin</span><span class="id"> x</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> sin_gt0_pi//</span><span class="id"> x0</span>.<br/>
+<span class="id">apply/andP;</span><span class="id"> split</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> mulr_gt0//</span><span class="id"> /f</span><span class="id"> !hornerE/=</span><span class="id"> mulr_gt0//</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> mulr_gt0</span><span class="id"> ?invr_gt0</span><span class="id"> ?ltr0n</span><span class="id"> ?fact_gt0//</span><span class="id"> exprn_gt0</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> exprn_gt0//</span><span class="id"> abx_gt0//</span><span class="id"> x0</span><span class="id"> piratE</span>.<br/>
+<span class="id">rewrite</span><span class="id"> /fsin</span><span class="id"> !hornerE/=</span><span class="id"> -2!mulrA</span><span class="id"> mulrC</span><span class="id"> ltr_pM2r</span><span class="id"> ?invr_gt0</span><span class="id"> ?ltr0n</span><span class="id"> ?fact_gt0//</span>.<br/>
+<span class="id">rewrite</span><span class="id"> -!exprMn</span><span class="id"> [in</span><span class="id"> ltRHS]mulrC</span><span class="id"> mulrA</span><span class="id"> -exprMn</span>.<br/>
+<span class="id">have</span><span class="id"> ?</span><span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;=</span><span class="id"> a</span><span class="id"> -</span><span class="id"> b</span><span class="id"> *</span><span class="id"> x</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> abx_ge0</span><span class="id"> ?piratE//</span> (<span class="id">ltW</span><span class="id"> x0</span>)<span class="id"> ltW</span>.<br/>
+<span class="id">have</span><span class="id"> ?</span><span class="id"> :</span><span class="id"> x</span><span class="id"> *</span> (<span class="id">a</span><span class="id"> -</span><span class="id"> b</span><span class="id"> *</span><span class="id"> x</span>)<span class="id"> &lt;</span><span class="id"> a</span><span class="id"> *</span><span class="id"> pi</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> [ltRHS]mulrC</span><span class="id"> ltr_pM//;</span><span class="id"> first</span><span class="id"> exact/ltW</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> ltrBlDl</span><span class="id"> //ltrDr</span><span class="id"> mulr_gt0//</span><span class="id"> lt0r</span><span class="id"> /b</span><span class="id"> pnatr_eq0</span><span class="id"> nb0/=</span>.<br/>
+<span class="id">have</span><span class="id"> :=</span><span class="id"> sin_le1</span><span class="id"> x;</span><span class="id"> rewrite</span><span class="id"> le_eqVlt</span><span class="id"> =&gt;</span><span class="id"> /predU1P[x1|x1]</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> x1</span><span class="id"> mulr1</span><span class="id"> ltrXn2r</span><span class="id"> ?gtn_eqF//</span><span class="id"> mulr_ge0//;</span><span class="id"> exact/ltW</span>.<br/>
+<span class="id">-</span><span class="id"> rewrite</span><span class="id"> -[ltRHS]mulr1</span><span class="id"> ltr_pM//</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> exprn_ge0//</span><span class="id"> mulr_ge0//;</span><span class="id"> exact/ltW</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> exact/ltW</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> ltrXn2r</span><span class="id"> ?gtn_eqF//</span><span class="id"> mulr_ge0//;</span><span class="id"> exact/ltW</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> intsin</span><span class="id"> :</span> (<span class="id">\int[mu]_</span>(<span class="id">x</span><span class="gallina-kwd"> in</span><span class="id"> `[0%R,</span><span class="id"> pi]</span>) (<span class="id">sin</span><span class="id"> x</span>)<span class="id">%:E</span><span class="id"> =</span><span class="id"> 2%:E</span>)<span class="id">%E</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span> (<span class="id">@continuous_FTC2</span><span class="id"> _</span><span class="id"> _</span> (<span class="id">-</span><span class="id"> cos</span>))<span class="id"> ?pi_gt0//</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> !EFinN</span><span class="id"> cos0</span><span class="id"> cospi</span><span class="id"> !EFinN</span><span class="id"> oppeK</span>.<br/>
+<span class="id">-</span><span class="id"> exact/continuous_subspaceT/continuous_sin</span>.<br/>
+<span class="id">-</span><span class="id"> split</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> x</span><span class="id"> x0pi;</span><span class="id"> exact/derivableN/derivable_cos</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> apply:</span><span class="id"> cvgN;</span><span class="id"> apply:</span><span class="id"> cvg_at_right_filter;</span><span class="id"> exact:</span><span class="id"> continuous_cos</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> apply:</span><span class="id"> cvgN;</span><span class="id"> apply:</span><span class="id"> cvg_at_left_filter;</span><span class="id"> exact:</span><span class="id"> continuous_cos</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> x</span><span class="id"> x0pi;</span><span class="id"> rewrite</span><span class="id"> derive1E</span><span class="id"> deriveN//</span><span class="id"> derive_val</span><span class="id"> opprK</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> integrable_fsin</span><span class="id"> n</span><span class="id"> :</span><span class="id"> mu</span>.<span class="id">-integrable</span><span class="id"> `[0%R,</span><span class="id"> pi]</span> (<span class="id">EFin</span><span class="id"> \o</span><span class="id"> fsin</span><span class="id"> n</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">apply:</span><span class="id"> continuous_compact_integrable;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> segment_compact</span>.<br/>
+<span class="id">exact:</span><span class="id"> cfsin</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> small_ballS</span> (<span class="id">m</span><span class="id"> :</span><span class="id"> R</span><span class="id"> :=</span><span class="id"> pi</span><span class="id"> /</span><span class="id"> 2</span>) (<span class="id">d</span><span class="id"> :=</span><span class="id"> pi</span><span class="id"> /</span><span class="id"> 4</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">closed_ball</span><span class="id"> m</span><span class="id"> d</span><span class="id"> `&lt;=`</span><span class="id"> `]0%R,</span><span class="id"> pi[</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> z;</span><span class="id"> rewrite</span><span class="id"> closed_ball_itv/=;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> divr_gt0//</span><span class="id"> pi_gt0</span>.<br/>
+<span class="id">rewrite</span><span class="id"> in_itv/=</span><span class="id"> =&gt;</span><span class="id"> /andP[mdz</span><span class="id"> zmd];</span><span class="id"> rewrite</span><span class="id"> in_itv/=;</span><span class="id"> apply/andP;</span><span class="id"> split</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span> (<span class="id">lt_le_trans</span><span class="id"> _</span><span class="id"> mdz</span>)<span class="id">//</span><span class="id"> subr_gt0</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> ltr_pM2l//</span><span class="id"> ?pi_gt0//</span><span class="id"> ltf_pV2//</span><span class="id"> ?posrE//</span><span class="id"> ltr_nat</span>.<br/>
+<span class="id">rewrite</span> (<span class="id">le_lt_trans</span><span class="id"> zmd</span>)<span class="id">//</span><span class="id"> -mulrDr</span><span class="id"> gtr_pMr//</span><span class="id"> ?pi_gt0//</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -ltrBrDl</span><span class="id"> [X</span><span class="gallina-kwd"> in</span><span class="id"> _</span><span class="id"> &lt;</span><span class="id"> X</span><span class="id"> -</span><span class="id"> _]</span>(<span class="id">splitr</span><span class="id"> 1</span>)<span class="id"> div1r</span><span class="id"> addrK</span><span class="id"> ltf_pV2</span><span class="id"> ?posrE//</span><span class="id"> ltr_nat</span>.<br/>
+<span class="comment">(*&nbsp;that&nbsp;would&nbsp;be&nbsp;immediate&nbsp;with&nbsp;lra...&nbsp;*)</span><br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Let</span><span class="id"> min_fsin</span> (<span class="id">m</span><span class="id"> :</span><span class="id"> R</span><span class="id"> :=</span><span class="id"> pi</span><span class="id"> /</span><span class="id"> 2</span>) (<span class="id">d</span><span class="id"> :=</span><span class="id"> pi</span><span class="id"> /</span><span class="id"> 4</span>)<span class="id"> n</span><span class="id"> :</span> (<span class="id">0</span><span class="id"> &lt;</span><span class="id"> n</span>)<span class="id">%N</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists2</span><span class="id"> r</span><span class="id"> :</span><span class="id"> R,</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> r</span><span class="id"> &amp;</span><span class="gallina-kwd"> forall</span><span class="id"> x,</span><span class="id"> x</span><span class="id"> \in</span><span class="id"> closed_ball</span><span class="id"> m</span><span class="id"> d</span><span class="id"> -&gt;</span><span class="id"> r</span><span class="id"> &lt;=</span><span class="id"> fsin</span><span class="id"> n</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> n0;</span><span class="id"> have</span><span class="id"> mdmd</span><span class="id"> :</span><span class="id"> m</span><span class="id"> -</span><span class="id"> d</span><span class="id"> &lt;=</span><span class="id"> m</span><span class="id"> +</span><span class="id"> d</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> lerBlDr</span><span class="id"> -addrA</span><span class="id"> lerDl</span><span class="id"> -mulr2n</span><span class="id"> mulrn_wge0//</span><span class="id"> divr_ge0//</span><span class="id"> pi_ge0</span>.<br/>
+<span class="id">have</span><span class="id"> cf</span><span class="id"> :</span><span class="id"> {within</span><span class="id"> `[m</span><span class="id"> -</span><span class="id"> d,</span><span class="id"> m</span><span class="id"> +</span><span class="id"> d],</span><span class="id"> continuous</span> (<span class="id">fsin</span><span class="id"> n</span>)<span class="id">}</span>.<br/>
+&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> cfsin</span>.<br/>
+<span class="id">have</span><span class="id"> [c</span><span class="id"> cmd</span><span class="id"> Hc]</span><span class="id"> :=</span><span class="id"> @EVT_min</span><span class="id"> R</span> (<span class="id">fsin</span><span class="id"> n</span>)<span class="id"> _</span><span class="id"> _</span><span class="id"> mdmd</span><span class="id"> cf</span>.<br/>
+<span class="gallina-kwd">exists</span> (<span class="id">fsin</span><span class="id"> n</span><span class="id"> c</span>).<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> /</span>(_<span class="id"> _</span>)<span class="id">/andP[]//</span><span class="id"> :=</span><span class="id"> @fsin_bounded</span><span class="id"> n</span><span class="id"> c</span><span class="id"> n0</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> :=</span><span class="id"> @small_ballS</span><span class="id"> c;</span><span class="id"> rewrite</span><span class="id"> /=in_itv/=;</span><span class="id"> apply</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> closed_ball_itv//=</span><span class="id"> divr_gt0//</span><span class="id"> pi_gt0</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> x</span><span class="id"> /set_mem;</span><span class="id"> rewrite</span><span class="id"> closed_ball_itv//=;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> Hc</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> divr_gt0//</span><span class="id"> pi_gt0</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> intfsin_gt0</span><span class="id"> n</span><span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> intfsin</span><span class="id"> n</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> fine_gt0//;</span><span class="id"> have</span><span class="id"> [-&gt;|n0]</span><span class="id"> :=</span><span class="id"> eqVneq</span><span class="id"> n</span><span class="id"> 0</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> /fsin;</span><span class="id"> under</span><span class="id"> eq_integral</span><span class="id"> do</span><span class="id"> rewrite</span><span class="id"> f0</span><span class="id"> mul1r</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> intsin</span><span class="id"> ltry</span><span class="id"> andbT</span>.<br/>
+<span class="id">have</span><span class="id"> fsin_ge0</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;=</span><span class="id"> x</span><span class="id"> &lt;=</span><span class="id"> pi</span><span class="id"> -&gt;</span> (<span class="id">0</span><span class="id"> &lt;=</span> (<span class="id">fsin</span><span class="id"> n</span><span class="id"> x</span>)<span class="id">%:E</span>)<span class="id">%E</span>.<br/>
+&nbsp;&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> /andP[x0</span><span class="id"> xpi];</span><span class="id"> rewrite</span><span class="id"> lee_fin</span><span class="id"> mulr_ge0//</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> !hornerE</span><span class="id"> mulr_ge0//=</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> mulr_ge0//</span><span class="id"> exprn_ge0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> exprn_ge0//</span><span class="id"> abx_ge0//</span><span class="id"> piratE</span><span class="id"> x0</span>.<br/>
+&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> sin_ge0_pi//</span><span class="id"> x0</span>.<br/>
+<span class="id">apply/andP;</span><span class="id"> split</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -lt0n</span><span class="gallina-kwd"> in</span><span class="id"> n0</span>.<br/>
+&nbsp;&nbsp;<span class="id">have</span><span class="id"> [r</span><span class="id"> r0]</span><span class="id"> :=</span><span class="id"> @min_fsin</span><span class="id"> _</span><span class="id"> n0</span>.<br/>
+&nbsp;&nbsp;<span class="id">pose</span><span class="id"> m</span><span class="id"> :</span><span class="id"> R</span><span class="id"> :=</span><span class="id"> pi</span><span class="id"> /</span><span class="id"> 2;</span><span class="id"> pose</span><span class="id"> d</span><span class="id"> :</span><span class="id"> R</span><span class="id"> :=</span><span class="id"> pi</span><span class="id"> /</span><span class="id"> 4</span><span class="id"> =&gt;</span><span class="id"> rn</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span> (<span class="id">@lt_le_trans</span><span class="id"> _</span><span class="id"> _</span> (<span class="id">\int[mu]_</span>(<span class="id">x</span><span class="gallina-kwd"> in</span><span class="id"> closed_ball</span><span class="id"> m</span><span class="id"> d</span>)<span class="id"> r%:E</span>))<span class="id">%E</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> integral_cst//=;</span><span class="id"> last</span><span class="id"> exact:</span><span class="id"> measurable_closed_ball</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> mule_gt0//</span><span class="id"> lebesgue_measure_closed_ball//</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> lte_fin</span><span class="id"> mulrn_wgt0//</span><span class="id"> divr_gt0//</span><span class="id"> pi_gt0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> divr_ge0//</span><span class="id"> pi_ge0</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span> (<span class="id">@le_trans</span><span class="id"> _</span><span class="id"> _</span> (<span class="id">\int[mu]_</span>(<span class="id">x</span><span class="gallina-kwd"> in</span> (<span class="id">closed_ball</span><span class="id"> m</span><span class="id"> d</span>)) (<span class="id">fsin</span><span class="id"> n</span><span class="id"> x</span>)<span class="id">%:E</span>))<span class="id">%E</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> ge0_le_integral</span><span class="id"> =&gt;</span><span class="id"> //=</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="id"> exact:</span><span class="id"> measurable_closed_ball</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> x</span><span class="id"> _;</span><span class="id"> rewrite</span><span class="id"> lee_fin</span><span class="id"> ltW</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> x</span><span class="id"> /small_ballS/=</span><span class="id"> /[!in_itv]/=</span><span class="id"> /andP[x0</span><span class="id"> xpi]</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> fsin_ge0//</span> (<span class="id">ltW</span><span class="id"> x0</span>)<span class="id">/=</span><span class="id"> ltW</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="id"> case/integrableP</span><span class="id"> :</span> (<span class="id">integrable_fsin</span><span class="id"> n</span>)<span class="id"> =&gt;</span><span class="id"> +</span><span class="id"> _</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> measurable_funS</span><span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> x</span><span class="id"> ix</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> subset_itv_oo_cc</span> (<span class="id">small_ballS</span><span class="id"> ix</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> x</span><span class="id"> /mem_set</span><span class="id"> /rn;</span><span class="id"> rewrite</span><span class="id"> lee_fin</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> ge0_subset_integral</span><span class="id"> =&gt;</span><span class="id"> //=</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="id"> exact:</span><span class="id"> measurable_closed_ball</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> case/integrableP</span><span class="id"> :</span> (<span class="id">integrable_fsin</span><span class="id"> n</span>).<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> x</span><span class="id"> ix;</span><span class="id"> exact:</span><span class="id"> subset_itv_oo_cc</span> (<span class="id">small_ballS</span><span class="id"> ix</span>).<br/>
+<span class="id">case/integrableP</span><span class="id"> :</span> (<span class="id">integrable_fsin</span><span class="id"> n</span>)<span class="id"> =&gt;</span><span class="id"> ?</span><span class="id"> /=</span>.<br/>
+<span class="id">apply:</span><span class="id"> le_lt_trans;</span><span class="id"> apply:</span><span class="id"> ge0_le_integral</span><span class="id"> =&gt;</span><span class="id"> //=</span>.<br/>
+<span class="id">-</span><span class="id"> apply/measurable_EFinP</span><span class="id"> =&gt;</span><span class="id"> /=;</span><span class="id"> apply/measurableT_comp</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;<span class="id">exact/measurable_EFinP</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> x</span><span class="id"> x0pi;</span><span class="id"> rewrite</span><span class="id"> lee_fin</span><span class="id"> ler_norm</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> intfsin_small</span> (<span class="id">e</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> e</span><span class="id"> -&gt;</span><span class="id"> \forall</span><span class="id"> n</span><span class="id"> \near</span><span class="id"> \oo,</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> intfsin</span><span class="id"> n</span><span class="id"> &lt;</span><span class="id"> e</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> e0;</span><span class="id"> near=&gt;</span><span class="id"> n</span>.<br/>
+<span class="id">rewrite</span><span class="id"> intfsin_gt0/=</span>.<br/>
+<span class="id">apply:</span> (<span class="id">@le_lt_trans</span><span class="id"> _</span><span class="id"> _</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">\int[mu]_</span>(<span class="id">x</span><span class="gallina-kwd"> in</span><span class="id"> `[0,</span><span class="id"> pi]</span>) ((<span class="id">pi</span><span class="id"> ^+</span><span class="id"> n</span><span class="id"> *</span><span class="id"> a</span><span class="id"> ^+</span><span class="id"> n</span>)<span class="id"> /</span><span class="id"> n`!%:R</span>))).<br/>
+&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> le_Rintegral</span><span class="id"> =&gt;</span><span class="id"> //=</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="id"> apply/continuous_compact_integrable;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> segment_compact</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply/continuous_subspaceT</span><span class="id"> =&gt;</span><span class="id"> x;</span><span class="id"> exact:</span><span class="id"> cvg_cst</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> x</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">have</span><span class="id"> ?</span><span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;=</span><span class="id"> pi</span><span class="id"> ^+</span><span class="id"> n</span><span class="id"> *</span><span class="id"> a</span><span class="id"> ^+</span><span class="id"> n</span><span class="id"> /</span><span class="id"> n`!%:R</span><span class="id"> :&gt;</span><span class="id"> R</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> mulr_ge0//</span><span class="id"> mulr_ge0//</span><span class="id"> exprn_ge0//</span><span class="id"> pi_ge0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> in_itv/=</span><span class="id"> =&gt;</span><span class="id"> /andP[]</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> le_eqVlt</span><span class="id"> =&gt;</span><span class="id"> /predU1P[&lt;-</span><span class="id"> _|x0];</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /fsin</span><span class="id"> sin0</span><span class="id"> !hornerE</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> le_eqVlt</span><span class="id"> =&gt;</span><span class="id"> /predU1P[-&gt;|xpi];</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> /fsin</span><span class="id"> sinpi</span><span class="id"> mulr0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">have</span><span class="id"> n0</span><span class="id"> :</span> (<span class="id">0</span><span class="id"> &lt;</span><span class="id"> n</span>)<span class="id">%N</span><span class="gallina-kwd"> by</span><span class="id"> near:</span><span class="id"> n;</span><span class="gallina-kwd"> exists</span><span class="id"> 1%N</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">have</span><span class="id"> /</span>(_<span class="id"> _</span>)<span class="id">/andP[|//]</span><span class="id"> :=</span><span class="id"> @fsin_bounded</span><span class="id"> _</span><span class="id"> x</span><span class="id"> n0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> x0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> _</span><span class="id"> /ltW</span>.<br/>
+<span class="id">rewrite</span><span class="id"> Rintegral_cst//=</span><span class="id"> lebesgue_measure_itv/=</span><span class="id"> lte_fin</span><span class="id"> pi_gt0/=</span>.<br/>
+<span class="id">rewrite</span><span class="id"> subr0</span><span class="id"> mulrAC</span><span class="id"> -exprMn</span> (<span class="id">mulrC</span><span class="id"> _</span><span class="id"> pi</span>)<span class="id"> -mulrA</span>.<br/>
+<span class="id">near:</span><span class="id"> n</span>.<br/>
+<span class="id">have</span><span class="id"> :</span><span class="id"> pi</span><span class="id"> *</span> (<span class="id">pi</span><span class="id"> *</span><span class="id"> a</span>)<span class="id"> ^+</span><span class="id"> n</span><span class="id"> /</span><span class="id"> n`!%:R</span><span class="id"> @[n</span><span class="id"> --&gt;</span><span class="id"> \oo]</span><span class="id"> --&gt;</span> (<span class="id">0:R</span>).<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[X</span><span class="gallina-kwd"> in</span><span class="id"> _</span><span class="id"> --&gt;</span><span class="id"> X]</span>(<span class="id">mulr0</span><span class="id"> pi</span>).<br/>
+&nbsp;&nbsp;<span class="id">under</span><span class="id"> eq_fun</span><span class="id"> do</span><span class="id"> rewrite</span><span class="id"> -mulrA</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> cvgMr;</span><span class="id"> exact:</span><span class="id"> exp_fact</span>.<br/>
+<span class="id">move/cvgrPdist_lt</span><span class="id"> =&gt;</span><span class="id"> /</span>(_<span class="id"> e</span><span class="id"> e0</span>)<span class="id">[k</span><span class="id"> _]H</span>.<br/>
+<span class="id">near=&gt;</span><span class="id"> n</span>.<br/>
+<span class="id">have</span><span class="id"> {H}</span><span class="id"> :=</span><span class="id"> H</span><span class="id"> n</span>.<br/>
+<span class="id">rewrite</span><span class="id"> sub0r</span><span class="id"> normrN</span><span class="id"> ger0_norm;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> !mulr_ge0</span><span class="id"> ?pi_ge0//</span><span class="id"> exprn_ge0//</span><span class="id"> mulr_ge0//</span><span class="id"> pi_ge0</span>.<br/>
+<span class="id">rewrite</span><span class="id"> mulrA;</span><span class="id"> apply</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> near:</span><span class="id"> n;</span><span class="gallina-kwd"> exists</span><span class="id"> k</span>.<br/>
+<span class="id">Unshelve</span>.<span class="id"> all:</span><span class="gallina-kwd"> by</span><span class="id"> end_near</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> analytic_part</span>.<br/>
+<br/>
+<span class="vernacular">End</span><span class="id"> pi_irrational</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> pi_irrationnal</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realType}</span><span class="id"> :</span><span class="id"> ~</span><span class="id"> rational</span> (<span class="id">pi</span><span class="id"> :</span><span class="id"> R</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> [a</span><span class="id"> [b]];</span><span class="id"> have</span><span class="id"> [-&gt;|b0</span><span class="id"> piratE]</span><span class="id"> :=</span><span class="id"> eqVneq</span><span class="id"> b</span><span class="id"> O</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> invr0</span><span class="id"> mulr0;</span><span class="id"> apply/eqP;</span><span class="id"> rewrite</span><span class="id"> gt_eqF//</span><span class="id"> pi_gt0</span>.<br/>
+<span class="id">have</span><span class="id"> [N</span><span class="id"> _]</span><span class="id"> :=</span><span class="id"> pi_irrational</span>.<span class="id">intfsin_small</span><span class="id"> b0</span> (<span class="id">esym</span><span class="id"> piratE</span>) (<span class="id">@ltr01</span><span class="id"> R</span>).<br/>
+<span class="id">near</span><span class="id"> \oo%classic</span><span class="id"> =&gt;</span><span class="id"> n</span>.<br/>
+<span class="id">have</span><span class="id"> Nn</span><span class="id"> :</span> (<span class="id">N</span><span class="id"> &lt;=</span><span class="id"> n</span>)<span class="id">%N</span><span class="gallina-kwd"> by</span><span class="id"> near:</span><span class="id"> n;</span><span class="gallina-kwd"> exists</span><span class="id"> N</span>.<br/>
+<span class="id">have</span><span class="id"> :=</span><span class="id"> @pi_irrational</span>.<span class="id">intfsin_int</span><span class="id"> R</span><span class="id"> _</span><span class="id"> _</span><span class="id"> b0</span> (<span class="id">esym</span><span class="id"> piratE</span>)<span class="id"> n</span>.<br/>
+<span class="id">rewrite</span><span class="id"> intrEge0;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> ltW//</span><span class="id"> pi_irrational</span>.<span class="id">intfsin_gt0</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> +</span><span class="id"> /</span>(_<span class="id"> n</span><span class="id"> Nn</span>).<br/>
+<span class="id">move/natrP</span><span class="id"> =&gt;</span><span class="id"> [k]</span><span class="id"> -&gt;</span>.<br/>
+<span class="id">rewrite</span><span class="id"> ltr0n</span><span class="id"> ltrn1</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> case:</span><span class="id"> k</span>.<br/>
+<span class="id">Unshelve</span>.<span class="id"> all:</span><span class="gallina-kwd"> by</span><span class="id"> end_near</span>. Qed.</div></details>
+
+      <div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/">a fork of coq2html</a></div>
+    </div>
+  </div>
+    </main>
+</body>
+</html>

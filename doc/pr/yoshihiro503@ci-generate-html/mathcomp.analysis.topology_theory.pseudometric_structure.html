@@ -49,19 +49,11 @@ non-hausdorff case, such as in our proof of Urysohn's lemma.
                                   structure: a type equipped with balls
                                   The HB class is PseudoMetric.
              pseudoPMetricType == a pointed pseudoMetric space
-        discrete_topology dscT == the discrete topology on T, provided
-                                  dscT : discrete_space T
                       ball x e == ball of center x and radius e
                nbhs_ball_ ball == nbhs defined using the given balls
                      nbhs_ball == nbhs defined using balls in a
                                   pseudometric space
-                  discrete_ent == entourages of the discrete uniformity
-                                  topology
-                 discrete_ball == singleton balls for the discrete metric
-        discrete_topology_type == equip choice types with a discrete
-                                  topology
 ```
-`discrete_ent` is equipped with the `Uniform` structure.
 ### Factories
 ```
            Nbhs_isPseudoMetric == factory to build a topological space
@@ -120,43 +112,6 @@ non-hausdorff case, such as in our proof of Urysohn's lemma.
 <span class="id">#[short</span>(<span class="id">type=</span><span class="id">&quot;pseudoPMetricType&quot;</span>)<span class="id">]</span><br/>
 <span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> PseudoPointedMetric</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> numDomainType</span>)<span class="id"> :=</span><br/>
 &nbsp;&nbsp;<span class="id">{T</span><span class="id"> of</span><span class="id"> Pointed</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> Uniform</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> Uniform_isPseudoMetric</span><span class="id"> R</span><span class="id"> T}</span>.<br/>
-<br/>
-<span class="vernacular">Definition</span><span class="id"> discrete_topology</span><span class="id"> T</span> (<span class="id">dsc</span><span class="id"> :</span><span class="id"> discrete_space</span><span class="id"> T</span>)<span class="id"> :</span><span class="gallina-kwd"> Type</span><span class="id"> :=</span><span class="id"> T</span>.<br/>
-<br/>
-<span class="vernacular">Section</span><span class="id"> discrete_uniform</span>.<br/>
-<span class="vernacular">Context</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> nbhsType}</span><span class="id"> {dsc:</span><span class="id"> discrete_space</span><span class="id"> T}</span>.<br/>
-<br/>
-<span class="vernacular">Definition</span><span class="id"> discrete_ent</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">set</span> (<span class="id">T</span><span class="id"> *</span><span class="id"> T</span>))<span class="id"> :=</span><br/>
-&nbsp;&nbsp;<span class="id">globally</span> (<span class="id">range</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span> (<span class="id">x,</span><span class="id"> x</span>))).<br/>
-<br/>
-<span class="id">Program</span><span class="vernacular"> Definition</span><span class="id"> discrete_uniform_structure</span><span class="id"> :=</span><br/>
-&nbsp;&nbsp;<span class="id">@isUniform</span>.<span class="id">Build</span> (<span class="id">discrete_topology</span><span class="id"> dsc</span>)<span class="id"> discrete_ent</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span>.<br/>
-<details>
-<summary class="toggleproof">Next Obligation.</summary>
-<div class="proofscript">
-<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> +</span><span class="id"> x</span><span class="id"> x12;</span><span class="id"> apply;</span><span class="gallina-kwd"> exists</span><span class="id"> x</span>.<span class="id">1;</span><span class="id"> rewrite</span><span class="id"> //</span><span class="id"> {2}x12</span><span class="id"> -surjective_pairing</span>.<br/>
-Qed.</div></details>
-<details>
-<summary class="toggleproof">Next Obligation.</summary>
-<div class="proofscript">
-<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> dA</span><span class="id"> x</span><span class="id"> [i</span><span class="id"> _</span><span class="id"> &lt;-];</span><span class="id"> apply:</span><span class="id"> dA;</span><span class="gallina-kwd"> exists</span><span class="id"> i</span>.<br/>
-Qed.</div></details>
-<details>
-<summary class="toggleproof">Next Obligation.</summary>
-<div class="proofscript">
-<span class="id">move=&gt;</span><span class="id"> ?</span><span class="id"> dA;</span><span class="gallina-kwd"> exists</span> (<span class="id">range</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span> (<span class="id">x,</span><span class="id"> x</span>)))<span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
-<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> set_compose_diag</span><span class="id"> =&gt;</span><span class="id"> x</span><span class="id"> [i</span><span class="id"> _</span><span class="id"> &lt;-];</span><span class="id"> apply:</span><span class="id"> dA;</span><span class="gallina-kwd"> exists</span><span class="id"> i</span>.<br/>
-Qed.</div></details>
-<br/>
-<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Choice</span>.<span class="id">on</span> (<span class="id">discrete_topology</span><span class="id"> dsc</span>).<br/>
-<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> discrete_uniform_structure</span>.<br/>
-<span class="vernacular">End</span><span class="id"> discrete_uniform</span>.<br/>
-<br/>
-<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">P</span><span class="id"> :</span><span class="id"> pnbhsType</span>) (<span class="id">dsc</span><span class="id"> :</span><span class="id"> discrete_space</span><span class="id"> P</span>)<span class="id"> :=</span><br/>
-&nbsp;&nbsp;<span class="id">Pointed</span>.<span class="id">on</span> (<span class="id">discrete_topology</span><span class="id"> dsc</span>).<br/>
-<br/>
-<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> pnbhsType}</span><span class="id"> {dsc:</span><span class="id"> discrete_space</span><span class="id"> T}</span><span class="id"> :=</span><br/>
-&nbsp;&nbsp;<span class="id">Pointed</span>.<span class="id">on</span> (<span class="id">discrete_topology</span><span class="id"> dsc</span>).<br/>
 <br/>
 <span class="id">HB</span>.<span class="id">factory</span><span class="vernacular"> Record</span><span class="id"> Nbhs_isPseudoMetric</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> numFieldType</span>)<span class="id"> M</span><span class="id"> of</span><span class="id"> Nbhs</span><span class="id"> M</span><span class="id"> :=</span><span class="id"> {</span><br/>
 &nbsp;&nbsp;<span class="id">ent</span><span class="id"> :</span><span class="id"> set_system</span> (<span class="id">M</span><span class="id"> *</span><span class="id"> M</span>)<span class="id">;</span><br/>
@@ -505,81 +460,6 @@ Qed.</div></details>
 Qed.</div></details>
 <br/>
 <div class="doc">Specific pseudoMetric spaces </div>
-<br/>
-<span class="vernacular">Section</span><span class="id"> discrete_pseudoMetric</span>.<br/>
-<span class="vernacular">Context</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> nbhsType}</span><span class="id"> {dsc</span><span class="id"> :</span><span class="id"> discrete_space</span><span class="id"> T}</span>.<br/>
-<br/>
-<span class="vernacular">Definition</span><span class="id"> discrete_ball</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> T</span>) (<span class="id">eps</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> y</span><span class="id"> :</span><span class="gallina-kwd"> Prop</span><span class="id"> :=</span><span class="id"> x</span><span class="id"> =</span><span class="id"> y</span>.<br/>
-<br/>
-<span class="vernacular">Lemma</span><span class="id"> discrete_ball_center</span><span class="id"> x</span> (<span class="id">eps</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> eps</span><span class="id"> -&gt;</span><span class="id"> discrete_ball</span><span class="id"> x</span><span class="id"> eps</span><span class="id"> x</span>.<br/>
-<details>
-<summary class="toggleproof">Proof.</summary>
-<div class="proofscript">
-<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
-<br/>
-<span class="id">Program</span><span class="vernacular"> Definition</span><span class="id"> discrete_pseudometric_structure</span><span class="id"> :=</span><br/>
-&nbsp;&nbsp;<span class="id">@Uniform_isPseudoMetric</span>.<span class="id">Build</span><span class="id"> R</span> (<span class="id">discrete_topology</span><span class="id"> dsc</span>)<span class="id"> discrete_ball</span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;_<span class="id"> _</span><span class="id"> _</span><span class="id"> _</span>.<br/>
-<details>
-<summary class="toggleproof">Next Obligation.</summary>
-<div class="proofscript">
-<span class="gallina-kwd"> by</span><span class="id"> done</span>. Qed.</div></details>
-<details>
-<summary class="toggleproof">Next Obligation.</summary>
-<div class="proofscript">
-<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> -&gt;</span>. Qed.</div></details>
-<details>
-<summary class="toggleproof">Next Obligation.</summary>
-<div class="proofscript">
-<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> -&gt;</span><span class="id"> -&gt;</span>. Qed.</div></details>
-<details>
-<summary class="toggleproof">Next Obligation.</summary>
-<div class="proofscript">
-<span class="id">rewrite</span><span class="id"> predeqE</span><span class="id"> =&gt;</span><span class="id"> P;</span><span class="id"> split;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
-&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> case=&gt;</span><span class="id"> e</span><span class="id"> _</span><span class="id"> leP;</span><span class="id"> move=&gt;</span><span class="id"> [a</span><span class="id"> b]</span><span class="id"> [i</span><span class="id"> _]</span><span class="id"> [-&gt;</span><span class="id"> -&gt;];</span><span class="id"> apply:</span><span class="id"> leP</span>.<br/>
-<span class="id">move=&gt;</span><span class="id"> entP;</span><span class="gallina-kwd"> exists</span><span class="id"> 1</span><span class="id"> =&gt;</span><span class="id"> //=</span><span class="id"> z</span><span class="id"> z12;</span><span class="id"> apply:</span><span class="id"> entP;</span><span class="gallina-kwd"> exists</span><span class="id"> z</span>.<span class="id">1</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
-<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> {2}z12</span><span class="id"> -surjective_pairing</span>.<br/>
-Qed.</div></details>
-<br/>
-<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> discrete_pseudometric_structure</span>.<br/>
-<span class="vernacular">End</span><span class="id"> discrete_pseudoMetric</span>.<br/>
-<br/>
-<div class="doc">we use `discrete_topology` to equip choice types with a discrete topology </div>
-<span class="vernacular">Section</span><span class="id"> discrete_topology</span>.<br/>
-<br/>
-<span class="vernacular">Let</span><span class="id"> discrete_subproof</span> (<span class="id">P</span><span class="id"> :</span><span class="id"> choiceType</span>)<span class="id"> :</span><br/>
-&nbsp;&nbsp;<span class="id">discrete_space</span> (<span class="id">principal_filter_type</span><span class="id"> P</span>).<br/>
-<details>
-<summary class="toggleproof">Proof.</summary>
-<div class="proofscript">
-<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
-<br/>
-<span class="vernacular">Definition</span><span class="id"> discrete_topology_type</span> (<span class="id">P</span><span class="id"> :</span><span class="gallina-kwd"> Type</span>)<span class="id"> :</span><span class="gallina-kwd"> Type</span><span class="id"> :=</span><span class="id"> P</span>.<br/>
-<br/>
-<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">P</span><span class="id"> :</span><span class="id"> choiceType</span>)<span class="id"> :=</span><span class="id"> Choice</span>.<span class="id">copy</span><br/>
-&nbsp;&nbsp;(<span class="id">discrete_topology_type</span><span class="id"> P</span>) (<span class="id">discrete_topology</span> (<span class="id">discrete_subproof</span><span class="id"> P</span>)).<br/>
-<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">P</span><span class="id"> :</span><span class="id"> choiceType</span>)<span class="id"> :=</span><span class="id"> Filtered</span>.<span class="id">copy</span><br/>
-&nbsp;&nbsp;(<span class="id">discrete_topology_type</span><span class="id"> P</span>) (<span class="id">discrete_topology</span> (<span class="id">discrete_subproof</span><span class="id"> P</span>)).<br/>
-<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span>  (<span class="id">P</span><span class="id"> :</span><span class="id"> choiceType</span>)<span class="id"> :=</span><span class="id"> Uniform</span>.<span class="id">copy</span><br/>
-&nbsp;&nbsp;(<span class="id">discrete_topology_type</span><span class="id"> P</span>) (<span class="id">discrete_topology</span> (<span class="id">discrete_subproof</span><span class="id"> P</span>)).<br/>
-<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">P</span><span class="id"> :</span><span class="id"> pointedType</span>)<span class="id"> :=</span><span class="id"> Pointed</span>.<span class="id">copy</span><br/>
-&nbsp;&nbsp;(<span class="id">discrete_topology_type</span><span class="id"> P</span>) (<span class="id">discrete_topology</span> (<span class="id">discrete_subproof</span><span class="id"> P</span>)).<br/>
-<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> R</span> (<span class="id">P</span><span class="id"> :</span><span class="id"> choiceType</span>)<span class="id"> :</span><span class="id"> @PseudoMetric</span><span class="id"> R</span><span class="id"> _</span><span class="id"> :=</span><br/>
-&nbsp;&nbsp;<span class="id">PseudoMetric</span>.<span class="id">copy</span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">discrete_topology_type</span><span class="id"> P</span>) (<span class="id">discrete_topology</span> (<span class="id">discrete_subproof</span><span class="id"> P</span>)).<br/>
-<br/>
-<span class="vernacular">End</span><span class="id"> discrete_topology</span>.<br/>
-<br/>
-<span class="vernacular">Lemma</span><span class="id"> discrete_space_discrete</span> (<span class="id">P</span><span class="id"> :</span><span class="id"> choiceType</span>)<span class="id"> :</span><br/>
-&nbsp;&nbsp;<span class="id">discrete_space</span> (<span class="id">discrete_topology_type</span><span class="id"> P</span>).<br/>
-<details>
-<summary class="toggleproof">Proof.</summary>
-<div class="proofscript">
-<span class="id">apply/funext</span><span class="id"> =&gt;</span><span class="id"> /=</span><span class="id"> x;</span><span class="id"> apply/funext</span><span class="id"> =&gt;</span><span class="id"> A;</span><span class="id"> apply/propext;</span><span class="id"> split</span>.<br/>
-<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> [E</span><span class="id"> hE</span><span class="id"> EA]</span><span class="id"> _</span><span class="id"> -&gt;;</span><span class="id"> apply/EA/xsectionP/hE;</span><span class="gallina-kwd"> exists</span><span class="id"> x</span>.<br/>
-<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> h;</span><span class="gallina-kwd"> exists</span><span class="id"> diagonal;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> -[a</span><span class="id"> b]</span><span class="id"> [t</span><span class="id"> _]</span><span class="id"> [&lt;-</span><span class="id"> &lt;-]</span>.<br/>
-&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> y</span><span class="id"> /xsectionP/=</span><span class="id"> xy;</span><span class="id"> exact:</span><span class="id"> h</span>.<br/>
-Qed.</div></details>
 <br/>
 <span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> zmodType</span>)<span class="id"> :=</span><span class="id"> isPointed</span>.<span class="id">Build</span><span class="id"> R</span><span class="id"> 0</span>.<br/>
 <br/>

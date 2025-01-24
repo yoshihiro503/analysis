@@ -514,25 +514,25 @@ Qed.</div></details>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
-<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itv_c_infty;</span><span class="id"> exact/mf/emeasurable_itv</span>. Qed.</div></details>
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itvcy;</span><span class="id"> exact/mf/emeasurable_itv</span>. Qed.</div></details>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> emeasurable_fun_o_infty</span><span class="id"> y</span><span class="id"> :</span> <span class="id"> measurable</span> (<span class="id">D</span><span class="id"> `&amp;`</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span><span class="id"> y</span><span class="id"> &lt;</span><span class="id"> f</span><span class="id"> x]</span>).<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
-<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itv_o_infty;</span><span class="id"> exact/mf/emeasurable_itv</span>. Qed.</div></details>
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itvoy;</span><span class="id"> exact/mf/emeasurable_itv</span>. Qed.</div></details>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> emeasurable_fun_infty_o</span><span class="id"> y</span><span class="id"> :</span><span class="id"> measurable</span> (<span class="id">D</span><span class="id"> `&amp;`</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span><span class="id"> f</span><span class="id"> x</span><span class="id"> &lt;</span><span class="id"> y]</span>).<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
-<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itv_infty_o;</span><span class="id"> exact/mf/emeasurable_itv</span>. Qed.</div></details>
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itvNyo;</span><span class="id"> exact/mf/emeasurable_itv</span>. Qed.</div></details>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> emeasurable_fun_infty_c</span><span class="id"> y</span><span class="id"> :</span><span class="id"> measurable</span> (<span class="id">D</span><span class="id"> `&amp;`</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span><span class="id"> f</span><span class="id"> x</span><span class="id"> &lt;=</span><span class="id"> y]</span>).<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
-<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itv_infty_c;</span><span class="id"> exact/mf/emeasurable_itv</span>. Qed.</div></details>
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itvNyc;</span><span class="id"> exact/mf/emeasurable_itv</span>. Qed.</div></details>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> emeasurable_fin_num</span><span class="id"> :</span><span class="id"> measurable</span> (<span class="id">D</span><span class="id"> `&amp;`</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span><span class="id"> f</span><span class="id"> x</span><span class="id"> \is</span><span class="id"> a</span><span class="id"> fin_num]</span>).<br/>
 <details>
@@ -541,19 +541,15 @@ Qed.</div></details>
 <span class="id">rewrite</span><span class="id"> [X</span><span class="gallina-kwd"> in</span><span class="id"> measurable</span><span class="id"> X]</span>(_<span class="id"> :</span><span class="id"> _</span><span class="id"> =</span><br/>
 &nbsp;&nbsp;<span class="id">\bigcup_k</span> (<span class="id">D</span><span class="id"> `&amp;`</span> (<span class="id">[set</span> <span class="id"> x</span><span class="id"> |</span><span class="id"> -</span><span class="id"> k%:R%:E</span><span class="id"> &lt;=</span><span class="id"> f</span><span class="id"> x]</span><span class="id"> `&amp;`</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span><span class="id"> f</span><span class="id"> x</span><span class="id"> &lt;=</span><span class="id"> k%:R%:E]</span>))).<br/>
 &nbsp;&nbsp;<span class="id">apply:</span><span class="id"> bigcupT_measurable</span><span class="id"> =&gt;</span><span class="id"> k;</span><span class="id"> rewrite</span><span class="id"> -</span>(<span class="id">setIid</span><span class="id"> D</span>)<span class="id"> setIACA</span>.<br/>
-&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> measurableI;</span><span class="id"> [exact:</span><span class="id"> emeasurable_fun_c_infty|</span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> emeasurable_fun_infty_c]</span>.<br/>
+&nbsp;&nbsp;<span class="id">exact/measurableI/emeasurable_fun_infty_c/emeasurable_fun_c_infty</span>.<br/>
 <span class="id">rewrite</span><span class="id"> predeqE</span><span class="id"> =&gt;</span><span class="id"> t;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> [/=</span><span class="id"> [Dt</span><span class="id"> ft]|]</span>.<br/>
-&nbsp;&nbsp;<span class="id">have</span><span class="id"> [ft0|ft0]</span><span class="id"> :=</span><span class="id"> leP</span><span class="id"> 0%R</span> (<span class="id">fine</span> (<span class="id">f</span><span class="id"> t</span>)).<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">exists</span><span class="id"> `|ceil</span> (<span class="id">fine</span> (<span class="id">f</span><span class="id"> t</span>))<span class="id">|%N</span><span class="id"> =&gt;</span><span class="id"> //=;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> split</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -{2}</span>(<span class="id">fineK</span><span class="id"> ft</span>)<span class="id">//</span><span class="id"> lee_fin</span> (<span class="id">le_trans</span><span class="id"> _</span><span class="id"> ft0</span>)<span class="id">//</span><span class="id"> lerNl</span><span class="id"> oppr0</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> natr_absz</span><span class="id"> ger0_norm;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -ceil_ge0</span> (<span class="id">lt_le_trans</span><span class="id"> _</span><span class="id"> ft0</span>).<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -</span>(<span class="id">fineK</span><span class="id"> ft</span>)<span class="id"> lee_fin</span><span class="id"> ceil_ge</span>.<br/>
-&nbsp;&nbsp;<span class="gallina-kwd">exists</span><span class="id"> `|floor</span> (<span class="id">fine</span> (<span class="id">f</span><span class="id"> t</span>))<span class="id">|%N</span><span class="id"> =&gt;</span><span class="id"> //=;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> split</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> natr_absz</span><span class="id"> ltr0_norm</span><span class="id"> -?floor_lt0//</span><span class="id"> EFinN</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -{2}</span>(<span class="id">fineK</span><span class="id"> ft</span>)<span class="id"> lee_fin</span><span class="id"> mulrNz</span><span class="id"> opprK</span><span class="id"> ge_floor//</span><span class="id"> ?num_real</span>.<br/>
-&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -</span>(<span class="id">fineK</span><span class="id"> ft</span>)<span class="id">//</span><span class="id"> lee_fin</span> (<span class="id">le_trans</span> (<span class="id">ltW</span><span class="id"> ft0</span>)).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">exists</span><span class="id"> `|ceil</span><span class="id"> `|fine</span> (<span class="id">f</span><span class="id"> t</span>)<span class="id">|</span><span class="id"> |%N</span><span class="id"> =&gt;</span><span class="id"> //=;</span><span class="id"> split=&gt;</span><span class="id"> //;</span><span class="id"> split</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[leRHS]</span>(<span class="id">fineK</span><span class="id"> ft</span>)<span class="id"> lee_fin</span><span class="id"> lerNl</span><span class="id"> pmulrn</span><span class="id"> abszE</span><span class="id"> ceil_ge_int</span><span class="id"> ger0_norm</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> ceil_le//</span><span class="id"> -normrN</span><span class="id"> ler_norm</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -</span>(<span class="id">ceil0</span><span class="id"> R</span>)<span class="id"> ceil_le</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[leLHS]</span>(<span class="id">fineK</span><span class="id"> ft</span>)<span class="id"> lee_fin</span><span class="id"> pmulrn</span><span class="id"> abszE</span><span class="id"> ceil_ge_int</span><span class="id"> ger0_norm</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> ceil_le//</span><span class="id"> ler_norm</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -</span>(<span class="id">ceil0</span><span class="id"> R</span>)<span class="id"> ceil_le</span>.<br/>
 <span class="id">move=&gt;</span><span class="id"> [n</span><span class="id"> _]</span><span class="id"> [/=</span><span class="id"> Dt</span><span class="id"> [nft</span><span class="id"> fnt]];</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> rewrite</span><span class="id"> fin_numElt</span>.<br/>
 <span class="gallina-kwd">by</span><span class="id"> rewrite</span> (<span class="id">lt_le_trans</span><span class="id"> _</span><span class="id"> nft</span>)<span class="id"> ?ltNyr//=</span> (<span class="id">le_lt_trans</span><span class="id"> fnt</span>)<span class="id">//</span><span class="id"> ltry</span>.<br/>
 Qed.</div></details>
@@ -856,7 +852,7 @@ Qed.</div></details>
 <span class="id">move=&gt;</span><span class="id"> [r|</span><span class="id"> |/</span>(_<span class="id"> O</span><span class="id"> Logic</span>.<span class="id">I</span>)<span class="id">]</span><span class="id"> //</span><span class="id"> /</span>(_<span class="id"> `|ceil</span><span class="id"> r|%N</span><span class="id"> Logic</span>.<span class="id">I</span>)<span class="id">;</span><span class="id"> rewrite</span><span class="id"> /=</span><span class="id"> in_itv</span><span class="id"> /=</span>.<br/>
 <span class="id">rewrite</span><span class="id"> andbT</span><span class="id"> lte_fin</span><span class="id"> ltNge</span>.<br/>
 <span class="id">have</span><span class="id"> [r0|r0]</span><span class="id"> :=</span><span class="id"> ltP</span><span class="id"> 0%R</span><span class="id"> r;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span> (<span class="id">le_trans</span><span class="id"> r0</span>).<br/>
-<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> natr_absz</span><span class="id"> gtr0_norm//</span><span class="id"> ?ceil_ge//</span><span class="id"> -ceil_gt0</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> natr_absz</span><span class="id"> gtr0_norm//</span><span class="id"> ?le_ceil//</span><span class="id"> -ceil_gt0</span>.<br/>
 Qed.</div></details>
 <br/>
 <span class="vernacular">End</span><span class="id"> erealwithrays</span>.<br/>
@@ -1079,7 +1075,7 @@ Qed.</div></details>
 <div class="proofscript">
 <span class="id">move=&gt;</span><span class="id"> scif;</span><span class="id"> apply:</span> (<span class="id">measurability</span> (<span class="id">ErealGenOInfty</span>.<span class="id">measurableE</span><span class="id"> R</span>)).<br/>
 <span class="id">move=&gt;</span><span class="id"> /=</span><span class="id"> _</span><span class="id"> [_</span><span class="id"> [a</span><span class="id"> -&gt;]]</span><span class="id"> &lt;-;</span><span class="id"> apply:</span><span class="id"> measurableI</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> apply:</span><span class="id"> open_measurable</span>.<br/>
-<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> preimage_itv_o_infty;</span><span class="id"> move/lower_semicontinuousP</span><span class="id"> :</span><span class="id"> scif;</span><span class="id"> exact</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> preimage_itvoy;</span><span class="id"> move/lower_semicontinuousP</span><span class="id"> :</span><span class="id"> scif;</span><span class="id"> exact</span>.<br/>
 Qed.</div></details>
 <br/>
 <span class="vernacular">Section</span><span class="id"> standard_measurable_fun</span>.<br/>
@@ -1169,12 +1165,12 @@ Qed.</div></details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
 <span class="id">move=&gt;</span><span class="id"> mf</span><span class="id"> mg</span><span class="id"> mD;</span><span class="id"> apply:</span> (<span class="id">measurability</span> (<span class="id">RGenOInfty</span>.<span class="id">measurableE</span><span class="id"> R</span>))<span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
-<span class="id">move=&gt;</span><span class="id"> /=</span><span class="id"> _</span><span class="id"> [_</span><span class="id"> [a</span><span class="id"> -&gt;]</span><span class="id"> &lt;-];</span><span class="id"> rewrite</span><span class="id"> preimage_itv_o_infty</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> /=</span><span class="id"> _</span><span class="id"> [_</span><span class="id"> [a</span><span class="id"> -&gt;]</span><span class="id"> &lt;-];</span><span class="id"> rewrite</span><span class="id"> preimage_itvoy</span>.<br/>
 <span class="id">rewrite</span><span class="id"> [X</span><span class="gallina-kwd"> in</span><span class="id"> measurable</span><span class="id"> X]</span>(_<span class="id"> :</span><span class="id"> _</span><span class="id"> =</span><span class="id"> \bigcup_</span>(<span class="id">q</span><span class="id"> :</span><span class="id"> rat</span>)<br/>
 &nbsp;&nbsp;((<span class="id">D</span><span class="id"> `&amp;`</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span><span class="id"> ratr</span><span class="id"> q</span><span class="id"> &lt;</span><span class="id"> f</span><span class="id"> x]</span>)<span class="id"> `&amp;`</span> (<span class="id">D</span><span class="id"> `&amp;`</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span><span class="id"> a</span><span class="id"> -</span><span class="id"> ratr</span><span class="id"> q</span><span class="id"> &lt;</span><span class="id"> g</span><span class="id"> x]</span>))).<br/>
 &nbsp;&nbsp;<span class="id">apply:</span><span class="id"> bigcupT_measurable_rat</span><span class="id"> =&gt;</span><span class="id"> q;</span><span class="id"> apply:</span><span class="id"> measurableI</span>.<br/>
-&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itv_o_infty;</span><span class="id"> apply:</span><span class="id"> mf</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> apply:</span><span class="id"> measurable_itv</span>.<br/>
-&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itv_o_infty;</span><span class="id"> apply:</span><span class="id"> mg</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> apply:</span><span class="id"> measurable_itv</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itvoy;</span><span class="id"> apply:</span><span class="id"> mf</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> measurable_itv</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itvoy;</span><span class="id"> apply:</span><span class="id"> mg</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> measurable_itv</span>.<br/>
 <span class="id">rewrite</span><span class="id"> predeqE</span><span class="id"> =&gt;</span><span class="id"> x;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> [|[r</span><span class="id"> _]</span><span class="id"> []/=</span><span class="id"> [Dx</span><span class="id"> rfx]]</span><span class="id"> /=</span><span class="id"> =&gt;</span><span class="id"> [[Dx]|[_]]</span>.<br/>
 &nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -ltrBlDr</span><span class="id"> =&gt;</span><span class="id"> /rat_in_itvoo[r];</span><span class="id"> rewrite</span><span class="id"> inE</span><span class="id"> /=</span><span class="id"> =&gt;</span><span class="id"> /itvP</span><span class="id"> h</span>.<br/>
 &nbsp;&nbsp;<span class="gallina-kwd">exists</span><span class="id"> r</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> rewrite</span><span class="id"> setIACA</span><span class="id"> setIid;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> /=</span>.<br/>
@@ -1216,7 +1212,7 @@ Qed.</div></details>
 <div class="proofscript">
 <span class="id">move=&gt;</span><span class="id"> mf</span><span class="id"> mg</span><span class="id"> mD;</span><span class="id"> apply:</span> (<span class="id">measurable_fun_bool</span><span class="id"> true</span>)<span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
 <span class="id">under</span><span class="id"> eq_fun</span><span class="id"> do</span><span class="id"> rewrite</span><span class="id"> -subr_gt0</span>.<br/>
-<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> preimage_true</span><span class="id"> -preimage_itv_o_infty;</span><span class="id"> exact:</span><span class="id"> measurable_funB</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> preimage_true</span><span class="id"> -preimage_itvoy;</span><span class="id"> exact:</span><span class="id"> measurable_funB</span>.<br/>
 Qed.</div></details>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> measurable_fun_ler</span><span class="id"> D</span><span class="id"> f</span><span class="id"> g</span><span class="id"> :</span><span class="id"> measurable_fun</span><span class="id"> D</span><span class="id"> f</span><span class="id"> -&gt;</span><span class="id"> measurable_fun</span><span class="id"> D</span><span class="id"> g</span><span class="id"> -&gt;</span><br/>
@@ -1226,7 +1222,7 @@ Qed.</div></details>
 <div class="proofscript">
 <span class="id">move=&gt;</span><span class="id"> mf</span><span class="id"> mg</span><span class="id"> mD;</span><span class="id"> apply:</span> (<span class="id">measurable_fun_bool</span><span class="id"> true</span>)<span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
 <span class="id">under</span><span class="id"> eq_fun</span><span class="id"> do</span><span class="id"> rewrite</span><span class="id"> -subr_ge0</span>.<br/>
-<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> preimage_true</span><span class="id"> -preimage_itv_c_infty;</span><span class="id"> exact:</span><span class="id"> measurable_funB</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> preimage_true</span><span class="id"> -preimage_itvcy;</span><span class="id"> exact:</span><span class="id"> measurable_funB</span>.<br/>
 Qed.</div></details>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> measurable_fun_eqr</span><span class="id"> D</span><span class="id"> f</span><span class="id"> g</span><span class="id"> :</span><span class="id"> measurable_fun</span><span class="id"> D</span><span class="id"> f</span><span class="id"> -&gt;</span><span class="id"> measurable_fun</span><span class="id"> D</span><span class="id"> g</span><span class="id"> -&gt;</span><br/>
@@ -1319,7 +1315,7 @@ Qed.</div></details>
 <span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> apply/bounded_fun_has_lbound/cvg_seq_bounded/cvg_ex;</span><span class="id"> eexists;</span><span class="id"> exact:</span><span class="id"> f_f</span>.<br/>
 Qed.</div></details>
 <br/>
-<span class="vernacular">Lemma</span><span class="id"> measurable_fun_indic</span><span class="id"> D</span> (<span class="id">U</span><span class="id"> :</span><span class="id"> set</span><span class="id"> T</span>)<span class="id"> :</span><span class="id"> measurable</span><span class="id"> U</span><span class="id"> -&gt;</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> measurable_indic</span><span class="id"> D</span> (<span class="id">U</span><span class="id"> :</span><span class="id"> set</span><span class="id"> T</span>)<span class="id"> :</span><span class="id"> measurable</span><span class="id"> U</span><span class="id"> -&gt;</span><br/>
 &nbsp;&nbsp;<span class="id">measurable_fun</span><span class="id"> D</span> (<span class="id">\1_U</span><span class="id"> :</span><span class="id"> _</span><span class="id"> -&gt;</span><span class="id"> R</span>).<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
@@ -1339,6 +1335,18 @@ Qed.</div></details>
 &nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> mem_set</span>.<br/>
 <span class="id">-</span><span class="id"> rewrite</span><span class="id"> [X</span><span class="gallina-kwd"> in</span><span class="id"> measurable</span><span class="id"> X]</span>(_<span class="id"> :</span><span class="id"> _</span><span class="id"> =</span><span class="id"> set0</span>)<span class="id">//</span>.<br/>
 &nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply/seteqP;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //</span><span class="id"> r</span><span class="id"> /=</span><span class="id"> -[_];</span><span class="id"> rewrite</span><span class="id"> indicE;</span><span class="id"> case:</span> (_<span class="id"> \in</span><span class="id"> _</span>).<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> measurable_indicP</span><span class="id"> D</span><span class="id"> :</span><span class="id"> measurable</span><span class="id"> D</span><span class="id"> &lt;-&gt;</span><span class="id"> measurable_fun</span><span class="id"> setT</span> (<span class="id">\1_D</span><span class="id"> :</span><span class="id"> _</span><span class="id"> -&gt;</span><span class="id"> R</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">split=&gt;</span><span class="id"> [|m1];</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> measurable_indic</span>.<br/>
+<span class="id">have</span><span class="id"> -&gt;</span><span class="id"> :</span><span class="id"> D</span><span class="id"> =</span> (<span class="id">\1_D</span><span class="id"> :</span><span class="id"> _</span><span class="id"> -&gt;</span><span class="id"> R</span>)<span class="id"> @^-1`</span><span class="id"> `]0,</span><span class="id"> +oo[</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply/seteqP;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> t/=</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> indicE</span><span class="id"> =&gt;</span><span class="id"> /mem_set</span><span class="id"> -&gt;;</span><span class="id"> rewrite</span><span class="id"> in_itv/=</span><span class="id"> ltr01</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> in_itv/=</span><span class="id"> andbT</span><span class="id"> indicE</span><span class="id"> ltr0n;</span><span class="id"> have</span><span class="id"> [/set_mem|//]</span><span class="id"> :=</span><span class="id"> boolP</span> (<span class="id">t</span><span class="id"> \in</span><span class="id"> D</span>).<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -[_</span><span class="id"> @^-1`</span><span class="id"> _]setTI;</span><span class="id"> exact:</span><span class="id"> m1</span>.<br/>
 Qed.</div></details>
 <br/>
 <span class="vernacular">End</span><span class="id"> measurable_fun_realType</span>.<br/>
@@ -1391,9 +1399,10 @@ Qed.</div></details>
 <span class="id">move=&gt;</span><span class="id"> mf</span>.<br/>
 <span class="id">exact:</span> (<span class="id">@measurable_comp</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> setT</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> :</span><span class="id"> R</span><span class="id"> =&gt;</span><span class="id"> x</span><span class="id"> ^+</span><span class="id"> n</span>)<span class="id"> _</span><span class="id"> f</span>).<br/>
 Qed.</div></details>
+<span class="id">#[deprecated</span>(<span class="id">since=</span><span class="id">&quot;mathcomp-analysis 1.4.0&quot;</span><span class="id">,</span><span class="id"> note=</span><span class="id">&quot;use `measurable_funX` instead&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Notation</span><span class="id"> measurable_fun_pow</span><span class="id"> :=</span><span class="id"> measurable_funX</span> (<span class="id">only</span><span class="id"> parsing</span>).<br/>
 <br/>
-<span class="vernacular">Lemma</span><span class="id"> measurable_powR</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>)<span class="id"> p</span><span class="id"> :</span><br/>
-&nbsp;&nbsp;<span class="id">measurable_fun</span><span class="id"> [set:</span><span class="id"> R]</span> (<span class="id">@powR</span><span class="id"> R</span><span class="id"> ^~</span><span class="id"> p</span>).<br/>
+<span class="vernacular">Lemma</span><span class="id"> measurable_powR</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>)<span class="id"> p</span><span class="id"> :</span><span class="id"> measurable_fun</span><span class="id"> [set:</span><span class="id"> R]</span> (<span class="id">@powR</span><span class="id"> R</span><span class="id"> ^~</span><span class="id"> p</span>).<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
@@ -1407,14 +1416,22 @@ Qed.</div></details>
 Qed.</div></details>
 <span class="id">#[global]</span><span class="vernacular"> Hint</span><span class="id"> Extern</span><span class="id"> 0</span> (<span class="id">measurable_fun</span><span class="id"> _</span> (<span class="id">@powR</span><span class="id"> _</span><span class="id"> ^~</span><span class="id"> _</span>))<span class="id"> =&gt;</span><br/>
 &nbsp;&nbsp;<span class="id">solve</span><span class="id"> [apply:</span><span class="id"> measurable_powR]</span><span class="id"> :</span><span class="id"> core</span>.<br/>
-<span class="id">#[deprecated</span>(<span class="id">since=</span><span class="id">&quot;mathcomp-analysis 0.6.3&quot;</span><span class="id">,</span><span class="id"> note=</span><span class="id">&quot;use `measurable_powR` instead&quot;</span>)<span class="id">]</span><br/>
-<span class="vernacular">Notation</span><span class="id"> measurable_fun_power_pos</span><span class="id"> :=</span><span class="id"> measurable_powR</span> (<span class="id">only</span><span class="id"> parsing</span>).<br/>
-<span class="id">#[deprecated</span>(<span class="id">since=</span><span class="id">&quot;mathcomp-analysis 0.6.4&quot;</span><span class="id">,</span><span class="id"> note=</span><span class="id">&quot;use `measurable_powR` instead&quot;</span>)<span class="id">]</span><br/>
-<span class="vernacular">Notation</span><span class="id"> measurable_power_pos</span><span class="id"> :=</span><span class="id"> measurable_powR</span> (<span class="id">only</span><span class="id"> parsing</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> measurable_powRr</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realType}</span><span class="id"> b</span><span class="id"> :</span><span class="id"> measurable_fun</span><span class="id"> [set:</span><span class="id"> R]</span> (<span class="id">@powR</span><span class="id"> R</span><span class="id"> b</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> /powR;</span><span class="id"> apply:</span><span class="id"> measurable_fun_if</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+<span class="id">-</span><span class="id"> rewrite</span><span class="id"> preimage_true</span><span class="id"> setTI/=</span>.<br/>
+&nbsp;&nbsp;<span class="id">case:</span> (<span class="id">b</span><span class="id"> ==</span><span class="id"> 0</span>)<span class="id">;</span><span class="id"> rewrite</span><span class="id"> ?set_true</span><span class="id"> ?set_false</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> apply:</span><span class="id"> measurableT_comp</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> measurable_fun_eqr</span>.<br/>
+&nbsp;&nbsp;<span class="id">+</span><span class="id"> exact:</span><span class="id"> measurable_fun_set0</span>.<br/>
+<span class="id">-</span><span class="id"> rewrite</span><span class="id"> preimage_false</span><span class="id"> setTI;</span><span class="id"> apply:</span><span class="id"> measurableT_comp</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> mulrr_measurable</span>.<br/>
+Qed.</div></details>
+<br/>
 <span class="id">#[deprecated</span>(<span class="id">since=</span><span class="id">&quot;mathcomp-analysis 0.6.3&quot;</span><span class="id">,</span><span class="id"> note=</span><span class="id">&quot;use `measurable_maxr` instead&quot;</span>)<span class="id">]</span><br/>
 <span class="vernacular">Notation</span><span class="id"> measurable_fun_max</span><span class="id"> :=</span><span class="id"> measurable_maxr</span> (<span class="id">only</span><span class="id"> parsing</span>).<br/>
-<span class="id">#[deprecated</span>(<span class="id">since=</span><span class="id">&quot;mathcomp-analysis 1.4.0&quot;</span><span class="id">,</span><span class="id"> note=</span><span class="id">&quot;use `measurable_funX` instead&quot;</span>)<span class="id">]</span><br/>
-<span class="vernacular">Notation</span><span class="id"> measurable_fun_pow</span><span class="id"> :=</span><span class="id"> measurable_funX</span> (<span class="id">only</span><span class="id"> parsing</span>).<br/>
 <br/>
 <span class="vernacular">Module</span><span class="id"> NGenCInfty</span>.<br/>
 <span class="vernacular">Section</span><span class="id"> ngencinfty</span>.<br/>
@@ -1474,12 +1491,12 @@ Qed.</div></details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
 <span class="id">move=&gt;</span><span class="id"> mf</span><span class="id"> mg</span><span class="id"> mD;</span><span class="id"> apply:</span> (<span class="id">measurability</span><span class="id"> NGenCInfty</span>.<span class="id">measurableE</span>)<span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
-<span class="id">move=&gt;</span><span class="id"> /=</span><span class="id"> _</span><span class="id"> [_</span><span class="id"> [a</span><span class="id"> -&gt;]</span><span class="id"> &lt;-];</span><span class="id"> rewrite</span><span class="id"> preimage_itv_c_infty</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> /=</span><span class="id"> _</span><span class="id"> [_</span><span class="id"> [a</span><span class="id"> -&gt;]</span><span class="id"> &lt;-];</span><span class="id"> rewrite</span><span class="id"> preimage_itvcy</span>.<br/>
 <span class="id">rewrite</span><span class="id"> [X</span><span class="gallina-kwd"> in</span><span class="id"> measurable</span><span class="id"> X]</span>(_<span class="id"> :</span><span class="id"> _</span><span class="id"> =</span><span class="id"> \bigcup_q</span><br/>
 &nbsp;&nbsp;((<span class="id">D</span><span class="id"> `&amp;`</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span><span class="id"> q</span><span class="id"> &lt;=</span><span class="id"> f</span><span class="id"> x]%O</span>)<span class="id"> `&amp;`</span> (<span class="id">D</span><span class="id"> `&amp;`</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span> (<span class="id">a</span><span class="id"> -</span><span class="id"> q</span>)<span class="id">%N</span><span class="id"> &lt;=</span><span class="id"> g</span><span class="id"> x]%O</span>))).<br/>
 &nbsp;&nbsp;<span class="id">apply:</span><span class="id"> bigcupT_measurable</span><span class="id"> =&gt;</span><span class="id"> q;</span><span class="id"> apply:</span><span class="id"> measurableI</span>.<br/>
-&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itv_c_infty;</span><span class="id"> exact:</span><span class="id"> mf</span>.<br/>
-&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itv_c_infty;</span><span class="id"> exact:</span><span class="id"> mg</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itvcy;</span><span class="id"> exact:</span><span class="id"> mf</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itvcy;</span><span class="id"> exact:</span><span class="id"> mg</span>.<br/>
 <span class="id">rewrite</span><span class="id"> predeqE</span><span class="id"> =&gt;</span><span class="id"> x;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> [|[r</span><span class="id"> ?]</span><span class="id"> []/=</span><span class="id"> [Dx</span><span class="id"> rfx]]</span><span class="id"> /=</span><span class="id"> =&gt;</span><span class="id"> [[Dx]|[?]]</span>.<br/>
 <span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> afxgx;</span><span class="gallina-kwd"> exists</span> (<span class="id">a</span><span class="id"> -</span><span class="id"> g</span><span class="id"> x</span>)<span class="id">%N</span><span class="id"> =&gt;</span><span class="id"> //=;</span><span class="id"> split;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> leEnat</span><span class="id"> leq_subLR//</span><span class="id"> addnC</span><span class="id"> -leEnat</span>.<br/>
@@ -1498,8 +1515,8 @@ Qed.</div></details>
 <span class="id">move=&gt;</span><span class="id"> /=</span><span class="id"> _</span><span class="id"> [_</span><span class="id"> [a</span><span class="id"> -&gt;]</span><span class="id"> &lt;-];</span><span class="id"> rewrite</span><span class="id"> [X</span><span class="gallina-kwd"> in</span><span class="id"> measurable</span><span class="id"> X]</span>(_<span class="id"> :</span><span class="id"> _</span><span class="id"> =</span><br/>
 &nbsp;&nbsp;((<span class="id">D</span><span class="id"> `&amp;`</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span><span class="id"> a</span><span class="id"> &lt;=</span><span class="id"> f</span><span class="id"> x]%O</span>)<span class="id"> `|`</span> (<span class="id">D</span><span class="id"> `&amp;`</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span><span class="id"> a</span><span class="id"> &lt;=</span><span class="id"> g</span><span class="id"> x]%O</span>))).<br/>
 &nbsp;&nbsp;<span class="id">apply:</span><span class="id"> measurableU</span>.<br/>
-&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itv_c_infty;</span><span class="id"> exact:</span><span class="id"> mf</span>.<br/>
-&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itv_c_infty;</span><span class="id"> exact:</span><span class="id"> mg</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itvcy;</span><span class="id"> exact:</span><span class="id"> mf</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itvcy;</span><span class="id"> exact:</span><span class="id"> mg</span>.<br/>
 <span class="id">rewrite</span><span class="id"> predeqE</span><span class="id"> =&gt;</span><span class="id"> x;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> [[Dx</span><span class="id"> /=]|]</span>.<br/>
 <span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> in_itv/=</span><span class="id"> andbT;</span><span class="id"> have</span><span class="id"> [fg</span><span class="id"> agx|gf</span><span class="id"> afx]</span><span class="id"> :=</span><span class="id"> leqP</span> (<span class="id">f</span><span class="id"> x</span>) (<span class="id">g</span><span class="id"> x</span>)<span class="id">;</span><span class="id"> tauto</span>.<br/>
 <span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> [[Dx</span><span class="id"> /=</span><span class="id"> afx]|[Dx</span><span class="id"> /=</span><span class="id"> agx]]</span>.<br/>
@@ -1516,13 +1533,13 @@ Qed.</div></details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
 <span class="id">move=&gt;</span><span class="id"> gf</span><span class="id"> mf</span><span class="id"> mg</span><span class="id"> mD;</span><span class="id"> apply:</span> (<span class="id">measurability</span><span class="id"> NGenCInfty</span>.<span class="id">measurableE</span>)<span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
-<span class="id">move=&gt;</span><span class="id"> /=</span><span class="id"> _</span><span class="id"> [_</span><span class="id"> [a</span><span class="id"> -&gt;]</span><span class="id"> &lt;-];</span><span class="id"> rewrite</span><span class="id"> preimage_itv_c_infty</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> /=</span><span class="id"> _</span><span class="id"> [_</span><span class="id"> [a</span><span class="id"> -&gt;]</span><span class="id"> &lt;-];</span><span class="id"> rewrite</span><span class="id"> preimage_itvcy</span>.<br/>
 <span class="id">rewrite</span><span class="id"> [X</span><span class="gallina-kwd"> in</span><span class="id"> measurable</span><span class="id"> X]</span>(_<span class="id"> :</span><span class="id"> _</span><span class="id"> =</span><span class="id"> \bigcup_q</span><br/>
 &nbsp;&nbsp;((<span class="id">D</span><span class="id"> `&amp;`</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span><span class="id"> maxn</span><span class="id"> a</span><span class="id"> q</span><span class="id"> &lt;=</span><span class="id"> f</span><span class="id"> x]%O</span>)<span class="id"> `&amp;`</span><br/>
 &nbsp;&nbsp;&nbsp;(<span class="id">D</span><span class="id"> `&amp;`</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span><span class="id"> g</span><span class="id"> x</span><span class="id"> &lt;=</span> (<span class="id">q</span><span class="id"> -</span><span class="id"> a</span>)<span class="id">%N]%O</span>))).<br/>
 &nbsp;&nbsp;<span class="id">apply:</span><span class="id"> bigcupT_measurable</span><span class="id"> =&gt;</span><span class="id"> q;</span><span class="id"> apply:</span><span class="id"> measurableI</span>.<br/>
-&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itv_c_infty;</span><span class="id"> exact:</span><span class="id"> mf</span>.<br/>
-&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itv_infty_c;</span><span class="id"> exact:</span><span class="id"> mg</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itvcy;</span><span class="id"> exact:</span><span class="id"> mf</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itvNyc;</span><span class="id"> exact:</span><span class="id"> mg</span>.<br/>
 <span class="id">rewrite</span><span class="id"> predeqE</span><span class="id"> =&gt;</span><span class="id"> x;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> [|[r</span><span class="id"> ?]</span><span class="id"> []/=</span><span class="id"> [Dx</span><span class="id"> rfx]]</span><span class="id"> /=</span><span class="id"> =&gt;</span><span class="id"> [[Dx]|[_]]</span>.<br/>
 <span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> afxgx;</span><span class="gallina-kwd"> exists</span> (<span class="id">g</span><span class="id"> x</span><span class="id"> +</span><span class="id"> a</span>)<span class="id">%N</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> split;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //=</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> leEnat;</span><span class="id"> have</span><span class="id"> /maxn_idPr</span><span class="id"> -&gt;</span><span class="id"> :=</span><span class="id"> leq_addl</span> (<span class="id">g</span><span class="id"> x</span>)<span class="id"> a</span>.<br/>
@@ -1560,15 +1577,15 @@ Qed.</div></details>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply/funext</span><span class="id"> =&gt;</span><span class="id"> n;</span><span class="id"> apply/idP/idP</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> !ltEnat</span><span class="id"> /ltn/=</span><span class="id"> =&gt;</span><span class="id"> fg;</span><span class="id"> rewrite</span><span class="id"> subn_gt0</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> !ltEnat</span><span class="id"> /ltn/=</span><span class="id"> =&gt;</span><span class="id"> fg;</span><span class="id"> rewrite</span><span class="id"> -subn_gt0</span>.<br/>
-&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> preimage_true</span><span class="id"> -preimage_itv_o_infty;</span><span class="id"> exact:</span><span class="id"> measurable_fun_subn</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> preimage_true</span><span class="id"> -preimage_itvoy;</span><span class="id"> exact:</span><span class="id"> measurable_fun_subn</span>.<br/>
 <span class="id">-</span><span class="id"> under</span><span class="id"> eq_fun</span><span class="id"> do</span><span class="id"> rewrite</span><span class="id"> ltnNge</span>.<br/>
 &nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> preimage_false</span><span class="id"> set_predC</span><span class="id"> setCK</span>.<br/>
 &nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> [X</span><span class="gallina-kwd"> in</span><span class="id"> _</span><span class="id"> `&amp;`</span><span class="id"> X]</span>(_<span class="id"> :</span><span class="id"> _</span><span class="id"> =</span><span class="id"> \bigcup_</span>(<span class="id">i</span><span class="gallina-kwd"> in</span><span class="id"> range</span><span class="id"> f</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">[set</span><span class="id"> y</span><span class="id"> |</span><span class="id"> g</span><span class="id"> y</span><span class="id"> &lt;=</span><span class="id"> i]%O</span><span class="id"> `&amp;`</span><span class="id"> [set</span><span class="id"> t</span><span class="id"> |</span><span class="id"> i</span><span class="id"> &lt;=</span><span class="id"> f</span><span class="id"> t]%O</span>)).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> setI_bigcupr;</span><span class="id"> apply:</span><span class="id"> bigcup_measurable</span><span class="id"> =&gt;</span><span class="id"> k</span><span class="id"> fk</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> setIIr;</span><span class="id"> apply:</span><span class="id"> measurableI</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itv_infty_c;</span><span class="id"> exact:</span><span class="id"> mg</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itv_c_infty;</span><span class="id"> exact:</span><span class="id"> mf</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itvNyc;</span><span class="id"> exact:</span><span class="id"> mg</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itvcy;</span><span class="id"> exact:</span><span class="id"> mf</span>.<br/>
 &nbsp;&nbsp;<span class="id">apply/funext</span><span class="id"> =&gt;</span><span class="id"> n/=</span>.<br/>
 &nbsp;&nbsp;<span class="id">suff</span><span class="id"> :</span> (<span class="id">g</span><span class="id"> n</span><span class="id"> &lt;=</span><span class="id"> f</span><span class="id"> n</span>)<span class="id">%N</span><span class="id"> &lt;-&gt;</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">\bigcup_</span>(<span class="id">i</span><span class="gallina-kwd"> in</span><span class="id"> range</span><span class="id"> f</span>) (<span class="id">[set</span><span class="id"> y</span><span class="id"> |</span><span class="id"> g</span><span class="id"> y</span><span class="id"> &lt;=</span><span class="id"> i]%O</span><span class="id"> `&amp;`</span><span class="id"> [set</span><span class="id"> t</span><span class="id"> |</span><span class="id"> i</span><span class="id"> &lt;=</span><span class="id"> f</span><span class="id"> t]%O</span>))<span class="id"> n</span>.<br/>
@@ -1590,8 +1607,8 @@ Qed.</div></details>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">\bigcup_</span>(<span class="id">i</span><span class="gallina-kwd"> in</span><span class="id"> range</span><span class="id"> g</span>) (<span class="id">[set</span><span class="id"> y</span><span class="id"> |</span><span class="id"> f</span><span class="id"> y</span><span class="id"> &lt;=</span><span class="id"> i]%O</span><span class="id"> `&amp;`</span><span class="id"> [set</span><span class="id"> t</span><span class="id"> |</span><span class="id"> i</span><span class="id"> &lt;=</span><span class="id"> g</span><span class="id"> t]%O</span>)).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> setI_bigcupr;</span><span class="id"> apply:</span><span class="id"> bigcup_measurable</span><span class="id"> =&gt;</span><span class="id"> k</span><span class="id"> fk</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> setIIr;</span><span class="id"> apply:</span><span class="id"> measurableI</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itv_infty_c;</span><span class="id"> exact:</span><span class="id"> mf</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itv_c_infty;</span><span class="id"> exact:</span><span class="id"> mg</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itvNyc;</span><span class="id"> exact:</span><span class="id"> mf</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">+</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_itvcy;</span><span class="id"> exact:</span><span class="id"> mg</span>.<br/>
 &nbsp;&nbsp;<span class="id">apply/funext</span><span class="id"> =&gt;</span><span class="id"> n/=</span>.<br/>
 &nbsp;&nbsp;<span class="id">suff</span><span class="id"> :</span> (<span class="id">f</span><span class="id"> n</span><span class="id"> &lt;=</span><span class="id"> g</span><span class="id"> n</span>)<span class="id">%N</span><span class="id"> &lt;-&gt;</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">\bigcup_</span>(<span class="id">i</span><span class="gallina-kwd"> in</span><span class="id"> range</span><span class="id"> g</span>) (<span class="id">[set</span><span class="id"> y</span><span class="id"> |</span><span class="id"> f</span><span class="id"> y</span><span class="id"> &lt;=</span><span class="id"> i]%O</span><span class="id"> `&amp;`</span><span class="id"> [set</span><span class="id"> t</span><span class="id"> |</span><span class="id"> i</span><span class="id"> &lt;=</span><span class="id"> g</span><span class="id"> t]%O</span>))<span class="id"> n</span>.<br/>
@@ -1627,7 +1644,7 @@ Qed.</div></details>
 <div class="proofscript">
 <span class="id">move=&gt;</span><span class="id"> mD;</span><span class="id"> apply:</span> (<span class="id">measurability</span> (<span class="id">ErealGenOInfty</span>.<span class="id">measurableE</span><span class="id"> R</span>))<span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
 <span class="id">move=&gt;</span><span class="id"> /=</span><span class="id"> _</span><span class="id"> [_</span><span class="id"> [x</span><span class="id"> -&gt;]]</span><span class="id"> &lt;-;</span><span class="id"> apply:</span><span class="id"> measurableI</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
-<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> preimage_itv_o_infty</span><span class="id"> EFin_itv;</span><span class="id"> exact:</span><span class="id"> measurable_itv</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> preimage_itvoy</span><span class="id"> EFin_itv;</span><span class="id"> exact:</span><span class="id"> measurable_itv</span>.<br/>
 Qed.</div></details>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> abse_measurable</span> (<span class="id">D</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">\bar</span><span class="id"> R</span>))<span class="id"> :</span><span class="id"> measurable_fun</span><span class="id"> D</span><span class="id"> abse</span>.<br/>
@@ -1696,7 +1713,7 @@ Qed.</div></details>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
-<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> /measurable_fun_indic/measurable_EFinP</span>. Qed.</div></details>
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> /measurable_indic/measurable_EFinP</span>. Qed.</div></details>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> measurable_er_map</span><span class="id"> d</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d</span>) (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>) (<span class="id">f</span><span class="id"> :</span><span class="id"> R</span><span class="id"> -&gt;</span><span class="id"> R</span>)<span class="id"> :</span><br/>
 &nbsp;&nbsp;<span class="id">measurable_fun</span><span class="id"> setT</span><span class="id"> f</span><span class="id"> -&gt;</span><span class="id"> measurable_fun</span><span class="id"> [set:</span><span class="id"> \bar</span><span class="id"> R]</span> (<span class="id">er_map</span><span class="id"> f</span>).<br/>
@@ -1763,14 +1780,16 @@ Qed.</div></details>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
-<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> mf;</span><span class="id"> exact:</span><span class="id"> measurable_maxe</span>. Qed.</div></details>
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> mf;</span><span class="id"> rewrite</span><span class="id"> unlock;</span><span class="id"> exact:</span><span class="id"> measurable_maxe</span>. Qed.</div></details>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> measurable_funeneg</span><span class="id"> D</span> (<span class="id">f</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> \bar</span><span class="id"> R</span>)<span class="id"> :</span><br/>
 &nbsp;&nbsp;<span class="id">measurable_fun</span><span class="id"> D</span><span class="id"> f</span><span class="id"> -&gt;</span><span class="id"> measurable_fun</span><span class="id"> D</span><span class="id"> f^\-</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
-<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> mf;</span><span class="id"> apply:</span><span class="id"> measurable_maxe</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> measurableT_comp</span>. Qed.</div></details>
+<span class="id">move=&gt;</span><span class="id"> mf;</span><span class="id"> rewrite</span><span class="id"> unlock;</span><span class="id"> apply:</span><span class="id"> measurable_maxe</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+<span class="id">exact:</span><span class="id"> measurableT_comp</span>.<br/>
+Qed.</div></details>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> measurable_mine</span><span class="id"> D</span> (<span class="id">f</span><span class="id"> g</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> \bar</span><span class="id"> R</span>)<span class="id"> :</span><br/>
 &nbsp;&nbsp;<span class="id">measurable_fun</span><span class="id"> D</span><span class="id"> f</span><span class="id"> -&gt;</span><span class="id"> measurable_fun</span><span class="id"> D</span><span class="id"> g</span><span class="id"> -&gt;</span><br/>
@@ -2226,8 +2245,7 @@ Qed.</div></details>
 <br/>
 <span class="vernacular">Hint</span><span class="id"> Extern</span><span class="id"> 0</span> ((_ .<span class="id">-ocitv</span>).<span class="id">-measurable</span><span class="id"> _</span>)<span class="id"> =&gt;</span><span class="id"> solve</span><span class="id"> [apply:</span><span class="id"> is_ocitv]</span><span class="id"> :</span><span class="id"> core</span>.<br/>
 <br/>
-<span class="vernacular">Lemma</span><span class="id"> hlength_sigma_subadditive</span><span class="id"> :</span><br/>
-&nbsp;&nbsp;<span class="id">measurable_subset_sigma_subadditive</span> (<span class="id">hlength</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">ocitv_type</span><span class="id"> R</span>)<span class="id"> -&gt;</span><span class="id"> _</span>).<br/>
+<span class="vernacular">Lemma</span><span class="id"> hlength_sigma_subadditive</span><span class="id"> :</span><span class="id"> measurable_subset_sigma_subadditive</span><span class="id"> hlength</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
@@ -2256,8 +2274,7 @@ Qed.</div></details>
 <span class="id">have:</span><span class="id"> `]</span>(<span class="id">a</span>.<span class="id">1</span><span class="id"> +</span><span class="id"> e%:num</span><span class="id"> /</span><span class="id"> 2</span>)<span class="id">,</span><span class="id"> a</span>.<span class="id">2]</span><span class="id"> `&lt;=`</span><span class="id"> \bigcup_</span>(<span class="id">i</span><span class="gallina-kwd"> in</span><span class="id"> [set`</span><span class="id"> X]</span>)<span class="id"> Aoc</span><span class="id"> i</span>.<br/>
 &nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> x</span><span class="id"> /subset_itv_oc_cc</span><span class="id"> /Xc</span><span class="id"> [i</span><span class="id"> /=</span><span class="id"> Xi]</span><span class="id"> Aooix</span>.<br/>
 &nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="gallina-kwd"> exists</span><span class="id"> i</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> apply:</span><span class="id"> subset_itv_oo_oc</span><span class="id"> Aooix</span>.<br/>
-<span class="id">have</span><span class="id"> /[apply]</span><span class="id"> :=</span><span class="id"> @content_sub_fsum</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><br/>
-&nbsp;&nbsp;<span class="id">[the</span><span class="id"> content</span><span class="id"> _</span><span class="id"> _</span><span class="id"> of</span><span class="id"> hlength</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">ocitv_type</span><span class="id"> R</span>)<span class="id"> -&gt;</span><span class="id"> _]</span><span class="id"> _</span><span class="id"> [set`</span><span class="id"> X]</span>.<br/>
+<span class="id">have</span><span class="id"> /[apply]</span><span class="id"> :=</span><span class="id"> @content_sub_fsum</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> hlength</span><span class="id"> _</span><span class="id"> [set`</span><span class="id"> X]</span>.<br/>
 <span class="id">move=&gt;</span><span class="id"> /</span>(_<span class="id"> _</span><span class="id"> _</span><span class="id"> _</span>)<span class="id">/Box[]//=;</span><span class="id"> apply:</span><span class="id"> le_le_trans</span>.<br/>
 &nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> hlength_itv</span><span class="id"> ?lte_fin</span><span class="id"> -?EFinD/=</span><span class="id"> -addrA</span><span class="id"> -opprD</span>.<br/>
 &nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> case:</span><span class="id"> ltP</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> rewrite</span><span class="id"> lee_fin</span><span class="id"> subr_le0</span>.<br/>
@@ -2273,7 +2290,7 @@ Qed.</div></details>
 <span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Content_SigmaSubAdditive_isMeasure</span>.<span class="id">Build</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><br/>
 &nbsp;&nbsp;<span class="id">hlength</span><span class="id"> hlength_sigma_subadditive</span>.<br/>
 <br/>
-<span class="vernacular">Lemma</span><span class="id"> hlength_sigma_finite</span><span class="id"> :</span><span class="id"> sigma_finite</span><span class="id"> setT</span> (<span class="id">hlength</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">ocitv_type</span><span class="id"> R</span>)<span class="id"> -&gt;</span><span class="id"> _</span>).<br/>
+<span class="vernacular">Lemma</span><span class="id"> hlength_sigma_finite</span><span class="id"> :</span><span class="id"> sigma_finite</span><span class="id"> setT</span><span class="id"> hlength</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
@@ -2298,15 +2315,14 @@ Qed.</div></details>
 <span class="vernacular">End</span><span class="id"> LebesgueMeasure</span>.<br/>
 <br/>
 <span class="vernacular">Definition</span><span class="id"> lebesgue_measure</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realType}</span><span class="id"> :</span><br/>
-&nbsp;&nbsp;<span class="id">set</span><span class="id"> [the</span><span class="id"> measurableType</span><span class="id"> _</span>.<span class="id">-sigma</span><span class="id"> of</span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">g_sigma_algebraType</span><span class="id"> R</span>.<span class="id">-ocitv</span>.<span class="id">-measurable]</span><span class="id"> -&gt;</span><span class="id"> \bar</span><span class="id"> R</span><span class="id"> :=</span><br/>
-&nbsp;&nbsp;<span class="id">[the</span><span class="id"> measure</span><span class="id"> _</span><span class="id"> _</span><span class="id"> of</span><span class="id"> lebesgue_stieltjes_measure</span><span class="id"> idfun]</span>.<br/>
+&nbsp;&nbsp;<span class="id">set</span> (<span class="id">g_sigma_algebraType</span><span class="id"> R</span>.<span class="id">-ocitv</span>.<span class="id">-measurable</span>)<span class="id"> -&gt;</span><span class="id"> \bar</span><span class="id"> R</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">lebesgue_stieltjes_measure</span><span class="id"> idfun</span>.<br/>
 <span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>)<span class="id"> :=</span><span class="id"> Measure</span>.<span class="id">on</span> (<span class="id">@lebesgue_measure</span><span class="id"> R</span>).<br/>
 <span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>)<span class="id"> :=</span><br/>
 &nbsp;&nbsp;<span class="id">SigmaFiniteMeasure</span>.<span class="id">on</span> (<span class="id">@lebesgue_measure</span><span class="id"> R</span>).<br/>
 <br/>
 <span class="vernacular">Definition</span><span class="id"> completed_lebesgue_measure</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realType}</span><span class="id"> :</span><span class="id"> set</span><span class="id"> _</span><span class="id"> -&gt;</span><span class="id"> \bar</span><span class="id"> R</span><span class="id"> :=</span><br/>
-&nbsp;&nbsp;<span class="id">[the</span><span class="id"> measure</span><span class="id"> _</span><span class="id"> _</span><span class="id"> of</span><span class="id"> completed_lebesgue_stieltjes_measure</span><span class="id"> idfun]</span>.<br/>
+&nbsp;&nbsp;<span class="id">completed_lebesgue_stieltjes_measure</span><span class="id"> idfun</span>.<br/>
 <span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>)<span class="id"> :=</span><br/>
 &nbsp;&nbsp;<span class="id">Measure</span>.<span class="id">on</span> (<span class="id">@completed_lebesgue_measure</span><span class="id"> R</span>).<br/>
 <span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>)<span class="id"> :=</span><br/>
@@ -2595,8 +2611,7 @@ Qed.</div></details>
 <span class="vernacular">Variable</span><span class="id"> R</span><span class="id"> :</span><span class="id"> realType</span>.<br/>
 <br/>
 <span class="vernacular">Let</span><span class="id"> lebesgue_measure_itvoc</span> (<span class="id">a</span><span class="id"> b</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
-&nbsp;&nbsp;(<span class="id">lebesgue_measure</span> (<span class="id">`]a,</span><span class="id"> b]</span><span class="id"> :</span><span class="id"> set</span><span class="id"> R</span>)<span class="id"> =</span><br/>
-&nbsp;&nbsp;<span class="id">wlength</span><span class="id"> [the</span><span class="id"> cumulative</span><span class="id"> _</span><span class="id"> of</span><span class="id"> idfun]</span><span class="id"> `]a,</span><span class="id"> b]</span>)<span class="id">%classic</span>.<br/>
+&nbsp;&nbsp;(<span class="id">lebesgue_measure</span> (<span class="id">`]a,</span><span class="id"> b]</span><span class="id"> :</span><span class="id"> set</span><span class="id"> R</span>)<span class="id"> =</span><span class="id"> wlength</span><span class="id"> idfun</span><span class="id"> `]a,</span><span class="id"> b]</span>)<span class="id">%classic</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
@@ -2625,7 +2640,7 @@ Qed.</div></details>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> ler_ltB//</span><span class="id"> invr_lt1</span><span class="id"> ?unitfE//</span><span class="id"> ltr1n</span><span class="id"> ltnS</span><span class="id"> lt0n</span>.<br/>
 &nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> !</span>(<span class="id">EFinB,EFinN</span>)<span class="id"> fin_num_oppeB//</span><span class="id"> addeAC</span><span class="id"> addeA</span><span class="id"> subee//</span><span class="id"> add0e</span>.<br/>
 <span class="id">apply/cvg_lim</span><span class="id"> =&gt;</span><span class="id"> //=;</span><span class="id"> apply/fine_cvgP;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> /=;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> nearW</span>.<br/>
-<span class="id">apply/</span>(<span class="id">@cvgrPdist_lt</span><span class="id"> _</span><span class="id"> [the</span><span class="id"> pseudoMetricNormedZmodType</span><span class="id"> R</span><span class="id"> of</span><span class="id"> R^o]</span>)<span class="id"> =&gt;</span><span class="id"> _/posnumP[e]</span>.<br/>
+<span class="id">apply/</span>(<span class="id">@cvgrPdist_lt</span><span class="id"> _</span><span class="id"> R^o</span>)<span class="id"> =&gt;</span><span class="id"> _/posnumP[e]</span>.<br/>
 <span class="id">near=&gt;</span><span class="id"> n;</span><span class="id"> rewrite</span><span class="id"> opprB</span><span class="id"> addrCA</span><span class="id"> subrr</span><span class="id"> addr0</span><span class="id"> ger0_norm//</span>.<br/>
 <span class="gallina-kwd">by</span><span class="id"> near:</span><span class="id"> n;</span><span class="id"> exact:</span><span class="id"> near_infty_natSinv_lt</span>.<br/>
 <span class="id">Unshelve</span>.<span class="id"> all:</span><span class="gallina-kwd"> by</span><span class="id"> end_near</span>. Qed.</div></details>
@@ -2647,8 +2662,7 @@ Qed.</div></details>
 Qed.</div></details>
 <br/>
 <span class="vernacular">Let</span><span class="id"> lebesgue_measure_itvoo</span> (<span class="id">a</span><span class="id"> b</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
-&nbsp;&nbsp;(<span class="id">lebesgue_measure</span> (<span class="id">`]a,</span><span class="id"> b[</span><span class="id"> :</span><span class="id"> set</span><span class="id"> R</span>)<span class="id"> =</span><br/>
-&nbsp;&nbsp;&nbsp;<span class="id">wlength</span><span class="id"> [the</span><span class="id"> cumulative</span><span class="id"> _</span><span class="id"> of</span><span class="id"> idfun]</span><span class="id"> `]a,</span><span class="id"> b[</span>)<span class="id">%classic</span>.<br/>
+&nbsp;&nbsp;(<span class="id">lebesgue_measure</span> (<span class="id">`]a,</span><span class="id"> b[</span><span class="id"> :</span><span class="id"> set</span><span class="id"> R</span>)<span class="id"> =</span><span class="id"> wlength</span><span class="id"> idfun</span><span class="id"> `]a,</span><span class="id"> b[</span>)<span class="id">%classic</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
@@ -2660,8 +2674,7 @@ Qed.</div></details>
 Qed.</div></details>
 <br/>
 <span class="vernacular">Let</span><span class="id"> lebesgue_measure_itvcc</span> (<span class="id">a</span><span class="id"> b</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
-&nbsp;&nbsp;(<span class="id">lebesgue_measure</span> (<span class="id">`[a,</span><span class="id"> b]</span><span class="id"> :</span><span class="id"> set</span><span class="id"> R</span>)<span class="id"> =</span><br/>
-&nbsp;&nbsp;&nbsp;<span class="id">wlength</span><span class="id"> [the</span><span class="id"> cumulative</span><span class="id"> _</span><span class="id"> of</span><span class="id"> idfun]</span><span class="id"> `[a,</span><span class="id"> b]</span>)<span class="id">%classic</span>.<br/>
+&nbsp;&nbsp;(<span class="id">lebesgue_measure</span> (<span class="id">`[a,</span><span class="id"> b]</span><span class="id"> :</span><span class="id"> set</span><span class="id"> R</span>)<span class="id"> =</span><span class="id"> wlength</span><span class="id"> idfun</span><span class="id"> `[a,</span><span class="id"> b]</span>)<span class="id">%classic</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
@@ -2673,8 +2686,7 @@ Qed.</div></details>
 Qed.</div></details>
 <br/>
 <span class="vernacular">Let</span><span class="id"> lebesgue_measure_itvco</span> (<span class="id">a</span><span class="id"> b</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
-&nbsp;&nbsp;(<span class="id">lebesgue_measure</span> (<span class="id">`[a,</span><span class="id"> b[</span><span class="id"> :</span><span class="id"> set</span><span class="id"> R</span>)<span class="id"> =</span><br/>
-&nbsp;&nbsp;&nbsp;<span class="id">wlength</span><span class="id"> [the</span><span class="id"> cumulative</span><span class="id"> _</span><span class="id"> of</span><span class="id"> idfun]</span><span class="id"> `[a,</span><span class="id"> b[</span>)<span class="id">%classic</span>.<br/>
+&nbsp;&nbsp;(<span class="id">lebesgue_measure</span> (<span class="id">`[a,</span><span class="id"> b[</span><span class="id"> :</span><span class="id"> set</span><span class="id"> R</span>)<span class="id"> =</span><span class="id"> wlength</span><span class="id"> idfun</span><span class="id"> `[a,</span><span class="id"> b[</span>)<span class="id">%classic</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
@@ -2687,7 +2699,7 @@ Qed.</div></details>
 <br/>
 <span class="vernacular">Let</span><span class="id"> lebesgue_measure_itv_bnd</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> bool</span>) (<span class="id">a</span><span class="id"> b</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
 &nbsp;&nbsp;<span class="id">lebesgue_measure</span> (<span class="id">[set`</span><span class="id"> Interval</span> (<span class="id">BSide</span><span class="id"> x</span><span class="id"> a</span>) (<span class="id">BSide</span><span class="id"> y</span><span class="id"> b</span>)<span class="id">]</span><span class="id"> :</span><span class="id"> set</span><span class="id"> R</span>)<span class="id"> =</span><br/>
-&nbsp;&nbsp;<span class="id">wlength</span><span class="id"> [the</span><span class="id"> cumulative</span><span class="id"> _</span><span class="id"> of</span><span class="id"> idfun]</span><span class="id"> [set`</span><span class="id"> Interval</span> (<span class="id">BSide</span><span class="id"> x</span><span class="id"> a</span>) (<span class="id">BSide</span><span class="id"> y</span><span class="id"> b</span>)<span class="id">]</span>.<br/>
+&nbsp;&nbsp;<span class="id">wlength</span><span class="id"> idfun</span><span class="id"> [set`</span><span class="id"> Interval</span> (<span class="id">BSide</span><span class="id"> x</span><span class="id"> a</span>) (<span class="id">BSide</span><span class="id"> y</span><span class="id"> b</span>)<span class="id">]</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
@@ -2899,7 +2911,7 @@ Qed.</div></details>
 <span class="vernacular">Section</span><span class="id"> lebesgue_regularity</span>.<br/>
 <span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ereal_scope</span>.<br/>
 <span class="vernacular">Context</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realType}</span>.<br/>
-<span class="vernacular">Let</span><span class="id"> mu</span><span class="id"> :=</span><span class="id"> [the</span><span class="id"> measure</span><span class="id"> _</span><span class="id"> _</span><span class="id"> of</span><span class="id"> @lebesgue_measure</span><span class="id"> R]</span>.<br/>
+<span class="vernacular">Let</span><span class="id"> mu</span><span class="id"> :</span><span class="id"> measure</span><span class="id"> _</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> @lebesgue_measure</span><span class="id"> R</span>.<br/>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> lebesgue_regularity_outer</span> (<span class="id">D</span><span class="id"> :</span><span class="id"> set</span><span class="id"> R</span>) (<span class="id">eps</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
 &nbsp;&nbsp;<span class="id">measurable</span><span class="id"> D</span><span class="id"> -&gt;</span><span class="id"> mu</span><span class="id"> D</span><span class="id"> &lt;</span><span class="id"> +oo</span><span class="id"> -&gt;</span> (<span class="id">0</span><span class="id"> &lt;</span><span class="id"> eps</span>)<span class="id">%R</span><span class="id"> -&gt;</span><br/>
@@ -3209,9 +3221,9 @@ Qed.</div></details>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> /=</span><span class="id"> x</span><span class="id"> [n</span><span class="id"> Fni</span><span class="id"> Bnx];</span><span class="gallina-kwd"> exists</span><span class="id"> n</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="gallina-kwd"> exists</span><span class="id"> i</span>.<br/>
 &nbsp;&nbsp;<span class="id">have</span><span class="id"> {CFi</span><span class="id"> Fir2}</span><span class="id"> :=</span><span class="id"> le_trans</span><span class="id"> MC</span> (<span class="id">le_trans</span><span class="id"> CFi</span><span class="id"> Fir2</span>).<br/>
 &nbsp;&nbsp;<span class="id">apply/negP;</span><span class="id"> rewrite</span><span class="id"> -ltNge</span><span class="id"> lebesgue_measure_ball//</span><span class="id"> lte_fin</span>.<br/>
-&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -</span>(<span class="id">@natr1</span><span class="id"> _</span><span class="id"> `|</span><span class="id"> _</span><span class="id"> |%N</span>)<span class="id"> natr_absz</span><span class="id"> ger0_norm;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -ceil_ge0//</span> (<span class="id">lt_le_trans</span> (<span class="id">ltrN10</span><span class="id"> _</span>)).<br/>
-&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -ltr_pdivrMr//</span><span class="id"> -ltrBlDr</span> (<span class="id">lt_le_trans</span><span class="id"> _</span> (<span class="id">ceil_ge</span><span class="id"> _</span>))<span class="id">//</span><span class="id"> ltrBlDr</span><span class="id"> ltrDl</span>.<br/>
+&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -[M%:R]natr1</span><span class="id"> natr_absz</span><span class="id"> ger0_norm;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -</span>(<span class="id">ceil0</span><span class="id"> R</span>)<span class="id"> ceil_le</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -ltr_pdivrMr//</span><span class="id"> intrD1</span><span class="id"> floor_lt_int</span><span class="id"> ltzD1</span><span class="id"> ceil_floor//</span><span class="id"> lerDl</span>.<br/>
 <span class="id">have</span><span class="id"> mur2_fin_num_</span><span class="id"> :</span><span class="id"> mu</span> (<span class="id">ball</span> (<span class="id">0:R</span>) (<span class="id">r%:num</span><span class="id"> +</span><span class="id"> 2</span>))<span class="id">%R</span><span class="id"> &lt;</span><span class="id"> +oo</span>.<br/>
 &nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> lebesgue_measure_ball//</span><span class="id"> ltry</span>.<br/>
 <span class="id">have</span><span class="id"> FE</span><span class="id"> :</span><span class="id"> \sum_</span>(<span class="id">n</span><span class="id"> &lt;oo</span>)<span class="id"> \esum_</span>(<span class="id">i</span><span class="gallina-kwd"> in</span><span class="id"> F</span><span class="id"> n</span>)<span class="id"> mu</span> (<span class="id">closure</span> (<span class="id">B</span><span class="id"> i</span>))<span class="id"> =</span><br/>
@@ -3233,7 +3245,7 @@ Qed.</div></details>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -bigcup_mkcond;</span><span class="id"> apply:</span><span class="id"> bigcup_measurable</span><span class="id"> =&gt;</span><span class="id"> k</span><span class="id"> _</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> measurable_closure</span>.<br/>
 &nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> esum_mkcond//=</span><span class="id"> nneseries_esum//</span><span class="id"> -fun_true//=</span>.<br/>
-&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> under</span><span class="id"> eq_esum</span><span class="id"> do</span><span class="id"> rewrite</span> (<span class="id">fun_if</span><span class="id"> mu</span>) (<span class="id">measure0</span><span class="id"> [the</span><span class="id"> measure</span><span class="id"> _</span><span class="id"> _</span><span class="id"> of</span><span class="id"> mu]</span>).<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> under</span><span class="id"> eq_esum</span><span class="id"> do</span><span class="id"> rewrite</span> (<span class="id">fun_if</span><span class="id"> mu</span>) (<span class="id">measure0</span><span class="id"> mu</span>).<br/>
 <span class="id">apply/eqP;</span><span class="id"> rewrite</span><span class="id"> -measure_le0</span>.<br/>
 <span class="id">apply/lee_addgt0Pr</span><span class="id"> =&gt;</span><span class="id"> _</span><span class="id"> /posnumP[e];</span><span class="id"> rewrite</span><span class="id"> add0e</span>.<br/>
 <span class="id">have</span><span class="id"> [N</span><span class="id"> F5e]</span><span class="id"> :</span><span class="gallina-kwd"> exists</span><span class="id"> N,</span><span class="id"> \sum_</span>(<span class="id">N</span><span class="id"> &lt;=</span><span class="id"> n</span><span class="id"> &lt;oo</span>)<span class="id"> \esum_</span>(<span class="id">i</span><span class="gallina-kwd"> in</span><span class="id"> F</span><span class="id"> n</span>)<span class="id"> mu</span> (<span class="id">closure</span> (<span class="id">B</span><span class="id"> i</span>))<span class="id"> &lt;</span><br/>
@@ -3266,7 +3278,7 @@ Qed.</div></details>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> le_lt_trans</span><span class="id"> foo</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span> (<span class="id">nneseries_split</span><span class="id"> _</span><span class="id"> N</span>)<span class="id">//</span><span class="id"> leeDr//;</span><span class="id"> exact:</span><span class="id"> sume_ge0</span>.<br/>
 &nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> fineK</span><span class="id"> ?ge0_fin_numE//;</span><span class="id"> last</span><span class="id"> exact:</span><span class="id"> nneseries_ge0</span>.<br/>
-&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> lee_nneseries</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> i</span><span class="id"> _;</span><span class="id"> exact:</span><span class="id"> esum_ge0</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> lee_nneseries</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> i</span><span class="id"> *;</span><span class="id"> exact:</span><span class="id"> esum_ge0</span>.<br/>
 &nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> n</span><span class="id"> Nn;</span><span class="id"> rewrite</span><span class="id"> measure_bigcup//=</span>.<br/>
 &nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> nneseries_esum//</span><span class="id"> set_mem_set</span>.<br/>
 &nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> i</span><span class="id"> _;</span><span class="id"> exact:</span><span class="id"> measurable_closure</span>.<br/>

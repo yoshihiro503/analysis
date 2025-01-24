@@ -1,0 +1,300 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module mathcomp.analysis.topology_theory.discrete_topology</title>
+<meta name="description" content="Documentation of Coq module mathcomp.analysis.topology_theory.discrete_topology" />
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it-texmath/texmath.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="init()">
+
+  <main>
+    <div class="sidebar">
+      <h2>Files</h2>
+      
+    </div>
+
+  <div class="coq">
+
+    <div class="content">
+      <p><a href="./index.html">Top</a></p>
+      <h1 class="title">Module mathcomp.analysis.topology_theory.discrete_topology</h1>
+<span class="vernacular">From</span><span class="id"> HB</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> structures</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> all_ssreflect</span><span class="id"> all_algebra</span><span class="id"> all_classical</span><span class="id"> all_reals</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> topology_structure</span><span class="id"> uniform_structure</span>.<br/>
+<span class="vernacular">From</span><span class="id"> mathcomp</span><span class="vernacular"> Require</span><span class="vernacular"> Import</span><span class="id"> order_topology</span><span class="id"> pseudometric_structure</span><span class="id"> compact</span>.<br/>
+<br/>
+<div class="ssrdoc md">
+# Discrete Topology
+```
+             discreteNbhsType == neighborhoods are principal filters
+                 discrete_ent == entourages of the discrete uniformity
+                                 topology, equipped with the Uniform
+                                 structure
+                discrete_ball == singleton balls for the discrete metric,
+                                 equipped with the Uniform structure
+      discreteTopologicalType == types with a discrete topology
+ discreteOrderTopologicalType == an order type with the discrete topology
+     pdiscreteTopologicalType == pointed type with the discrete topology
+pdiscreteOrderTopologicalType == pointed, ordered, and discrete
+          discreteUniformType == a uniform space where the diagonal is an
+                                 entourage
+     discretePseudoMetricType == a pseudometric space where the only balls
+                                 are singletons
+          discrete_topology T == alias attaching discrete structures for
+                                 topology, uniformity, and pseudometric
+```
+</div>
+<span class="vernacular">Import</span><span class="id"> Order</span>.<span class="id">TTheory</span><span class="id"> GRing</span>.<span class="id">Theory</span><span class="id"> Num</span>.<span class="id">Def</span><span class="id"> Num</span>.<span class="id">Theory</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> classical_set_scope</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ring_scope</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">mixin</span><span class="vernacular"> Record</span><span class="id"> Discrete_ofNbhs</span><span class="id"> T</span><span class="id"> of</span><span class="id"> Nbhs</span><span class="id"> T</span><span class="id"> :=</span><span class="id"> {</span><br/>
+&nbsp;&nbsp;<span class="id">nbhs_principalE</span><span class="id"> :</span> (<span class="id">@nbhs</span><span class="id"> T</span><span class="id"> _</span>)<span class="id"> =</span><span class="id"> principal_filter;</span><br/>
+<span class="id">}</span>.<br/>
+<br/>
+<span class="id">#[short</span>(<span class="id">type=</span><span class="id">&quot;discreteNbhsType&quot;</span>)<span class="id">]</span><br/>
+<span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> DiscreteNbhs</span><span class="id"> :=</span><span class="id"> {T</span><span class="id"> of</span><span class="id"> Nbhs</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> Discrete_ofNbhs</span><span class="id"> T}</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> discrete_ent</span><span class="id"> {T}</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">set</span> (<span class="id">T</span><span class="id"> *</span><span class="id"> T</span>))<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">globally</span> (<span class="id">range</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span> (<span class="id">x,</span><span class="id"> x</span>))).<br/>
+<br/>
+<div class="doc">Note: having the discrete topology does not guarantee the discrete
+    uniformity. Likewise for the discrete metric. Consider <span class="bracket"><span class="id">set</span> 1/<span class="id">n</span> | <span class="id">n</span> <span class="gallina-kwd">in</span> <span class="id">R</span></span> </div>
+<span class="id">HB</span>.<span class="id">mixin</span><span class="vernacular"> Record</span><span class="id"> Discrete_ofUniform</span><span class="id"> T</span><span class="id"> of</span><span class="id"> Uniform</span><span class="id"> T</span><span class="id"> :=</span><span class="id"> {</span><br/>
+&nbsp;&nbsp;<span class="id">uniform_discrete</span><span class="id"> :</span><span class="id"> @entourage</span><span class="id"> T</span><span class="id"> =</span><span class="id"> discrete_ent</span><br/>
+<span class="id">}</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> discrete_ball</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> {T}</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> T</span>) (<span class="id">eps</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> y</span><span class="id"> :</span><span class="gallina-kwd"> Prop</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">x</span><span class="id"> =</span><span class="id"> y</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">mixin</span><span class="vernacular"> Record</span><span class="id"> Discrete_ofPseudometric</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> T</span><span class="id"> of</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">PseudoMetric</span><span class="id"> R</span><span class="id"> T</span><span class="id"> :=</span><span class="id"> {</span><br/>
+&nbsp;&nbsp;<span class="id">metric_discrete</span><span class="id"> :</span><span class="id"> @ball</span><span class="id"> R</span><span class="id"> T</span><span class="id"> =</span><span class="id"> @discrete_ball</span><span class="id"> R</span><span class="id"> T</span><br/>
+<span class="id">}</span>.<br/>
+<br/>
+<span class="id">#[short</span>(<span class="id">type=</span><span class="id">&quot;discreteTopologicalType&quot;</span>)<span class="id">]</span><br/>
+<span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> DiscreteTopology</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">{</span><span class="id"> T</span><span class="id"> of</span><span class="id"> DiscreteNbhs</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> Topological</span><span class="id"> T}</span>.<br/>
+<br/>
+<span class="id">#[short</span>(<span class="id">type=</span><span class="id">&quot;discreteOrderTopologicalType&quot;</span>)<span class="id">]</span><br/>
+<span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> DiscreteOrderTopology</span><span class="id"> d</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">{</span><span class="id"> T</span><span class="id"> of</span><span class="id"> Discrete_ofNbhs</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> OrderTopological</span><span class="id"> d</span><span class="id"> T}</span>.<br/>
+<br/>
+<span class="id">#[short</span>(<span class="id">type=</span><span class="id">&quot;pdiscreteTopologicalType&quot;</span>)<span class="id">]</span><br/>
+<span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> PointedDiscreteTopology</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">{</span><span class="id"> T</span><span class="id"> of</span><span class="id"> DiscreteTopology</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> Pointed</span><span class="id"> T}</span>.<br/>
+<br/>
+<span class="id">#[short</span>(<span class="id">type=</span><span class="id">&quot;pdiscreteOrderTopologicalType&quot;</span>)<span class="id">]</span><br/>
+<span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> PointedDiscreteOrderTopology</span><span class="id"> d</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">{</span><span class="id"> T</span><span class="id"> of</span><span class="id"> Discrete_ofNbhs</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> OrderTopological</span><span class="id"> d</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> Pointed</span><span class="id"> T}</span>.<br/>
+<br/>
+<span class="id">#[short</span>(<span class="id">type=</span><span class="id">&quot;discreteUniformType&quot;</span>)<span class="id">]</span><br/>
+<span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> DiscreteUniform</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">{</span><span class="id"> T</span><span class="id"> of</span><span class="id"> Discrete_ofUniform</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> Uniform</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> Discrete_ofNbhs</span><span class="id"> T}</span>.<br/>
+<br/>
+<span class="id">#[short</span>(<span class="id">type=</span><span class="id">&quot;discretePseudoMetricType&quot;</span>)<span class="id">]</span><br/>
+<span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> DiscretePseudoMetric</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">{</span><span class="id"> T</span><span class="id"> of</span><span class="id"> Discrete_ofPseudometric</span><span class="id"> R</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> PseudoMetric</span><span class="id"> R</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> DiscreteUniform</span><span class="id"> T}</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">builders</span><span class="vernacular"> Context</span><span class="id"> T</span><span class="id"> of</span><span class="id"> Discrete_ofNbhs</span><span class="id"> T</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> principal_nbhs_filter</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> T</span>)<span class="id"> :</span><span class="id"> ProperFilter</span> (<span class="id">nbhs</span><span class="id"> p</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> rewrite</span><span class="id"> nbhs_principalE;</span><span class="id"> exact:</span><span class="id"> principal_filter_proper</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> principal_nbhs_singleton</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> T</span>) (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span><span class="id"> T</span>)<span class="id"> :</span><span class="id"> nbhs</span><span class="id"> p</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> A</span><span class="id"> p</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> nbhs_principalE</span><span class="id"> =&gt;</span><span class="id"> /principal_filterP</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> principal_nbhs_nbhs</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> T</span>) (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span><span class="id"> T</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">nbhs</span><span class="id"> p</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> nbhs</span><span class="id"> p</span> (<span class="id">nbhs^~</span><span class="id"> A</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?;</span><span class="id"> rewrite</span><span class="id"> {1}nbhs_principalE;</span><span class="id"> apply/principal_filterP</span>. Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> @Nbhs_isNbhsTopological</span>.<span class="id">Build</span><span class="id"> T</span><br/>
+&nbsp;&nbsp;<span class="id">principal_nbhs_filter</span><span class="id"> principal_nbhs_singleton</span><span class="id"> principal_nbhs_nbhs</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="gallina-kwd">end</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">factory</span><span class="vernacular"> Record</span><span class="id"> DiscreteUniform_ofNbhs</span><span class="id"> T</span><span class="id"> of</span><span class="id"> Discrete_ofNbhs</span><span class="id"> T</span><span class="id"> &amp;</span><span class="id"> Nbhs</span><span class="id"> T</span><span class="id"> :=</span><span class="id"> {}</span>.<br/>
+<span class="id">HB</span>.<span class="id">builders</span><span class="vernacular"> Context</span><span class="id"> T</span><span class="id"> of</span><span class="id"> DiscreteUniform_ofNbhs</span><span class="id"> T</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> relation_scope</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Notation</span><span class="id"> d</span><span class="id"> :=</span> (<span class="id">@discrete_ent</span><span class="id"> T</span>).<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> discrete_entourage_filter</span><span class="id"> :</span><span class="id"> Filter</span><span class="id"> d</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id"> exact:</span><span class="id"> globally_filter</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> discrete_entourage_diagonal</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> A,</span><span class="id"> d</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> diagonal</span><span class="id"> `&lt;=`</span><span class="id"> A</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> +</span><span class="id"> x</span><span class="id"> x12;</span><span class="id"> apply;</span><span class="gallina-kwd"> exists</span><span class="id"> x</span>.<span class="id">1;</span><span class="id"> rewrite</span><span class="id"> //</span><span class="id"> {2}x12</span><span class="id"> -surjective_pairing</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> discrete_entourage_inv</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> A,</span><span class="id"> d</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> d</span><span class="id"> A^-1</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> dA</span><span class="id"> x</span><span class="id"> [i</span><span class="id"> _</span><span class="id"> &lt;-];</span><span class="id"> apply:</span><span class="id"> dA;</span><span class="gallina-kwd"> exists</span><span class="id"> i</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> discrete_entourage_split_ex</span><span class="id"> :</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">forall</span><span class="id"> A,</span><span class="id"> d</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="gallina-kwd"> exists2</span><span class="id"> B,</span><span class="id"> d</span><span class="id"> B</span><span class="id"> &amp;</span><span class="id"> B</span><span class="id"> \;</span><span class="id"> B</span><span class="id"> `&lt;=`</span><span class="id"> A</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">move=&gt;</span><span class="id"> ?</span><span class="id"> dA;</span><span class="gallina-kwd"> exists</span> (<span class="id">range</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> =&gt;</span> (<span class="id">x,</span><span class="id"> x</span>)))<span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> set_compose_diag</span><span class="id"> =&gt;</span><span class="id"> x</span><span class="id"> [i</span><span class="id"> _</span><span class="id"> &lt;-];</span><span class="id"> apply:</span><span class="id"> dA;</span><span class="gallina-kwd"> exists</span><span class="id"> i</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> discrete_entourage_nbhsE</span><span class="id"> :</span> (<span class="id">@nbhs</span><span class="id"> T</span><span class="id"> _</span>)<span class="id"> =</span><span class="id"> nbhs_</span><span class="id"> d</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> funeqE</span><span class="id"> =&gt;</span><span class="id"> x;</span><span class="id"> rewrite</span><span class="id"> nbhs_principalE</span><span class="id"> eqEsubset;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> U</span>.<br/>
+&nbsp;&nbsp;<span class="id">move/principal_filterP</span><span class="id"> =&gt;</span><span class="id"> ?;</span><span class="gallina-kwd"> exists</span><span class="id"> diagonal;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> [w</span><span class="id"> _</span><span class="id"> &lt;-]</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> z</span><span class="id"> /=</span><span class="id"> /set_mem;</span><span class="id"> rewrite</span><span class="id"> /diagonal</span><span class="id"> /=</span><span class="id"> =&gt;</span><span class="id"> &lt;-</span>.<br/>
+<span class="id">case</span><span class="id"> =&gt;</span><span class="id"> w</span><span class="id"> entW</span><span class="id"> wU;</span><span class="id"> apply/principal_filterP;</span><span class="id"> apply:</span><span class="id"> wU;</span><span class="id"> apply/mem_set</span>.<br/>
+<span class="id">exact:</span><span class="id"> entW</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> @Nbhs_isUniform</span>.<span class="id">Build</span><span class="id"> T</span><br/>
+&nbsp;&nbsp;<span class="id">discrete_ent</span><br/>
+&nbsp;&nbsp;<span class="id">discrete_entourage_filter</span><br/>
+&nbsp;&nbsp;<span class="id">discrete_entourage_diagonal</span><br/>
+&nbsp;&nbsp;<span class="id">discrete_entourage_inv</span><br/>
+&nbsp;&nbsp;<span class="id">discrete_entourage_split_ex</span><br/>
+&nbsp;&nbsp;<span class="id">discrete_entourage_nbhsE</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> @Discrete_ofUniform</span>.<span class="id">Build</span><span class="id"> T</span><span class="id"> erefl</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="gallina-kwd">end</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">factory</span><span class="vernacular"> Record</span><span class="id"> DiscretePseudoMetric_ofUniform</span> (<span class="id">R</span><span class="id"> :</span><span class="id"> numDomainType</span>)<span class="id"> T</span><span class="id"> of</span><br/>
+&nbsp;&nbsp;<span class="id">DiscreteUniform</span><span class="id"> T</span><span class="id"> :=</span><span class="id"> {}</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">builders</span><span class="vernacular"> Context</span><span class="id"> R</span><span class="id"> T</span><span class="id"> of</span><span class="id"> DiscretePseudoMetric_ofUniform</span><span class="id"> R</span><span class="id"> T</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> discrete_ball_center</span><span class="id"> x</span> (<span class="id">eps</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> 0</span><span class="id"> &lt;</span><span class="id"> eps</span><span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">@discrete_ball</span><span class="id"> R</span><span class="id"> T</span><span class="id"> x</span><span class="id"> eps</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> discrete_ball_sym</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> :</span><span class="id"> T</span>) (<span class="id">e</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">discrete_ball</span><span class="id"> x</span><span class="id"> e</span><span class="id"> y</span><span class="id"> -&gt;</span><span class="id"> discrete_ball</span><span class="id"> y</span><span class="id"> e</span><span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;-&gt;</span>. Qed.</div></details>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> discrete_ball_triangle</span> (<span class="id">x</span><span class="id"> y</span><span class="id"> z:T</span>) (<span class="id">e1</span><span class="id"> e2</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">discrete_ball</span><span class="id"> x</span><span class="id"> e1</span><span class="id"> y</span><span class="id"> -&gt;</span><span class="id"> discrete_ball</span><span class="id"> y</span><span class="id"> e2</span><span class="id"> z</span><span class="id"> -&gt;</span><span class="id"> discrete_ball</span><span class="id"> x</span> (<span class="id">e1</span><span class="id"> +</span><span class="id"> e2</span>)<span class="id"> z</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> -&gt;</span><span class="id"> -&gt;</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> discrete_entourageE</span><span class="id"> :</span><span class="id"> entourage</span><span class="id"> =</span><span class="id"> entourage_</span> (<span class="id">@discrete_ball</span><span class="id"> R</span><span class="id"> T</span>).<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> predeqE</span><span class="id"> =&gt;</span><span class="id"> P;</span><span class="id"> rewrite</span><span class="id"> uniform_discrete;</span><span class="id"> split;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> dbP</span><span class="id"> ?</span><span class="id"> [?]</span><span class="id"> _</span><span class="id"> &lt;-;</span><span class="id"> move:</span><span class="id"> dbP;</span><span class="id"> case</span><span class="id"> =&gt;</span><span class="id"> /=</span><span class="id"> ?</span><span class="id"> ?;</span><span class="id"> apply</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> entP;</span><span class="gallina-kwd"> exists</span><span class="id"> 1</span><span class="id"> =&gt;</span><span class="id"> //=</span><span class="id"> z</span><span class="id"> z12;</span><span class="id"> apply:</span><span class="id"> entP;</span><span class="gallina-kwd"> exists</span><span class="id"> z</span>.<span class="id">1</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> {2}z12</span><span class="id"> -surjective_pairing</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">@Uniform_isPseudoMetric</span>.<span class="id">Build</span><span class="id"> R</span><span class="id"> T</span> (<span class="id">@discrete_ball</span><span class="id"> R</span><span class="id"> T</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">discrete_ball_center</span><span class="id"> discrete_ball_sym</span><span class="id"> discrete_ball_triangle</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">discrete_entourageE</span>.<br/>
+<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> discrete_ballE</span><span class="id"> :</span><span class="id"> @ball</span><span class="id"> R</span><span class="id"> T</span><span class="id"> =</span><span class="id"> @discrete_ball</span><span class="id"> R</span><span class="id"> T</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> funeq2E</span><span class="id"> =&gt;</span><span class="id"> ?</span><span class="id"> ?</span>. Qed.</div></details>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> @Discrete_ofPseudometric</span>.<span class="id">Build</span><span class="id"> R</span><span class="id"> T</span><span class="id"> discrete_ballE</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="gallina-kwd">end</span>.<br/>
+<br/>
+<span class="vernacular">Definition</span><span class="id"> discrete_topology</span> (<span class="id">T</span><span class="id"> :</span><span class="gallina-kwd"> Type</span>)<span class="id"> :</span><span class="gallina-kwd"> Type</span><span class="id"> :=</span><span class="id"> T</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> choiceType</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">Choice</span>.<span class="id">copy</span> (<span class="id">discrete_topology</span><span class="id"> T</span>)<span class="id"> T</span>.<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> pointedType</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">Pointed</span>.<span class="id">on</span> (<span class="id">discrete_topology</span><span class="id"> T</span>).<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> choiceType</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">hasNbhs</span>.<span class="id">Build</span> (<span class="id">discrete_topology</span><span class="id"> T</span>)<span class="id"> principal_filter</span>.<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> choiceType</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">Discrete_ofNbhs</span>.<span class="id">Build</span> (<span class="id">discrete_topology</span><span class="id"> T</span>)<span class="id"> erefl</span>.<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> choiceType</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">DiscreteUniform_ofNbhs</span>.<span class="id">Build</span> (<span class="id">discrete_topology</span><span class="id"> T</span>).<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> numDomainType}</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> choiceType</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">@DiscretePseudoMetric_ofUniform</span>.<span class="id">Build</span><span class="id"> R</span> (<span class="id">discrete_topology</span><span class="id"> T</span>).<br/>
+<br/>
+<span class="vernacular">Section</span><span class="id"> discrete_topology</span>.<br/>
+<br/>
+<span class="vernacular">Context</span><span class="id"> {X</span><span class="id"> :</span><span class="id"> discreteTopologicalType}</span>.<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> discrete_open</span> (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span><span class="id"> X</span>)<span class="id"> :</span><span class="id"> open</span><span class="id"> A</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> openE</span><span class="id"> =&gt;</span><span class="id"> ?</span><span class="id"> ?;</span><span class="id"> rewrite</span><span class="id"> /interior</span><span class="id"> nbhs_principalE</span>.<br/>
+<span class="id">exact/principal_filterP</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> discrete_set1</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> X</span>)<span class="id"> :</span><span class="id"> nbhs</span><span class="id"> x</span><span class="id"> [set</span><span class="id"> x]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> apply:</span><span class="id"> open_nbhs_nbhs;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> discrete_open</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> discrete_closed</span> (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span><span class="id"> X</span>)<span class="id"> :</span><span class="id"> closed</span><span class="id"> A</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -[A]setCK</span><span class="id"> closedC;</span><span class="id"> exact:</span><span class="id"> discrete_open</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> discrete_cvg</span> (<span class="id">F</span><span class="id"> :</span><span class="id"> set_system</span><span class="id"> X</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> X</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">Filter</span><span class="id"> F</span><span class="id"> -&gt;</span><span class="id"> F</span><span class="id"> --&gt;</span><span class="id"> x</span><span class="id"> &lt;-&gt;</span><span class="id"> F</span><span class="id"> [set</span><span class="id"> x]</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="id">rewrite</span><span class="id"> nbhs_principalE</span><span class="id"> nbhs_simpl;</span><span class="id"> split;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> exact</span>.<br/>
+<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> Fx</span><span class="id"> U</span><span class="id"> /principal_filterP</span><span class="id"> ?;</span><span class="id"> apply:</span><span class="id"> filterS</span><span class="id"> Fx</span><span class="id"> =&gt;</span><span class="id"> ?</span><span class="id"> -&gt;</span>.<br/>
+Qed.</div></details>
+<br/>
+<span class="vernacular">End</span><span class="id"> discrete_topology</span>.<br/>
+
+      <div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/">a fork of coq2html</a></div>
+    </div>
+  </div>
+    </main>
+</body>
+</html>

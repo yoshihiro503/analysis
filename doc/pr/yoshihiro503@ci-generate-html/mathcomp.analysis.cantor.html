@@ -73,12 +73,13 @@ The proof is in 4 parts:
 <br/>
 <span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> classical_set_scope</span>.<br/>
 <br/>
-<span class="vernacular">Definition</span><span class="id"> cantor_space</span><span class="id"> :=</span><br/>
-&nbsp;&nbsp;<span class="id">prod_topology</span> (<span class="gallina-kwd">fun</span><span class="id"> _</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> =&gt;</span><span class="id"> discrete_topology</span><span class="id"> discrete_bool</span>).<br/>
+<span class="vernacular">Definition</span><span class="id"> cantor_space</span><span class="id"> :</span><span class="gallina-kwd"> Type</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">prod_topology</span> (<span class="gallina-kwd">fun</span><span class="id"> _</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> =&gt;</span><span class="id"> bool</span>).<br/>
 <br/>
 <span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Pointed</span>.<span class="id">on</span><span class="id"> cantor_space</span>.<br/>
 <span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Nbhs</span>.<span class="id">on</span><span class="id"> cantor_space</span>.<br/>
 <span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Topological</span>.<span class="id">on</span><span class="id"> cantor_space</span>.<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Uniform</span>.<span class="id">on</span><span class="id"> cantor_space</span>.<br/>
 <br/>
 <span class="vernacular">Definition</span><span class="id"> cantor_like</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> topologicalType</span>)<span class="id"> :=</span><br/>
 &nbsp;&nbsp;<span class="id">[/\</span><span class="id"> perfect_set</span><span class="id"> [set:</span><span class="id"> T],</span><br/>
@@ -90,7 +91,7 @@ The proof is in 4 parts:
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
-<span class="id">have</span><span class="id"> :=</span><span class="id"> @tychonoff</span><span class="id"> _</span> (<span class="gallina-kwd">fun</span><span class="id"> _</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> =&gt;</span><span class="id"> _</span>)<span class="id"> _</span> (<span class="id">fun=&gt;</span><span class="id"> discrete_bool_compact</span>).<br/>
+<span class="id">have</span><span class="id"> :=</span><span class="id"> @tychonoff</span><span class="id"> _</span> (<span class="gallina-kwd">fun</span><span class="id"> _</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> =&gt;</span><span class="id"> _</span>)<span class="id"> _</span> (<span class="id">fun=&gt;</span><span class="id"> bool_compact</span>).<br/>
 <span class="gallina-kwd">by</span><span class="id"> congr</span> (<span class="id">compact</span><span class="id"> _</span>)<span class="id">;</span><span class="id"> rewrite</span><span class="id"> eqEsubset</span>.<br/>
 Qed.</div></details>
 <br/>
@@ -99,7 +100,6 @@ Qed.</div></details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
 <span class="id">apply:</span><span class="id"> hausdorff_product</span><span class="id"> =&gt;</span><span class="id"> ?;</span><span class="id"> apply:</span><span class="id"> discrete_hausdorff</span>.<br/>
-<span class="id">exact:</span><span class="id"> discrete_space_discrete</span>.<br/>
 Qed.</div></details>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> cantor_zero_dimensional</span><span class="id"> :</span><span class="id"> zero_dimensional</span><span class="id"> cantor_space</span>.<br/>
@@ -107,7 +107,6 @@ Qed.</div></details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
 <span class="id">apply:</span><span class="id"> zero_dimension_prod</span><span class="id"> =&gt;</span><span class="id"> _;</span><span class="id"> apply:</span><span class="id"> discrete_zero_dimension</span>.<br/>
-<span class="id">exact:</span><span class="id"> discrete_space_discrete</span>.<br/>
 Qed.</div></details>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> cantor_perfect</span><span class="id"> :</span><span class="id"> perfect_set</span><span class="id"> [set:</span><span class="id"> cantor_space]</span>.<br/>
@@ -143,13 +142,12 @@ The goal is to build a map from branches to X.
 
 </div>
 <span class="vernacular">Section</span><span class="id"> topological_trees</span>.<br/>
-<span class="vernacular">Context</span><span class="id"> {K</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> -&gt;</span><span class="id"> ptopologicalType}</span><span class="id"> {X</span><span class="id"> :</span><span class="id"> ptopologicalType}</span><br/>
+<span class="vernacular">Context</span><span class="id"> {K</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> -&gt;</span><span class="id"> pdiscreteTopologicalType}</span><span class="id"> {X</span><span class="id"> :</span><span class="id"> ptopologicalType}</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">refine_apx</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> n,</span><span class="id"> set</span><span class="id"> X</span><span class="id"> -&gt;</span><span class="id"> K</span><span class="id"> n</span><span class="id"> -&gt;</span><span class="id"> set</span><span class="id"> X</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">tree_invariant</span><span class="id"> :</span><span class="id"> set</span><span class="id"> X</span><span class="id"> -&gt;</span><span class="gallina-kwd"> Prop</span>).<br/>
 <br/>
 <span class="vernacular">Hypothesis</span><span class="id"> cmptX</span><span class="id"> :</span><span class="id"> compact</span><span class="id"> [set:</span><span class="id"> X]</span>.<br/>
 <span class="vernacular">Hypothesis</span><span class="id"> hsdfX</span><span class="id"> :</span><span class="id"> hausdorff_space</span><span class="id"> X</span>.<br/>
-<span class="vernacular">Hypothesis</span><span class="id"> discreteK</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> n,</span><span class="id"> discrete_space</span> (<span class="id">K</span><span class="id"> n</span>).<br/>
 <span class="vernacular">Hypothesis</span><span class="id"> refine_cover</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> n</span><span class="id"> U,</span><span class="id"> U</span><span class="id"> =</span><span class="id"> \bigcup_e</span><span class="id"> @refine_apx</span><span class="id"> n</span><span class="id"> U</span><span class="id"> e</span>.<br/>
 <span class="vernacular">Hypothesis</span><span class="id"> refine_invar</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> n</span><span class="id"> U</span><span class="id"> e,</span><br/>
 &nbsp;&nbsp;<span class="id">tree_invariant</span><span class="id"> U</span><span class="id"> -&gt;</span><span class="id"> tree_invariant</span> (<span class="id">@refine_apx</span><span class="id"> n</span><span class="id"> U</span><span class="id"> e</span>).<br/>
@@ -166,7 +164,7 @@ The goal is to build a map from branches to X.
 <div class="proofscript">
 <span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> [X</span><span class="gallina-kwd"> in</span><span class="id"> _</span><span class="id"> `&lt;=`</span><span class="id"> X]</span>(<span class="id">refine_cover</span><span class="id"> n</span>)<span class="id">;</span><span class="id"> exact:</span><span class="id"> bigcup_sup</span>. Qed.</div></details>
 <br/>
-<span class="vernacular">Let</span><span class="id"> T</span><span class="id"> :=</span><span class="id"> prod_topology</span><span class="id"> K</span>.<br/>
+<span class="vernacular">Let</span><span class="id"> T</span><span class="id"> :=</span><span class="id"> prod_topology</span> (<span class="id">K</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> -&gt;</span><span class="id"> ptopologicalType</span>).<br/>
 <br/>
 <span class="vernacular">Local</span><span class="vernacular"> Fixpoint</span><span class="id"> branch_apx</span> (<span class="id">b</span><span class="id"> :</span><span class="id"> T</span>)<span class="id"> n</span><span class="id"> :=</span><br/>
 &nbsp;&nbsp;<span class="gallina-kwd">if</span><span class="id"> n</span><span class="id"> is</span><span class="id"> m</span>.<span class="id">+1</span><span class="gallina-kwd"> then</span><span class="id"> refine_apx</span> (<span class="id">branch_apx</span><span class="id"> b</span><span class="id"> m</span>) (<span class="id">b</span><span class="id"> m</span>)<span class="gallina-kwd"> else</span><span class="id"> [set:</span><span class="id"> X]</span>.<br/>
@@ -250,7 +248,6 @@ Qed.</div></details>
 <span class="id">move=&gt;</span><span class="id"> [-&gt;];</span><span class="id"> near:</span><span class="id"> z;</span><span class="gallina-kwd"> exists</span> (<span class="id">proj</span><span class="id"> n</span><span class="id"> @^-1`</span><span class="id"> [set</span><span class="id"> b</span><span class="id"> n]</span>).<br/>
 <span class="id">split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> suff</span><span class="id"> :</span><span class="id"> @open</span><span class="id"> T</span> (<span class="id">proj</span><span class="id"> n</span><span class="id"> @^-1`</span><span class="id"> [set</span><span class="id"> b</span><span class="id"> n]</span>)<span class="gallina-kwd"> by</span><span class="id"> []</span>.<br/>
 <span class="id">apply:</span><span class="id"> open_comp;</span><span class="id"> [move=&gt;</span><span class="id"> +</span><span class="id"> _;</span><span class="id"> exact:</span><span class="id"> proj_continuous|</span><span class="id"> apply:</span><span class="id"> discrete_open]</span>.<br/>
-<span class="id">exact:</span><span class="id"> discreteK</span>.<br/>
 <span class="id">Unshelve</span>.<span class="id"> all:</span><span class="id"> end_near</span>. Qed.</div></details>
 <br/>
 <span class="vernacular">Let</span><span class="id"> apx_prefix</span><span class="id"> b</span><span class="id"> c</span><span class="id"> n</span><span class="id"> :</span><br/>
@@ -382,9 +379,7 @@ Qed.</div></details>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
-<span class="id">have</span><span class="id"> []</span><span class="id"> :=</span><span class="id"> @tree_map_props</span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">fun=&gt;</span><span class="id"> discrete_topology</span><span class="id"> discrete_bool</span>)<span class="id"> T</span><span class="id"> c_ind</span><span class="id"> c_invar</span><span class="id"> cmptT</span><span class="id"> hsdfT</span>.<br/>
-<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?;</span><span class="id"> exact:</span><span class="id"> discrete_space_discrete</span>.<br/>
+<span class="id">have</span><span class="id"> []</span><span class="id"> :=</span><span class="id"> @tree_map_props</span> (<span class="id">fun=&gt;</span><span class="id"> bool</span>)<span class="id"> T</span><span class="id"> c_ind</span><span class="id"> c_invar</span><span class="id"> cmptT</span><span class="id"> hsdfT</span>.<br/>
 <span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> n</span><span class="id"> V;</span><span class="id"> rewrite</span><span class="id"> eqEsubset;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> [t</span><span class="id"> Vt|t</span><span class="id"> [?</span><span class="id"> ?</span><span class="id"> []]//]</span>.<br/>
 &nbsp;&nbsp;<span class="id">have</span><span class="id"> [?|?]</span><span class="id"> :=</span><span class="id"> pselect</span> (<span class="id">U_</span><span class="id"> n</span><span class="id"> `&amp;`</span><span class="id"> V</span><span class="id"> !=set0</span><span class="id"> /\</span><span class="id"> ~`</span><span class="id"> U_</span><span class="id"> n</span><span class="id"> `&amp;`</span><span class="id"> V</span><span class="id"> !=set0</span>).<br/>
 &nbsp;&nbsp;<span class="id">+</span><span class="id"> have</span><span class="id"> [Unt|Unt]</span><span class="id"> :=</span><span class="id"> pselect</span> (<span class="id">U_</span><span class="id"> n</span><span class="id"> t</span>).<br/>
@@ -433,7 +428,7 @@ Qed.</div></details>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
-<span class="gallina-kwd">exists</span><span class="id"> [the</span><span class="id"> {splitbij</span><span class="id"> _</span><span class="id"> &gt;-&gt;</span><span class="id"> _}</span><span class="id"> of</span><span class="id"> tree_map]</span><span class="id"> =&gt;</span><span class="id"> /=</span>.<br/>
+<span class="gallina-kwd">exists</span><span class="id"> tree_map</span><span class="id"> =&gt;</span><span class="id"> /=</span>.<br/>
 <span class="id">have</span><span class="id"> [cts</span><span class="id"> surj</span><span class="id"> inje]</span><span class="id"> :=</span><span class="id"> projT2</span> (<span class="id">cid</span><span class="id"> cantor_map</span>)<span class="id">;</span><span class="id"> split;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> cts</span>.<br/>
 <span class="id">move=&gt;</span><span class="id"> A</span><span class="id"> clA;</span><span class="id"> apply:</span> (<span class="id">compact_closed</span><span class="id"> hsdfT</span>).<br/>
 <span class="id">apply:</span> (<span class="id">@continuous_compact</span><span class="id"> _</span><span class="id"> _</span><span class="id"> tree_map</span>)<span class="id">;</span><span class="id"> first</span><span class="id"> exact:</span><span class="id"> continuous_subspaceT</span>.<br/>
@@ -443,40 +438,42 @@ Qed.</div></details>
 <br/>
 <span class="vernacular">End</span><span class="id"> TreeStructure</span>.<br/>
 <br/>
+<span class="vernacular">Section</span><span class="id"> cantor</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realType}</span>.<br/>
+<br/>
 <div class="ssrdoc md">
 ## Part 3: Finitely branching trees are Cantor-like
 </div>
 <span class="vernacular">Section</span><span class="id"> FinitelyBranchingTrees</span>.<br/>
 <br/>
 <span class="vernacular">Definition</span><span class="id"> tree_of</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> -&gt;</span><span class="id"> pointedType</span>)<span class="id"> :</span><span class="gallina-kwd"> Type</span><span class="id"> :=</span><br/>
-&nbsp;&nbsp;<span class="id">prod_topology</span> (<span class="gallina-kwd">fun</span><span class="id"> n</span><span class="id"> =&gt;</span> <span class="id"> discrete_topology_type</span> (<span class="id">T</span><span class="id"> n</span>)).<br/>
+&nbsp;&nbsp;<span class="id">prod_topology</span> (<span class="gallina-kwd">fun</span><span class="id"> n</span><span class="id"> =&gt;</span><span class="id"> discrete_topology</span> (<span class="id">T</span><span class="id"> n</span>)).<br/>
 <br/>
 <span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> -&gt;</span><span class="id"> pointedType</span>)<span class="id"> :</span><span class="id"> Pointed</span> (<span class="id">tree_of</span><span class="id"> T</span>)<span class="id">:=</span> <br/>
 &nbsp;&nbsp;<span class="id">Pointed</span>.<span class="id">on</span> (<span class="id">tree_of</span><span class="id"> T</span>).<br/>
 <br/>
 <span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> -&gt;</span><span class="id"> pointedType</span>)<span class="id"> :=</span><span class="id"> Uniform</span>.<span class="id">on</span> (<span class="id">tree_of</span><span class="id"> T</span>).<br/>
 <br/>
-<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realType}</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> -&gt;</span><span class="id"> pointedType</span>)<span class="id"> :</span> <br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> -&gt;</span><span class="id"> pointedType</span>)<span class="id"> :</span> <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">@PseudoMetric</span><span class="id"> R</span><span class="id"> _</span><span class="id"> :=</span><br/>
 &nbsp;&nbsp;&nbsp;<span class="id">@PseudoMetric</span>.<span class="id">on</span> (<span class="id">tree_of</span><span class="id"> T</span>).<br/>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> cantor_like_finite_prod</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> -&gt;</span><span class="id"> ptopologicalType</span>)<span class="id"> :</span><br/>
-&nbsp;&nbsp;(<span class="gallina-kwd">forall</span><span class="id"> n,</span><span class="id"> finite_set</span><span class="id"> [set:</span><span class="id"> discrete_topology_type</span> (<span class="id">T</span><span class="id"> n</span>)<span class="id">]</span>)<span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;(<span class="gallina-kwd">forall</span><span class="id"> n,</span><span class="id"> finite_set</span><span class="id"> [set:</span><span class="id"> discrete_topology</span> (<span class="id">T</span><span class="id"> n</span>)<span class="id">]</span>)<span class="id"> -&gt;</span><br/>
 &nbsp;&nbsp;(<span class="gallina-kwd">forall</span><span class="id"> n,</span> (<span class="gallina-kwd">exists</span><span class="id"> xy</span><span class="id"> :</span><span class="id"> T</span><span class="id"> n</span><span class="id"> *</span><span class="id"> T</span><span class="id"> n,</span><span class="id"> xy</span>.<span class="id">1</span><span class="id"> !=</span><span class="id"> xy</span>.<span class="id">2</span>))<span class="id"> -&gt;</span><br/>
 &nbsp;&nbsp;<span class="id">cantor_like</span> (<span class="id">tree_of</span><span class="id"> T</span>).<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
 <span class="id">move=&gt;</span><span class="id"> finiteT</span><span class="id"> twoElems;</span><span class="id"> split</span>.<br/>
-<span class="id">-</span><span class="id"> exact/</span>(<span class="id">@perfect_diagonal</span> (<span class="id">discrete_topology_type</span><span class="id"> \o</span><span class="id"> T</span>))<span class="id">/twoElems</span>.<br/>
+<span class="id">-</span><span class="id"> exact/</span>(<span class="id">@perfect_diagonal</span> (<span class="id">discrete_topology</span><span class="id"> \o</span><span class="id"> T</span>))<span class="id">/twoElems</span>.<br/>
 <span class="id">-</span><span class="id"> have</span><span class="id"> :=</span><span class="id"> tychonoff</span> (<span class="gallina-kwd">fun</span><span class="id"> n</span><span class="id"> =&gt;</span><span class="id"> finite_compact</span> (<span class="id">finiteT</span><span class="id"> n</span>)).<br/>
 &nbsp;&nbsp;<span class="id">set</span><span class="id"> A</span><span class="id"> :=</span> (<span class="id">X</span><span class="gallina-kwd"> in</span><span class="id"> compact</span><span class="id"> X</span><span class="id"> -&gt;</span><span class="id"> _</span>).<br/>
 &nbsp;&nbsp;<span class="id">suff</span><span class="id"> :</span><span class="id"> A</span><span class="id"> =</span><span class="id"> [set:</span><span class="id"> tree_of</span> (<span class="gallina-kwd">fun</span><span class="id"> x</span><span class="id"> :</span><span class="id"> nat</span><span class="id"> =&gt;</span><span class="id"> T</span><span class="id"> x</span>)<span class="id">]</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> -&gt;</span>.<br/>
 &nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> eqEsubset</span>.<br/>
-<span class="id">-</span><span class="id"> apply:</span> (<span class="id">@hausdorff_product</span><span class="id"> _</span> (<span class="id">discrete_topology_type</span><span class="id"> \o</span><span class="id"> T</span>))<span class="id"> =&gt;</span><span class="id"> n</span>.<br/>
+<span class="id">-</span><span class="id"> apply:</span> (<span class="id">@hausdorff_product</span><span class="id"> _</span> (<span class="id">discrete_topology</span><span class="id"> \o</span><span class="id"> T</span>))<span class="id"> =&gt;</span><span class="id"> n</span>.<br/>
 &nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> discrete_hausdorff;</span><span class="id"> exact:</span><span class="id"> discrete_space_discrete</span>.<br/>
 <span class="id">-</span><span class="id"> apply:</span><span class="id"> zero_dimension_prod</span><span class="id"> =&gt;</span><span class="id"> ?;</span><span class="id"> apply:</span><span class="id"> discrete_zero_dimension</span>.<br/>
-&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> discrete_space_discrete</span>.<br/>
 Qed.</div></details>
 <br/>
 <span class="vernacular">End</span><span class="id"> FinitelyBranchingTrees</span>.<br/>
@@ -485,7 +482,7 @@ Qed.</div></details>
 ## Part 4: Building a finitely branching tree to cover `T`
 </div>
 <span class="vernacular">Section</span><span class="id"> alexandroff_hausdorff</span>.<br/>
-<span class="vernacular">Context</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realType}</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> pseudoPMetricType</span><span class="id"> R}</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> pseudoPMetricType</span><span class="id"> R}</span>.<br/>
 <br/>
 <span class="vernacular">Hypothesis</span><span class="id"> cptT</span><span class="id"> :</span><span class="id"> compact</span><span class="id"> [set:</span><span class="id"> T]</span>.<br/>
 <span class="vernacular">Hypothesis</span><span class="id"> hsdfT</span><span class="id"> :</span><span class="id"> hausdorff_space</span><span class="id"> T</span>.<br/>
@@ -572,8 +569,13 @@ Qed.</div></details>
 <span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> n</span><span class="id"> :=</span><span class="id"> gen_choiceMixin</span> (<span class="id">K'</span><span class="id"> n</span>).<br/>
 <span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> n</span><span class="id"> :=</span><span class="id"> isPointed</span>.<span class="id">Build</span> (<span class="id">K'</span><span class="id"> n</span>) (<span class="id">K'p</span><span class="id"> n</span>).<br/>
 <br/>
-<span class="vernacular">Let</span><span class="id"> K</span><span class="id"> n</span><span class="id"> :=</span><span class="id"> K'</span><span class="id"> n</span>.<br/>
+<span class="vernacular">Let</span><span class="id"> K</span><span class="id"> n</span><span class="id"> :=</span><span class="id"> discrete_topology</span> (<span class="id">K'</span><span class="id"> n</span>).<br/>
 <span class="vernacular">Let</span><span class="id"> Tree</span><span class="id"> :=</span><span class="id"> @tree_of</span><span class="id"> K</span>.<br/>
+<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> n</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">DiscreteTopology</span>.<span class="id">on</span> (<span class="id">K</span><span class="id"> n</span>). <br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> n</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">Pointed</span>.<span class="id">on</span> (<span class="id">K</span><span class="id"> n</span>). <br/>
 <br/>
 <span class="vernacular">Let</span><span class="id"> embed_refine</span><span class="id"> n</span> (<span class="id">U</span><span class="id"> :</span><span class="id"> set</span><span class="id"> T</span>) (<span class="id">k</span><span class="id"> :</span><span class="id"> K</span><span class="id"> n</span>)<span class="id"> :=</span><br/>
 &nbsp;&nbsp;(<span class="gallina-kwd">if</span><span class="id"> pselect</span> (<span class="id">projT1</span><span class="id"> k</span><span class="id"> `&amp;`</span><span class="id"> U</span><span class="id"> !=set0</span>)<br/>
@@ -591,22 +593,14 @@ Qed.</div></details>
 <span class="id">exact</span>.<br/>
 Qed.</div></details>
 <br/>
-<span class="vernacular">Let</span><span class="id"> discrete_subproof</span> (<span class="id">P</span><span class="id"> :</span><span class="id"> choiceType</span>)<span class="id"> :</span><br/>
-&nbsp;&nbsp;<span class="id">discrete_space</span> (<span class="id">principal_filter_type</span><span class="id"> P</span>).<br/>
-<details>
-<summary class="toggleproof">Proof.</summary>
-<div class="proofscript">
-<span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
-<br/>
 <span class="vernacular">Local</span><span class="vernacular"> Lemma</span><span class="id"> cantor_surj_pt1</span><span class="id"> :</span><span class="gallina-kwd"> exists2</span><span class="id"> f</span><span class="id"> :</span><span class="id"> Tree</span><span class="id"> -&gt;</span><span class="id"> T,</span><br/>
 &nbsp;&nbsp;<span class="id">continuous</span><span class="id"> f</span><span class="id"> &amp;</span><span class="id"> set_surj</span><span class="id"> [set:</span><span class="id"> Tree]</span><span class="id"> [set:</span><span class="id"> T]</span><span class="id"> f</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
 <span class="id">pose</span><span class="id"> entn</span><span class="id"> n</span><span class="id"> :=</span><span class="id"> projT2</span> (<span class="id">cid</span> (<span class="id">ent_balls'</span> (<span class="id">count_unif</span><span class="id"> n</span>))).<br/>
-<span class="id">have</span><span class="id"> [//|</span><span class="id"> |</span><span class="id"> |?</span><span class="id"> []//|</span><span class="id"> |?</span><span class="id"> []//</span><span class="id"> |</span><span class="id"> |]</span><span class="id"> :=</span><span class="id"> @tree_map_props</span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">discrete_topology_type</span><span class="id"> \o</span><span class="id"> K</span>)<span class="id"> T</span> (<span class="id">embed_refine</span>) (<span class="id">embed_invar</span>)<span class="id"> cptT</span><span class="id"> hsdfT</span>.<br/>
-<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> n;</span><span class="id"> exact:</span><span class="id"> discrete_space_discrete</span>.<br/>
+<span class="id">have</span><span class="id"> [</span><span class="id"> |</span><span class="id"> |?</span><span class="id"> []//|</span><span class="id"> |?</span><span class="id"> []//</span><span class="id"> |</span><span class="id"> |]</span><span class="id"> :=</span><span class="id"> @tree_map_props</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">K</span><span class="id"> T</span> (<span class="id">embed_refine</span>) (<span class="id">embed_invar</span>)<span class="id"> cptT</span><span class="id"> hsdfT</span>.<br/>
 <span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> n</span><span class="id"> U;</span><span class="id"> rewrite</span><span class="id"> eqEsubset;</span><span class="id"> split=&gt;</span><span class="id"> [t</span><span class="id"> Ut|t</span><span class="id"> [?</span><span class="id"> ?</span><span class="id"> []]//]</span>.<br/>
 &nbsp;&nbsp;<span class="id">have</span><span class="id"> [//|_</span><span class="id"> _</span><span class="id"> _</span><span class="id"> +</span><span class="id"> _]</span><span class="id"> :=</span><span class="id"> entn</span><span class="id"> n;</span><span class="id"> rewrite</span><span class="id"> -subTset</span>.<br/>
 &nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> /</span>(_<span class="id"> t</span><span class="id"> I</span>)<span class="id">[W</span><span class="id"> cbW</span><span class="id"> Wt];</span><span class="gallina-kwd"> exists</span> (<span class="id">existT</span><span class="id"> _</span><span class="id"> W</span><span class="id"> cbW</span>)<span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
@@ -637,7 +631,7 @@ Qed.</div></details>
 &nbsp;&nbsp;<span class="id">have</span><span class="id"> [z</span><span class="id"> [Dz</span><span class="id"> DzE]]</span><span class="id"> :=</span><span class="id"> Csub</span><span class="id"> _</span><span class="id"> cbD</span>.<br/>
 &nbsp;&nbsp;<span class="id">have</span><span class="id"> /ent_closure</span><span class="id"> :=</span><span class="id"> DzE</span><span class="id"> _</span><span class="id"> Dx</span><span class="id"> =&gt;</span><span class="id"> /</span>(_ (<span class="id">ent_count_unif</span><span class="id"> n</span>))<span class="id">/xsectionP/ctE</span><span class="id"> [_</span><span class="id"> /=</span><span class="id"> Exz]</span>.<br/>
 &nbsp;&nbsp;<span class="id">have</span><span class="id"> /ent_closure</span><span class="id"> :=</span><span class="id"> DzE</span><span class="id"> _</span><span class="id"> Dy</span><span class="id"> =&gt;</span><span class="id"> /</span>(_ (<span class="id">ent_count_unif</span><span class="id"> n</span>))<span class="id">/xsectionP/ctE</span><span class="id"> [Ezy</span><span class="id"> _]</span>.<br/>
-&nbsp;&nbsp;<span class="id">exact:</span> (<span class="id">@entourage_split</span><span class="id"> _</span> <span class="comment">(*[the&nbsp;uniformType&nbsp;of&nbsp;T]*)</span><span class="id"> z</span>).<br/>
+&nbsp;&nbsp;<span class="id">exact:</span> (<span class="id">@entourage_split</span><span class="id"> T</span><span class="id"> z</span>).<br/>
 <span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> f</span><span class="id"> [ctsf</span><span class="id"> surjf</span><span class="id"> _];</span><span class="gallina-kwd"> exists</span><span class="id"> f</span>.<br/>
 Qed.</div></details>
 <br/>
@@ -647,7 +641,7 @@ Qed.</div></details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
 <span class="id">have</span><span class="id"> [|f</span><span class="id"> [ctsf</span><span class="id"> _]]</span><span class="id"> :=</span><span class="id"> @homeomorphism_cantor_like</span><span class="id"> R</span><span class="id"> Tree;</span><span class="id"> last</span><span class="gallina-kwd"> by</span><span class="gallina-kwd"> exists</span><span class="id"> f</span>.<br/>
-<span class="id">apply:</span> (<span class="id">@cantor_like_finite_prod</span> (<span class="id">discrete_topology_type</span><span class="id"> \o</span><span class="id"> K</span>))<span class="id"> =&gt;</span><span class="id"> [n</span><span class="id"> /=|n]</span>.<br/>
+<span class="id">apply:</span> (<span class="id">@cantor_like_finite_prod</span> (<span class="id">discrete_topology</span><span class="id"> \o</span><span class="id"> K</span>))<span class="id"> =&gt;</span><span class="id"> [n</span><span class="id"> /=|n]</span>.<br/>
 &nbsp;&nbsp;<span class="id">have</span><span class="id"> [//|</span><span class="id"> fs</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _]</span><span class="id"> :=</span><span class="id"> projT2</span> (<span class="id">cid</span> (<span class="id">ent_balls'</span> (<span class="id">count_unif</span><span class="id"> n</span>))).<br/>
 &nbsp;&nbsp;<span class="id">suff</span><span class="id"> -&gt;</span><span class="id"> :</span><span class="id"> [set:</span><span class="id"> {classic</span><span class="id"> K'</span><span class="id"> n}]</span><span class="id"> =</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">@projT1</span> (<span class="id">set</span><span class="id"> T</span>)<span class="id"> _</span>)<span class="id"> @^-1`</span> (<span class="id">projT1</span> (<span class="id">cid</span> (<span class="id">ent_balls'</span> (<span class="id">count_unif</span><span class="id"> n</span>)))).<br/>
@@ -685,6 +679,7 @@ Qed.</div></details>
 Qed.</div></details>
 <br/>
 <span class="vernacular">End</span><span class="id"> alexandroff_hausdorff</span>.<br/>
+<span class="vernacular">End</span><span class="id"> cantor</span>.<br/>
 
       <div class="footer"><hr/>Generated by <a href="https://github.com/yoshihiro503/coq2html/">a fork of coq2html</a></div>
     </div>

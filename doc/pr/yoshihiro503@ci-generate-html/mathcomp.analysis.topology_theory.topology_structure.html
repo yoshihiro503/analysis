@@ -69,15 +69,13 @@ by extending the hierarchy.
                      x^' == set of neighbourhoods of x where x is
                             excluded (a "deleted neighborhood")
            limit_point E == the set of limit points of E
-        discrete_space T == every nbhs is a principal filter
-     discrete_space dscT == the discrete topology on T, provided
-                            a (dscT : discrete_space T)
                  dense S == the set (S : set T) is dense in T, with T of
                             type topologicalType
           continuousType == type of continuous functions
                             The HB structures is Continuous.
              mkcts f_cts == object of type continuousType corresponding to
                             the function f (f_cts : continuous f)
+
 ```
 ### Factories
 ```
@@ -1181,58 +1179,6 @@ Qed.</div></details>
 <span class="id">#[deprecated</span>(<span class="id">since=</span><span class="id">&quot;mathcomp-analysis 1.7.0&quot;</span><span class="id">,</span><span class="id"> note=</span><span class="id">&quot;use `interiorC` and `interiorEbigcup` instead&quot;</span>)<span class="id">]</span><br/>
 <span class="vernacular">Notation</span><span class="id"> closureC</span><span class="id"> :=</span><span class="id"> closureC_deprecated</span> (<span class="id">only</span><span class="id"> parsing</span>).<br/>
 <br/>
-<span class="vernacular">Section</span><span class="id"> DiscreteTopology</span>.<br/>
-<span class="vernacular">Section</span><span class="id"> DiscreteMixin</span>.<br/>
-<span class="vernacular">Context</span><span class="id"> {X</span><span class="id"> :</span><span class="id"> Type}</span>.<br/>
-<br/>
-<span class="vernacular">Lemma</span><span class="id"> discrete_sing</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> X</span>) (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span><span class="id"> X</span>)<span class="id"> :</span><span class="id"> principal_filter</span><span class="id"> p</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> A</span><span class="id"> p</span>.<br/>
-<details>
-<summary class="toggleproof">Proof.</summary>
-<div class="proofscript">
-<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> /principal_filterP</span>. Qed.</div></details>
-<br/>
-<span class="vernacular">Lemma</span><span class="id"> discrete_nbhs</span> (<span class="id">p</span><span class="id"> :</span><span class="id"> X</span>) (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span><span class="id"> X</span>)<span class="id"> :</span><br/>
-&nbsp;&nbsp;<span class="id">principal_filter</span><span class="id"> p</span><span class="id"> A</span><span class="id"> -&gt;</span><span class="id"> principal_filter</span><span class="id"> p</span> (<span class="id">principal_filter^~</span><span class="id"> A</span>).<br/>
-<details>
-<summary class="toggleproof">Proof.</summary>
-<div class="proofscript">
-<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?;</span><span class="id"> exact/principal_filterP</span>. Qed.</div></details>
-<br/>
-<span class="vernacular">End</span><span class="id"> DiscreteMixin</span>.<br/>
-<br/>
-<span class="vernacular">Definition</span><span class="id"> discrete_space</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> nbhsType</span>)<span class="id"> :=</span><span class="id"> @nbhs</span><span class="id"> X</span><span class="id"> _</span><span class="id"> =</span><span class="id"> @principal_filter</span><span class="id"> X</span>.<br/>
-<br/>
-<span class="vernacular">Context</span><span class="id"> {X</span><span class="id"> :</span><span class="id"> topologicalType}</span><span class="id"> {dsc</span><span class="id"> :</span><span class="id"> discrete_space</span><span class="id"> X}</span>.<br/>
-<br/>
-<span class="vernacular">Lemma</span><span class="id"> discrete_open</span> (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span><span class="id"> X</span>)<span class="id"> :</span><span class="id"> open</span><span class="id"> A</span>.<br/>
-<details>
-<summary class="toggleproof">Proof.</summary>
-<div class="proofscript">
-<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> openE</span><span class="id"> =&gt;</span><span class="id"> ?</span><span class="id"> ?;</span><span class="id"> rewrite</span><span class="id"> /interior</span><span class="id"> dsc;</span><span class="id"> exact/principal_filterP</span>.<br/>
-Qed.</div></details>
-<br/>
-<span class="vernacular">Lemma</span><span class="id"> discrete_set1</span> (<span class="id">x</span><span class="id"> :</span><span class="id"> X</span>)<span class="id"> :</span><span class="id"> nbhs</span><span class="id"> x</span><span class="id"> [set</span><span class="id"> x]</span>.<br/>
-<details>
-<summary class="toggleproof">Proof.</summary>
-<div class="proofscript">
-<span class="gallina-kwd"> by</span><span class="id"> apply:</span><span class="id"> open_nbhs_nbhs;</span><span class="id"> split</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> discrete_open</span>. Qed.</div></details>
-<br/>
-<span class="vernacular">Lemma</span><span class="id"> discrete_closed</span> (<span class="id">A</span><span class="id"> :</span><span class="id"> set</span><span class="id"> X</span>)<span class="id"> :</span><span class="id"> closed</span><span class="id"> A</span>.<br/>
-<details>
-<summary class="toggleproof">Proof.</summary>
-<div class="proofscript">
-<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -[A]setCK</span><span class="id"> closedC;</span><span class="id"> exact:</span><span class="id"> discrete_open</span>. Qed.</div></details>
-<br/>
-<span class="vernacular">Lemma</span><span class="id"> discrete_cvg</span> (<span class="id">F</span><span class="id"> :</span><span class="id"> set_system</span><span class="id"> X</span>) (<span class="id">x</span><span class="id"> :</span><span class="id"> X</span>)<span class="id"> :</span><br/>
-&nbsp;&nbsp;<span class="id">Filter</span><span class="id"> F</span><span class="id"> -&gt;</span><span class="id"> F</span><span class="id"> --&gt;</span><span class="id"> x</span><span class="id"> &lt;-&gt;</span><span class="id"> F</span><span class="id"> [set</span><span class="id"> x]</span>.<br/>
-<details>
-<summary class="toggleproof">Proof.</summary>
-<div class="proofscript">
-<span class="id">rewrite</span><span class="id"> dsc</span><span class="id"> nbhs_simpl;</span><span class="id"> split;</span><span class="id"> first</span><span class="gallina-kwd"> by</span><span class="id"> exact</span>.<br/>
-<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> Fx</span><span class="id"> U</span><span class="id"> /principal_filterP</span><span class="id"> ?;</span><span class="id"> apply:</span><span class="id"> filterS</span><span class="id"> Fx</span><span class="id"> =&gt;</span><span class="id"> ?</span><span class="id"> -&gt;</span>.<br/>
-Qed.</div></details>
-<br/>
-<span class="vernacular">End</span><span class="id"> DiscreteTopology</span>.<br/>
 <br/>
 <span class="vernacular">Definition</span><span class="id"> dense</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> topologicalType</span>) (<span class="id">S</span><span class="id"> :</span><span class="id"> set</span><span class="id"> T</span>)<span class="id"> :=</span><br/>
 &nbsp;&nbsp;<span class="gallina-kwd">forall</span> (<span class="id">O</span><span class="id"> :</span><span class="id"> set</span><span class="id"> T</span>)<span class="id">,</span><span class="id"> O</span><span class="id"> !=set0</span><span class="id"> -&gt;</span><span class="id"> open</span><span class="id"> O</span><span class="id"> -&gt;</span><span class="id"> O</span><span class="id"> `&amp;`</span><span class="id"> S</span><span class="id"> !=set0</span>.<br/>

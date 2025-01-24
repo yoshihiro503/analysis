@@ -350,8 +350,7 @@ Qed.</div></details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
 <span class="id">have</span><span class="id"> /closed_subspaceP</span><span class="id"> :=</span> (<span class="id">@closed_closure</span><span class="id"> _</span> (<span class="id">U</span><span class="id"> :</span><span class="id"> set</span> (<span class="id">subspace</span><span class="id"> A</span>))).<br/>
-<span class="id">move=&gt;</span><span class="id"> [V]</span><span class="id"> [clV</span><span class="id"> VAclUA]</span>.<br/>
-<span class="id">move=&gt;</span><span class="id"> /[dup]</span><span class="id"> /</span>(<span class="id">@closure_subset</span><span class="id"> [the</span><span class="id"> topologicalType</span><span class="id"> of</span><span class="id"> subspace</span><span class="id"> _]</span>).<br/>
+<span class="id">move=&gt;</span><span class="id"> [V]</span><span class="id"> [clV</span><span class="id"> VAclUA]</span><span class="id"> /[dup]</span><span class="id"> /</span>(<span class="id">@closure_subset</span> (<span class="id">subspace</span><span class="id"> _</span>)).<br/>
 <span class="id">have</span><span class="id"> /closure_id</span><span class="id"> &lt;-</span><span class="id"> :=</span><span class="id"> closed_subspaceT</span><span class="id"> =&gt;</span><span class="id"> /setIidr</span><span class="id"> &lt;-;</span><span class="id"> rewrite</span><span class="id"> setIC</span>.<br/>
 <span class="id">move=&gt;</span><span class="id"> UsubA;</span><span class="id"> rewrite</span><span class="id"> eqEsubset;</span><span class="id"> split</span>.<br/>
 &nbsp;&nbsp;<span class="id">apply:</span><span class="id"> setSI;</span><span class="id"> rewrite</span><span class="id"> closureE;</span><span class="id"> apply:</span><span class="id"> smallest_sub</span> (<span class="id">@subset_closure</span><span class="id"> _</span><span class="id"> U</span>).<br/>

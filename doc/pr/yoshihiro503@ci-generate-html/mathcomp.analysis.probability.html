@@ -46,23 +46,24 @@ This file provides basic notions of probability theory. See measure.v for
 the type probability T R (a measure that sums to 1).
 
 ```
-        {RV P &gt;-&gt; R} == real random variable: a measurable function from
-                        the measurableType of the probability P to R
+       {RV P &gt;-&gt; T'} == random variable: a measurable function to the
+                        measurableType T' from the measured space
+                        characterized by the probability P
     distribution P X == measure image of the probability measure P by the
-                        random variable X : {RV P -&gt; R}
+                        random variable X : {RV P -&gt; T'}
                         P as type probability T R with T of type
                         measurableType.
                         Declared as an instance of probability measure.
              'E_P[X] == expectation of the real measurable function X
       covariance X Y == covariance between real random variable X and Y
              'V_P[X] == variance of the real random variable X
-       mmt_gen_fun X == moment generating function of the random variable
+               'M_ X == moment generating function of the random variable
                         X
      {dmfun T &gt;-&gt; R} == type of discrete real-valued measurable functions
        {dRV P &gt;-&gt; R} == real-valued discrete random variable
            dRV_dom X == domain of the discrete random variable X
           dRV_enum X == bijection between the domain and the range of X
-            pmf X r := fine (P (X @^-1` [set r]))
+             pmf X r := fine (P (X @^-1` [set r]))
        enum_prob X k == probability of the kth value in the range of X
 ```
 
@@ -87,6 +88,8 @@ the type probability T R (a measure that sums to 1).
 &nbsp;&nbsp;(<span class="gallina-kwd">at</span><span class="id"> level</span><span class="id"> 0,</span><span class="id"> format</span> <span class="id">&quot;'{' 'RV'  P  '&gt;-&gt;'  R '}'&quot;</span>).<br/>
 <span class="vernacular">Reserved</span><span class="vernacular"> Notation</span> <span class="id">&quot;''E_' P [ X ]&quot;</span> (<span class="id">format</span> <span class="id">&quot;''E_' P [ X ]&quot;</span><span class="id">,</span><span class="gallina-kwd"> at</span><span class="id"> level</span><span class="id"> 5</span>).<br/>
 <span class="vernacular">Reserved</span><span class="vernacular"> Notation</span> <span class="id">&quot;''V_' P [ X ]&quot;</span> (<span class="id">format</span> <span class="id">&quot;''V_' P [ X ]&quot;</span><span class="id">,</span><span class="gallina-kwd"> at</span><span class="id"> level</span><span class="id"> 5</span>).<br/>
+<span class="vernacular">Reserved</span><span class="vernacular"> Notation</span> <span class="id">&quot;'M_ X t&quot;</span> (<span class="id">format</span> <span class="id">&quot;''M_' X  t&quot;</span><span class="id">,</span><br/>
+&nbsp;&nbsp;<span class="gallina-kwd">at</span><span class="id"> level</span><span class="id"> 5,</span><span class="id"> t,</span><span class="id"> X</span><span class="gallina-kwd"> at</span><span class="id"> next</span><span class="id"> level</span>).<br/>
 <span class="vernacular">Reserved</span><span class="vernacular"> Notation</span> <span class="id">&quot;{ 'dmfun' aT &gt;-&gt; T }&quot;</span><br/>
 &nbsp;&nbsp;(<span class="gallina-kwd">at</span><span class="id"> level</span><span class="id"> 0,</span><span class="id"> format</span> <span class="id">&quot;{ 'dmfun'  aT  &gt;-&gt;  T }&quot;</span>).<br/>
 <span class="vernacular">Reserved</span><span class="vernacular"> Notation</span> <span class="id">&quot;'{' 'dRV' P &gt;-&gt; R '}'&quot;</span><br/>
@@ -102,33 +105,35 @@ the type probability T R (a measure that sums to 1).
 <span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> classical_set_scope</span>.<br/>
 <span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ring_scope</span>.<br/>
 <br/>
-<span class="vernacular">Definition</span><span class="id"> random_variable</span> (<span class="id">d</span><span class="id"> :</span><span class="id"> _</span>) (<span class="id">T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d</span>) (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>)<br/>
-&nbsp;&nbsp;(<span class="id">P</span><span class="id"> :</span><span class="id"> probability</span><span class="id"> T</span><span class="id"> R</span>)<span class="id"> :=</span><span class="id"> {mfun</span><span class="id"> T</span><span class="id"> &gt;-&gt;</span><span class="id"> R}</span>.<br/>
+<span class="vernacular">Definition</span><span class="id"> random_variable</span><span class="id"> d</span><span class="id"> d'</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d</span>) (<span class="id">T'</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d'</span>)<br/>
+&nbsp;&nbsp;(<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>) (<span class="id">P</span><span class="id"> :</span><span class="id"> probability</span><span class="id"> T</span><span class="id"> R</span>)<span class="id"> :=</span><span class="id"> {mfun</span><span class="id"> T</span><span class="id"> &gt;-&gt;</span><span class="id"> T'}</span>.<br/>
 <br/>
-<span class="vernacular">Notation</span> <span class="id">&quot;{ 'RV' P &gt;-&gt; R }&quot;</span><span class="id"> :=</span> (<span class="id">@random_variable</span><span class="id"> _</span><span class="id"> _</span><span class="id"> R</span><span class="id"> P</span>)<span class="id"> :</span><span class="id"> form_scope</span>.<br/>
+<span class="vernacular">Notation</span> <span class="id">&quot;{ 'RV' P &gt;-&gt; T' }&quot;</span><span class="id"> :=</span> (<span class="id">@random_variable</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> T'</span><span class="id"> _</span><span class="id"> P</span>)<span class="id"> :</span><span class="id"> form_scope</span>.<br/>
 <br/>
-<span class="vernacular">Lemma</span><span class="id"> notin_range_measure</span><span class="id"> d</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d</span>) (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>)<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">P</span><span class="id"> :</span><span class="id"> {measure</span><span class="id"> set</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> \bar</span><span class="id"> R}</span>) (<span class="id">X</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> R</span>)<span class="id"> r</span><span class="id"> :</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> notin_range_measure</span><span class="id"> d</span><span class="id"> d'</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d</span>) (<span class="id">T'</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d'</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>) (<span class="id">P</span><span class="id"> :</span><span class="id"> {measure</span><span class="id"> set</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> \bar</span><span class="id"> R}</span>) (<span class="id">X</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> R</span>)<span class="id"> r</span><span class="id"> :</span><br/>
 &nbsp;&nbsp;<span class="id">r</span><span class="id"> \notin</span><span class="id"> range</span><span class="id"> X</span><span class="id"> -&gt;</span><span class="id"> P</span> (<span class="id">X</span><span class="id"> @^-1`</span><span class="id"> [set</span><span class="id"> r]</span>)<span class="id"> =</span><span class="id"> 0%E</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
 <span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> notin_setE</span><span class="id"> =&gt;</span><span class="id"> hr;</span><span class="id"> rewrite</span><span class="id"> preimage10</span>. Qed.</div></details>
 <br/>
-<span class="vernacular">Lemma</span><span class="id"> probability_range</span><span class="id"> d</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d</span>) (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>)<br/>
-&nbsp;&nbsp;(<span class="id">P</span><span class="id"> :</span><span class="id"> probability</span><span class="id"> T</span><span class="id"> R</span>) (<span class="id">X</span><span class="id"> :</span><span class="id"> {RV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> R}</span>)<span class="id"> :</span><span class="id"> P</span> (<span class="id">X</span><span class="id"> @^-1`</span><span class="id"> range</span><span class="id"> X</span>)<span class="id"> =</span><span class="id"> 1%E</span>.<br/>
+<span class="vernacular">Lemma</span><span class="id"> probability_range</span><span class="id"> d</span><span class="id"> d'</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d</span>) (<span class="id">T'</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d'</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>) (<span class="id">P</span><span class="id"> :</span><span class="id"> probability</span><span class="id"> T</span><span class="id"> R</span>) (<span class="id">X</span><span class="id"> :</span><span class="id"> {RV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> R}</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;<span class="id">P</span> (<span class="id">X</span><span class="id"> @^-1`</span><span class="id"> range</span><span class="id"> X</span>)<span class="id"> =</span><span class="id"> 1%E</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
 <span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> preimage_range</span><span class="id"> probability_setT</span>. Qed.</div></details>
 <br/>
-<span class="vernacular">Definition</span><span class="id"> distribution</span><span class="id"> d</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d</span>) (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>)<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">P</span><span class="id"> :</span><span class="id"> probability</span><span class="id"> T</span><span class="id"> R</span>) (<span class="id">X</span><span class="id"> :</span><span class="id"> {mfun</span><span class="id"> T</span><span class="id"> &gt;-&gt;</span><span class="id"> R}</span>)<span class="id"> :=</span><br/>
+<span class="vernacular">Definition</span><span class="id"> distribution</span><span class="id"> d</span><span class="id"> d'</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d</span>) (<span class="id">T'</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d'</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>) (<span class="id">P</span><span class="id"> :</span><span class="id"> probability</span><span class="id"> T</span><span class="id"> R</span>) (<span class="id">X</span><span class="id"> :</span><span class="id"> {mfun</span><span class="id"> T</span><span class="id"> &gt;-&gt;</span><span class="id"> T'}</span>)<span class="id"> :=</span><br/>
 &nbsp;&nbsp;<span class="id">pushforward</span><span class="id"> P</span> (<span class="id">@measurable_funP</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> X</span>).<br/>
 <br/>
 <span class="vernacular">Section</span><span class="id"> distribution_is_probability</span>.<br/>
-<span class="vernacular">Context</span><span class="id"> d</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d</span>) (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>) (<span class="id">P</span><span class="id"> :</span><span class="id"> probability</span><span class="id"> T</span><span class="id"> R</span>)<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">X</span><span class="id"> :</span><span class="id"> {mfun</span><span class="id"> T</span><span class="id"> &gt;-&gt;</span><span class="id"> R}</span>).<br/>
+<span class="vernacular">Context</span><span class="id"> d</span><span class="id"> d'</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d}</span><span class="id"> {T'</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d'}</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realType}</span><br/>
+&nbsp;&nbsp;<span class="id">{P</span><span class="id"> :</span><span class="id"> probability</span><span class="id"> T</span><span class="id"> R}</span>.<br/>
+<span class="vernacular">Variable</span><span class="id"> X</span><span class="id"> :</span><span class="id"> {mfun</span><span class="id"> T</span><span class="id"> &gt;-&gt;</span><span class="id"> T'}</span>.<br/>
 <br/>
 <span class="vernacular">Let</span><span class="id"> distribution0</span><span class="id"> :</span><span class="id"> distribution</span><span class="id"> P</span><span class="id"> X</span><span class="id"> set0</span><span class="id"> =</span><span class="id"> 0%E</span>.<br/>
 <details>
@@ -148,7 +153,7 @@ the type probability T R (a measure that sums to 1).
 <div class="proofscript">
 <span class="id"> exact:</span><span class="id"> measure_semi_sigma_additive</span>. Qed.</div></details>
 <br/>
-<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> isMeasure</span>.<span class="id">Build</span><span class="id"> _</span><span class="id"> _</span><span class="id"> R</span> (<span class="id">distribution</span><span class="id"> P</span><span class="id"> X</span>)<br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> isMeasure</span>.<span class="id">Build</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span> (<span class="id">distribution</span><span class="id"> P</span><span class="id"> X</span>)<br/>
 &nbsp;&nbsp;<span class="id">distribution0</span><span class="id"> distribution_ge0</span><span class="id"> distribution_sigma_additive</span>.<br/>
 <br/>
 <span class="vernacular">Let</span><span class="id"> distribution_is_probability</span><span class="id"> :</span><span class="id"> distribution</span><span class="id"> P</span><span class="id"> X</span><span class="id"> [set:</span><span class="id"> _]</span><span class="id"> =</span><span class="id"> 1%:E</span>.<br/>
@@ -158,29 +163,38 @@ the type probability T R (a measure that sums to 1).
 <span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> /distribution</span><span class="id"> /=</span><span class="id"> /pushforward</span><span class="id"> /=</span><span class="id"> preimage_setT</span><span class="id"> probability_setT</span>.<br/>
 Qed.</div></details>
 <br/>
-<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Measure_isProbability</span>.<span class="id">Build</span><span class="id"> _</span><span class="id"> _</span><span class="id"> R</span><br/>
+<span class="id">HB</span>.<span class="id">instance</span><span class="vernacular"> Definition</span><span class="id"> _</span><span class="id"> :=</span><span class="id"> Measure_isProbability</span>.<span class="id">Build</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><br/>
 &nbsp;&nbsp;(<span class="id">distribution</span><span class="id"> P</span><span class="id"> X</span>)<span class="id"> distribution_is_probability</span>.<br/>
 <br/>
 <span class="vernacular">End</span><span class="id"> distribution_is_probability</span>.<br/>
 <br/>
 <span class="vernacular">Section</span><span class="id"> transfer_probability</span>.<br/>
 <span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ereal_scope</span>.<br/>
-<span class="vernacular">Context</span><span class="id"> d</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d</span>) (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>) (<span class="id">P</span><span class="id"> :</span><span class="id"> probability</span><span class="id"> T</span><span class="id"> R</span>).<br/>
+<span class="vernacular">Context</span><span class="id"> d</span><span class="id"> d'</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d}</span><span class="id"> {T'</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d'}</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realType}</span><br/>
+&nbsp;&nbsp;(<span class="id">P</span><span class="id"> :</span><span class="id"> probability</span><span class="id"> T</span><span class="id"> R</span>).<br/>
 <br/>
-<span class="vernacular">Lemma</span><span class="id"> probability_distribution</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> {RV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> R}</span>)<span class="id"> r</span><span class="id"> :</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> probability_distribution</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> {RV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> T'}</span>)<span class="id"> r</span><span class="id"> :</span><br/>
 &nbsp;&nbsp;<span class="id">P</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span><span class="id"> X</span><span class="id"> x</span><span class="id"> =</span><span class="id"> r]</span><span class="id"> =</span><span class="id"> distribution</span><span class="id"> P</span><span class="id"> X</span><span class="id"> [set</span><span class="id"> r]</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
 <span class="gallina-kwd"> by</span><span class="id"> []</span>. Qed.</div></details>
 <br/>
-<span class="vernacular">Lemma</span><span class="id"> integral_distribution</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> {RV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> R}</span>) (<span class="id">f</span><span class="id"> :</span><span class="id"> R</span><span class="id"> -&gt;</span><span class="id"> \bar</span><span class="id"> R</span>)<span class="id"> :</span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">measurable_fun</span><span class="id"> [set:</span><span class="id"> R]</span><span class="id"> f</span><span class="id"> -&gt;</span> (<span class="gallina-kwd">forall</span><span class="id"> y,</span><span class="id"> 0</span><span class="id"> &lt;=</span><span class="id"> f</span><span class="id"> y</span>)<span class="id"> -&gt;</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> ge0_integral_distribution</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> {RV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> T'}</span>) (<span class="id">f</span><span class="id"> :</span><span class="id"> T'</span><span class="id"> -&gt;</span><span class="id"> \bar</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">measurable_fun</span><span class="id"> [set:</span><span class="id"> T']</span><span class="id"> f</span><span class="id"> -&gt;</span> (<span class="gallina-kwd">forall</span><span class="id"> y,</span><span class="id"> 0</span><span class="id"> &lt;=</span><span class="id"> f</span><span class="id"> y</span>)<span class="id"> -&gt;</span><br/>
 &nbsp;&nbsp;<span class="id">\int[distribution</span><span class="id"> P</span><span class="id"> X]_y</span><span class="id"> f</span><span class="id"> y</span><span class="id"> =</span><span class="id"> \int[P]_x</span> (<span class="id">f</span><span class="id"> \o</span><span class="id"> X</span>)<span class="id"> x</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
 <span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> mf</span><span class="id"> f0;</span><span class="id"> rewrite</span><span class="id"> ge0_integral_pushforward</span>. Qed.</div></details>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> integral_distribution</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> {RV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> T'}</span>) (<span class="id">f</span><span class="id"> :</span><span class="id"> T'</span><span class="id"> -&gt;</span><span class="id"> \bar</span><span class="id"> R</span>)<span class="id"> :</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">measurable_fun</span><span class="id"> [set:</span><span class="id"> T']</span><span class="id"> f</span><span class="id"> -&gt;</span><span class="id"> P</span>.<span class="id">-integrable</span><span class="id"> [set:</span><span class="id"> T]</span> (<span class="id">f</span><span class="id"> \o</span><span class="id"> X</span>)<span class="id"> -&gt;</span><br/>
+&nbsp;&nbsp;<span class="id">\int[distribution</span><span class="id"> P</span><span class="id"> X]_y</span><span class="id"> f</span><span class="id"> y</span><span class="id"> =</span><span class="id"> \int[P]_x</span> (<span class="id">f</span><span class="id"> \o</span><span class="id"> X</span>)<span class="id"> x</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> mf</span><span class="id"> intf;</span><span class="id"> rewrite</span><span class="id"> integral_pushforward</span>. Qed.</div></details>
 <br/>
 <span class="vernacular">End</span><span class="id"> transfer_probability</span>.<br/>
 <br/>
@@ -193,6 +207,12 @@ Qed.</div></details>
 <span class="vernacular">Section</span><span class="id"> expectation_lemmas</span>.<br/>
 <span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ereal_scope</span>.<br/>
 <span class="vernacular">Context</span><span class="id"> d</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d</span>) (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>) (<span class="id">P</span><span class="id"> :</span><span class="id"> probability</span><span class="id"> T</span><span class="id"> R</span>).<br/>
+<br/>
+<span class="vernacular">Lemma</span><span class="id"> expectation_def</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> {RV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> R}</span>)<span class="id"> :</span><span class="id"> 'E_P[X]</span><span class="id"> =</span> (<span class="id">\int[P]_w</span> (<span class="id">X</span><span class="id"> w</span>)<span class="id">%:E</span>)<span class="id">%E</span>.<br/>
+<details>
+<summary class="toggleproof">Proof.</summary>
+<div class="proofscript">
+<span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> unlock</span>. Qed.</div></details>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> expectation_fin_num</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> {RV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> R}</span>)<span class="id"> :</span><span class="id"> P</span>.<span class="id">-integrable</span><span class="id"> setT</span> (<span class="id">EFin</span><span class="id"> \o</span><span class="id"> X</span>)<span class="id"> -&gt;</span><br/>
 &nbsp;&nbsp;<span class="id">'E_P[X]</span><span class="id"> \is</span><span class="id"> a</span><span class="id"> fin_num</span>.<br/>
@@ -222,7 +242,7 @@ Qed.</div></details>
 <span class="id">exact:</span><span class="id"> le_trans</span> (<span class="id">le_abse_integral</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span>).<br/>
 Qed.</div></details>
 <br/>
-<span class="vernacular">Lemma</span><span class="id"> expectationM</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> {RV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> R}</span>) (<span class="id">iX</span><span class="id"> :</span><span class="id"> P</span>.<span class="id">-integrable</span><span class="id"> [set:</span><span class="id"> T]</span> (<span class="id">EFin</span><span class="id"> \o</span><span class="id"> X</span>))<br/>
+<span class="vernacular">Lemma</span><span class="id"> expectationZl</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> {RV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> R}</span>) (<span class="id">iX</span><span class="id"> :</span><span class="id"> P</span>.<span class="id">-integrable</span><span class="id"> [set:</span><span class="id"> T]</span> (<span class="id">EFin</span><span class="id"> \o</span><span class="id"> X</span>))<br/>
 &nbsp;&nbsp;(<span class="id">k</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span><span class="id"> 'E_P[k</span><span class="id"> \o*</span><span class="id"> X]</span><span class="id"> =</span><span class="id"> k%:E</span><span class="id"> *</span><span class="id"> 'E_P</span><span class="id"> [X]</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
@@ -287,6 +307,8 @@ Qed.</div></details>
 Qed.</div></details>
 <br/>
 <span class="vernacular">End</span><span class="id"> expectation_lemmas</span>.<br/>
+<span class="id">#[deprecated</span>(<span class="id">since=</span><span class="id">&quot;mathcomp-analysis 1.8.0&quot;</span><span class="id">,</span><span class="id"> note=</span><span class="id">&quot;renamed to `expectationZl`&quot;</span>)<span class="id">]</span><br/>
+<span class="vernacular">Notation</span><span class="id"> expectationM</span><span class="id"> :=</span><span class="id"> expectationZl</span> (<span class="id">only</span><span class="id"> parsing</span>).<br/>
 <br/>
 <span class="id">HB</span>.<span class="id">lock</span><span class="vernacular"> Definition</span><span class="id"> covariance</span><span class="id"> {d}</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d}</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realType}</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">P</span><span class="id"> :</span><span class="id"> probability</span><span class="id"> T</span><span class="id"> R</span>) (<span class="id">X</span><span class="id"> Y</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> R</span>)<span class="id"> :=</span><br/>
@@ -319,7 +341,7 @@ Qed.</div></details>
 &nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> compreBr//</span><span class="id"> integrableB//</span><span class="id"> compre_scale</span><span class="id"> ?integrableZl</span>.<br/>
 &nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> compre_scale//</span><span class="id"> integrableZl//</span><span class="id"> finite_measure_integrable_cst</span>.<br/>
 <span class="id">rewrite</span><span class="id"> 2?expectationB//=</span><span class="id"> ?compre_scale//</span><span class="id"> ?integrableZl//</span>.<br/>
-<span class="id">rewrite</span><span class="id"> 3?expectationM//=</span><span class="id"> ?finite_measure_integrable_cst//</span>.<br/>
+<span class="id">rewrite</span><span class="id"> 3?expectationZl//=</span><span class="id"> ?finite_measure_integrable_cst//</span>.<br/>
 <span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> expectation_cst</span><span class="id"> mule1</span><span class="id"> fineM//</span><span class="id"> EFinM</span><span class="id"> !fineK//</span><span class="id"> muleC</span><span class="id"> subeK</span><span class="id"> ?fin_numM</span>.<br/>
 Qed.</div></details>
 <br/>
@@ -370,7 +392,7 @@ Qed.</div></details>
 <span class="id">rewrite</span><span class="id"> [LHS]covarianceE</span><span class="id"> =&gt;</span><span class="id"> [||//|]</span><span class="id"> /=;</span><span class="id"> last</span><span class="id"> 2</span><span class="id"> first</span>.<br/>
 <span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> compre_scale</span><span class="id"> ?integrableZl</span>.<br/>
 <span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> aXY</span><span class="id"> compre_scale</span><span class="id"> ?integrableZl</span>.<br/>
-<span class="id">rewrite</span><span class="id"> covarianceE//</span><span class="id"> aXY</span><span class="id"> !expectationM//</span>.<br/>
+<span class="id">rewrite</span><span class="id"> covarianceE//</span><span class="id"> aXY</span><span class="id"> !expectationZl//</span>.<br/>
 <span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> -muleA</span><span class="id"> -muleBr//</span><span class="id"> fin_num_adde_defr//</span><span class="id"> expectation_fin_num</span>.<br/>
 Qed.</div></details>
 <br/>
@@ -688,15 +710,15 @@ Qed.</div></details>
 Qed.</div></details>
 <br/>
 <span class="vernacular">Definition</span><span class="id"> mmt_gen_fun</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> {RV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> R}</span>) (<span class="id">t</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :=</span><span class="id"> 'E_P[expR</span><span class="id"> \o</span><span class="id"> t</span><span class="id"> \o*</span><span class="id"> X]</span>.<br/>
+<span class="vernacular">Local</span><span class="vernacular"> Notation</span> <span class="id">&quot;'M_ X t&quot;</span><span class="id"> :=</span> (<span class="id">mmt_gen_fun</span><span class="id"> X</span><span class="id"> t</span>).<br/>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> chernoff</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> {RV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> R}</span>) (<span class="id">r</span><span class="id"> a</span><span class="id"> :</span><span class="id"> R</span>)<span class="id"> :</span> (<span class="id">0</span><span class="id"> &lt;</span><span class="id"> r</span>)<span class="id">%R</span><span class="id"> -&gt;</span><br/>
-&nbsp;&nbsp;<span class="id">P</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span><span class="id"> X</span><span class="id"> x</span><span class="id"> &gt;=</span><span class="id"> a]%R</span><span class="id"> &lt;=</span><span class="id"> mmt_gen_fun</span><span class="id"> X</span><span class="id"> r</span><span class="id"> *</span> (<span class="id">expR</span> (<span class="id">-</span> (<span class="id">r</span><span class="id"> *</span><span class="id"> a</span>)))<span class="id">%:E</span>.<br/>
+&nbsp;&nbsp;<span class="id">P</span><span class="id"> [set</span><span class="id"> x</span><span class="id"> |</span><span class="id"> X</span><span class="id"> x</span><span class="id"> &gt;=</span><span class="id"> a]%R</span><span class="id"> &lt;=</span><span class="id"> 'M_X</span><span class="id"> r</span><span class="id"> *</span> (<span class="id">expR</span> (<span class="id">-</span> (<span class="id">r</span><span class="id"> *</span><span class="id"> a</span>)))<span class="id">%:E</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
-<span class="id">move=&gt;</span><span class="id"> t0</span>.<br/>
-<span class="id">rewrite</span><span class="id"> /mmt_gen_fun;</span><span class="id"> have</span><span class="id"> -&gt;</span><span class="id"> :</span><span class="id"> expR</span><span class="id"> \o</span><span class="id"> r</span><span class="id"> \o*</span><span class="id"> X</span><span class="id"> =</span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">normr</span><span class="id"> \o</span><span class="id"> normr</span>)<span class="id"> \o</span><span class="id"> [the</span><span class="id"> {mfun</span><span class="id"> T</span><span class="id"> &gt;-&gt;</span><span class="id"> R}</span><span class="id"> of</span><span class="id"> expR</span><span class="id"> \o</span><span class="id"> r</span><span class="id"> \o*</span><span class="id"> X]</span>.<br/>
+<span class="id">move=&gt;</span><span class="id"> t0;</span><span class="id"> rewrite</span><span class="id"> /mmt_gen_fun</span>.<br/>
+<span class="id">have</span><span class="id"> -&gt;</span><span class="id"> :</span><span class="id"> expR</span><span class="id"> \o</span><span class="id"> r</span><span class="id"> \o*</span><span class="id"> X</span><span class="id"> =</span> (<span class="id">normr</span><span class="id"> \o</span><span class="id"> normr</span>)<span class="id"> \o</span> (<span class="id">expR</span><span class="id"> \o</span><span class="id"> r</span><span class="id"> \o*</span><span class="id"> X</span>).<br/>
 &nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> funext</span><span class="id"> =&gt;</span><span class="id"> t</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> normr_id</span><span class="id"> ger0_norm</span><span class="id"> ?expR_ge0</span>.<br/>
 <span class="id">rewrite</span><span class="id"> expRN</span><span class="id"> lee_pdivlMr</span><span class="id"> ?expR_gt0//</span>.<br/>
 <span class="id">rewrite</span> (<span class="id">le_trans</span><span class="id"> _</span> (<span class="id">markov</span><span class="id"> _</span> (<span class="id">expR_gt0</span> (<span class="id">r</span><span class="id"> *</span><span class="id"> a</span>))<span class="id"> _</span><span class="id"> _</span><span class="id"> _</span>))<span class="id">//;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
@@ -722,12 +744,13 @@ Qed.</div></details>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> r</span><span class="id"> _;</span><span class="id"> exact:</span><span class="id"> sqr_ge0</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="id"> move=&gt;</span><span class="id"> x</span><span class="id"> y;</span><span class="id"> rewrite</span><span class="id"> !nnegrE</span><span class="id"> =&gt;</span><span class="id"> x0</span><span class="id"> y0</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> ler_sqr</span>.<br/>
-&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> expectation_le</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;<span class="id">apply:</span><span class="id"> expectation_le</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> apply:</span><span class="id"> measurableT_comp</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> measurableT_comp</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> []</span>.<br/>
 &nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> x</span><span class="id"> /=;</span><span class="id"> exact:</span><span class="id"> sqr_ge0</span>.<br/>
 &nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> x</span><span class="id"> /=;</span><span class="id"> exact:</span><span class="id"> sqr_ge0</span>.<br/>
 &nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> apply/aeW</span><span class="id"> =&gt;</span><span class="id"> t</span><span class="id"> /=;</span><span class="id"> rewrite</span><span class="id"> real_normK//</span><span class="id"> num_real</span>.<br/>
-<span class="id">have</span><span class="id"> :=</span><span class="id"> h</span><span class="id"> [the</span><span class="id"> {mfun</span><span class="id"> T</span><span class="id"> &gt;-&gt;</span><span class="id"> R}</span><span class="id"> of</span> (<span class="id">X</span><span class="id"> \-</span><span class="id"> cst</span> (<span class="id">fine</span> (<span class="id">'E_P[X]</span>)))<span class="id">%R]</span>.<br/>
+<span class="id">have</span><span class="id"> :=</span><span class="id"> h</span> (<span class="id">X</span><span class="id"> \-</span><span class="id"> cst</span> (<span class="id">fine</span> (<span class="id">'E_P[X]</span>)))<span class="id">%R</span>.<br/>
 <span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> /le_trans;</span><span class="id"> apply;</span><span class="id"> rewrite</span><span class="id"> /variance</span><span class="id"> [in</span><span class="id"> leRHS]unlock</span>.<br/>
 Qed.</div></details>
 <br/>
@@ -825,52 +848,55 @@ Qed.</div></details>
 <br/>
 <span class="vernacular">End</span><span class="id"> markov_chebyshev_cantelli</span>.<br/>
 <br/>
-<span class="id">HB</span>.<span class="id">mixin</span><span class="vernacular"> Record</span><span class="id"> MeasurableFun_isDiscrete</span><span class="id"> d</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d</span>) (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>)<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">X</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> R</span>)<span class="id"> of</span><span class="id"> @MeasurableFun</span><span class="id"> d</span><span class="id"> _</span><span class="id"> T</span><span class="id"> R</span><span class="id"> X</span><span class="id"> :=</span><span class="id"> {</span><br/>
+<span class="id">HB</span>.<span class="id">mixin</span><span class="vernacular"> Record</span><span class="id"> MeasurableFun_isDiscrete</span><span class="id"> d</span><span class="id"> d'</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">T'</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d'</span>) (<span class="id">X</span><span class="id"> :</span><span class="id"> T</span><span class="id"> -&gt;</span><span class="id"> T'</span>)<span class="id"> of</span><span class="id"> @MeasurableFun</span><span class="id"> d</span><span class="id"> d'</span><span class="id"> T</span><span class="id"> T'</span><span class="id"> X</span><span class="id"> :=</span><span class="id"> {</span><br/>
 &nbsp;&nbsp;<span class="id">countable_range</span><span class="id"> :</span><span class="id"> countable</span> (<span class="id">range</span><span class="id"> X</span>)<br/>
 <span class="id">}</span>.<br/>
 <br/>
-<span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> discreteMeasurableFun</span><span class="id"> d</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d</span>)<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>)<span class="id"> :=</span><span class="id"> {</span><br/>
-&nbsp;&nbsp;<span class="id">X</span><span class="id"> of</span><span class="id"> isMeasurableFun</span><span class="id"> d</span><span class="id"> _</span><span class="id"> T</span><span class="id"> R</span><span class="id"> X</span><span class="id"> &amp;</span><span class="id"> MeasurableFun_isDiscrete</span><span class="id"> d</span><span class="id"> T</span><span class="id"> R</span><span class="id"> X</span><br/>
+<span class="id">HB</span>.<span class="id">structure</span><span class="vernacular"> Definition</span><span class="id"> discreteMeasurableFun</span><span class="id"> d</span><span class="id"> d'</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">T'</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d'</span>)<span class="id"> :=</span><span class="id"> {</span><br/>
+&nbsp;&nbsp;<span class="id">X</span><span class="id"> of</span><span class="id"> isMeasurableFun</span><span class="id"> d</span><span class="id"> d'</span><span class="id"> T</span><span class="id"> T'</span><span class="id"> X</span><span class="id"> &amp;</span><span class="id"> MeasurableFun_isDiscrete</span><span class="id"> d</span><span class="id"> d'</span><span class="id"> T</span><span class="id"> T'</span><span class="id"> X</span><br/>
 <span class="id">}</span>.<br/>
 <br/>
 <span class="vernacular">Notation</span> <span class="id">&quot;{ 'dmfun' aT &gt;-&gt; T }&quot;</span><span class="id"> :=</span><br/>
-&nbsp;&nbsp;(<span class="id">@discreteMeasurableFun</span>.<span class="id">type</span><span class="id"> _</span><span class="id"> aT</span><span class="id"> T</span>)<span class="id"> :</span><span class="id"> form_scope</span>.<br/>
+&nbsp;&nbsp;(<span class="id">@discreteMeasurableFun</span>.<span class="id">type</span><span class="id"> _</span><span class="id"> _</span><span class="id"> aT</span><span class="id"> T</span>)<span class="id"> :</span><span class="id"> form_scope</span>.<br/>
 <br/>
-<span class="vernacular">Definition</span><span class="id"> discrete_random_variable</span> (<span class="id">d</span><span class="id"> :</span><span class="id"> _</span>) (<span class="id">T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d</span>)<br/>
-&nbsp;&nbsp;(<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>) (<span class="id">P</span><span class="id"> :</span><span class="id"> probability</span><span class="id"> T</span><span class="id"> R</span>)<span class="id"> :=</span><span class="id"> {dmfun</span><span class="id"> T</span><span class="id"> &gt;-&gt;</span><span class="id"> R}</span>.<br/>
+<span class="vernacular">Definition</span><span class="id"> discrete_random_variable</span><span class="id"> d</span><span class="id"> d'</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">T'</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d'</span>) (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>) (<span class="id">P</span><span class="id"> :</span><span class="id"> probability</span><span class="id"> T</span><span class="id"> R</span>)<span class="id"> :=</span><br/>
+&nbsp;&nbsp;<span class="id">{dmfun</span><span class="id"> T</span><span class="id"> &gt;-&gt;</span><span class="id"> T'}</span>.<br/>
 <br/>
-<span class="vernacular">Notation</span> <span class="id">&quot;{ 'dRV' P &gt;-&gt; R }&quot;</span><span class="id"> :=</span><br/>
-&nbsp;&nbsp;(<span class="id">@discrete_random_variable</span><span class="id"> _</span><span class="id"> _</span><span class="id"> R</span><span class="id"> P</span>)<span class="id"> :</span><span class="id"> form_scope</span>.<br/>
+<span class="vernacular">Notation</span> <span class="id">&quot;{ 'dRV' P &gt;-&gt; T }&quot;</span><span class="id"> :=</span><br/>
+&nbsp;&nbsp;(<span class="id">@discrete_random_variable</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> T</span><span class="id"> _</span><span class="id"> P</span>)<span class="id"> :</span><span class="id"> form_scope</span>.<br/>
 <br/>
 <span class="vernacular">Section</span><span class="id"> dRV_definitions</span>.<br/>
-<span class="vernacular">Context</span><span class="id"> d</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d</span>) (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>) (<span class="id">P</span><span class="id"> :</span><span class="id"> probability</span><span class="id"> T</span><span class="id"> R</span>).<br/>
+<span class="vernacular">Context</span><span class="id"> {d}</span><span class="id"> {d'}</span><span class="id"> {T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d}</span><span class="id"> {T'</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d'}</span><span class="id"> {R</span><span class="id"> :</span><span class="id"> realType}</span><br/>
+&nbsp;&nbsp;(<span class="id">P</span><span class="id"> :</span><span class="id"> probability</span><span class="id"> T</span><span class="id"> R</span>).<br/>
 <br/>
-<span class="vernacular">Definition</span><span class="id"> dRV_dom_enum</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> {dRV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> R}</span>)<span class="id"> :</span><br/>
+<span class="vernacular">Lemma</span><span class="id"> dRV_dom_enum</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> {dRV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> T'}</span>)<span class="id"> :</span><br/>
 &nbsp;&nbsp;<span class="id">{</span><span class="id"> B</span><span class="id"> :</span><span class="id"> set</span><span class="id"> nat</span><span class="id"> &amp;</span><span class="id"> {splitbij</span><span class="id"> B</span><span class="id"> &gt;-&gt;</span><span class="id"> range</span><span class="id"> X}}</span>.<br/>
 <details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
-<span class="id">have</span><span class="id"> /countable_bijP/cid[B]</span><span class="id"> :=</span><span class="id"> @countable_range</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> X</span>.<br/>
+<span class="id">have</span><span class="id"> /countable_bijP/cid[B]</span><span class="id"> :=</span><span class="id"> @countable_range</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> _</span><span class="id"> X</span>.<br/>
 <span class="id">move/card_esym/ppcard_eqP/unsquash</span><span class="id"> =&gt;</span><span class="id"> f</span>.<br/>
 <span class="gallina-kwd">exists</span><span class="id"> B;</span><span class="id"> exact:</span><span class="id"> f</span>.<br/>
 Qed.</div></details>
 <br/>
-<span class="vernacular">Definition</span><span class="id"> dRV_dom</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> {dRV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> R}</span>)<span class="id"> :</span><span class="id"> set</span><span class="id"> nat</span><span class="id"> :=</span><span class="id"> projT1</span> (<span class="id">dRV_dom_enum</span><span class="id"> X</span>).<br/>
+<span class="vernacular">Definition</span><span class="id"> dRV_dom</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> {dRV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> T'}</span>)<span class="id"> :</span><span class="id"> set</span><span class="id"> nat</span><span class="id"> :=</span><span class="id"> projT1</span> (<span class="id">dRV_dom_enum</span><span class="id"> X</span>).<br/>
 <br/>
-<span class="vernacular">Definition</span><span class="id"> dRV_enum</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> {dRV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> R}</span>)<span class="id"> :</span><span class="id"> {splitbij</span> (<span class="id">dRV_dom</span><span class="id"> X</span>)<span class="id"> &gt;-&gt;</span><span class="id"> range</span><span class="id"> X}</span><span class="id"> :=</span><br/>
+<span class="vernacular">Definition</span><span class="id"> dRV_enum</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> {dRV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> T'}</span>)<span class="id"> :</span><span class="id"> {splitbij</span> (<span class="id">dRV_dom</span><span class="id"> X</span>)<span class="id"> &gt;-&gt;</span><span class="id"> range</span><span class="id"> X}</span><span class="id"> :=</span><br/>
 &nbsp;&nbsp;<span class="id">projT2</span> (<span class="id">dRV_dom_enum</span><span class="id"> X</span>).<br/>
 <br/>
-<span class="vernacular">Definition</span><span class="id"> enum_prob</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> {dRV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> R}</span>)<span class="id"> :=</span><br/>
+<span class="vernacular">Definition</span><span class="id"> enum_prob</span> (<span class="id">X</span><span class="id"> :</span><span class="id"> {dRV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> T'}</span>)<span class="id"> :=</span><br/>
 &nbsp;&nbsp;(<span class="gallina-kwd">fun</span><span class="id"> k</span><span class="id"> =&gt;</span><span class="id"> P</span> (<span class="id">X</span><span class="id"> @^-1`</span><span class="id"> [set</span><span class="id"> dRV_enum</span><span class="id"> X</span><span class="id"> k]</span>))<span class="id"> \_</span> (<span class="id">dRV_dom</span><span class="id"> X</span>).<br/>
 <br/>
 <span class="vernacular">End</span><span class="id"> dRV_definitions</span>.<br/>
 <br/>
 <span class="vernacular">Section</span><span class="id"> distribution_dRV</span>.<br/>
 <span class="vernacular">Local</span><span class="vernacular"> Open</span><span class="vernacular"> Scope</span><span class="id"> ereal_scope</span>.<br/>
-<span class="vernacular">Context</span><span class="id"> d</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d</span>) (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>) (<span class="id">P</span><span class="id"> :</span><span class="id"> probability</span><span class="id"> T</span><span class="id"> R</span>).<br/>
-<span class="vernacular">Variable</span><span class="id"> X</span><span class="id"> :</span><span class="id"> {dRV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> R}</span>.<br/>
+<span class="vernacular">Context</span><span class="id"> d</span><span class="id"> d'</span> (<span class="id">T</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d</span>) (<span class="id">T'</span><span class="id"> :</span><span class="id"> measurableType</span><span class="id"> d'</span>) (<span class="id">R</span><span class="id"> :</span><span class="id"> realType</span>)<br/>
+&nbsp;&nbsp;(<span class="id">P</span><span class="id"> :</span><span class="id"> probability</span><span class="id"> T</span><span class="id"> R</span>).<br/>
+<span class="vernacular">Variable</span><span class="id"> X</span><span class="id"> :</span><span class="id"> {dRV</span><span class="id"> P</span><span class="id"> &gt;-&gt;</span><span class="id"> T'}</span>.<br/>
 <br/>
 <span class="vernacular">Lemma</span><span class="id"> distribution_dRV_enum</span> (<span class="id">n</span><span class="id"> :</span><span class="id"> nat</span>)<span class="id"> :</span><span class="id"> n</span><span class="id"> \in</span><span class="id"> dRV_dom</span><span class="id"> X</span><span class="id"> -&gt;</span><br/>
 &nbsp;&nbsp;<span class="id">distribution</span><span class="id"> P</span><span class="id"> X</span><span class="id"> [set</span><span class="id"> dRV_enum</span><span class="id"> X</span><span class="id"> n]</span><span class="id"> =</span><span class="id"> enum_prob</span><span class="id"> X</span><span class="id"> n</span>.<br/>
@@ -880,6 +906,8 @@ Qed.</div></details>
 <span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> nX;</span><span class="id"> rewrite</span><span class="id"> /distribution/=</span><span class="id"> /enum_prob/=</span><span class="id"> patchE</span><span class="id"> nX</span>.<br/>
 Qed.</div></details>
 <br/>
+<span class="vernacular">Hypothesis</span><span class="id"> measurable_set1T'</span><span class="id"> :</span><span class="gallina-kwd"> forall</span><span class="id"> x</span><span class="id"> :</span><span class="id"> T',</span><span class="id"> measurable</span><span class="id"> [set</span><span class="id"> x]</span>.<br/>
+<br/>
 <span class="vernacular">Lemma</span><span class="id"> distribution_dRV</span><span class="id"> A</span><span class="id"> :</span><span class="id"> measurable</span><span class="id"> A</span><span class="id"> -&gt;</span><br/>
 &nbsp;&nbsp;<span class="id">distribution</span><span class="id"> P</span><span class="id"> X</span><span class="id"> A</span><span class="id"> =</span><span class="id"> \sum_</span>(<span class="id">k</span><span class="id"> &lt;oo</span>)<span class="id"> enum_prob</span><span class="id"> X</span><span class="id"> k</span><span class="id"> *</span><span class="id"> \d_</span> (<span class="id">dRV_enum</span><span class="id"> X</span><span class="id"> k</span>)<span class="id"> A</span>.<br/>
 <details>
@@ -887,8 +915,8 @@ Qed.</div></details>
 <div class="proofscript">
 <span class="id">move=&gt;</span><span class="id"> mA;</span><span class="id"> rewrite</span><span class="id"> /distribution</span><span class="id"> /pushforward</span>.<br/>
 <span class="id">have</span><span class="id"> mAX</span><span class="id"> i</span><span class="id"> :</span><span class="id"> dRV_dom</span><span class="id"> X</span><span class="id"> i</span><span class="id"> -&gt;</span><span class="id"> measurable</span> (<span class="id">X</span><span class="id"> @^-1`</span> (<span class="id">A</span><span class="id"> `&amp;`</span><span class="id"> [set</span><span class="id"> dRV_enum</span><span class="id"> X</span><span class="id"> i]</span>)).<br/>
-&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> _;</span><span class="id"> rewrite</span><span class="id"> preimage_setI;</span><span class="id"> apply:</span><span class="id"> measurableI</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
-&nbsp;&nbsp;<span class="id">exact/measurable_sfunP</span>.<br/>
+&nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> domXi;</span><span class="id"> rewrite</span><span class="id"> preimage_setI</span>.<br/>
+&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> measurableI;</span><span class="id"> rewrite</span><span class="id"> //-[X</span><span class="gallina-kwd"> in</span><span class="id"> _</span><span class="id"> X]setTI;</span><span class="id"> exact/measurable_funP</span>.<br/>
 <span class="id">have</span><span class="id"> tAX</span><span class="id"> :</span><span class="id"> trivIset</span> (<span class="id">dRV_dom</span><span class="id"> X</span>) (<span class="gallina-kwd">fun</span><span class="id"> k</span><span class="id"> =&gt;</span><span class="id"> X</span><span class="id"> @^-1`</span> (<span class="id">A</span><span class="id"> `&amp;`</span><span class="id"> [set</span><span class="id"> dRV_enum</span><span class="id"> X</span><span class="id"> k]</span>)).<br/>
 &nbsp;&nbsp;<span class="id">under</span><span class="id"> eq_fun</span><span class="id"> do</span><span class="id"> rewrite</span><span class="id"> preimage_setI;</span><span class="id"> rewrite</span><span class="id"> -/</span>(<span class="id">trivIset</span><span class="id"> _</span><span class="id"> _</span>).<br/>
 &nbsp;&nbsp;<span class="id">apply:</span><span class="id"> trivIset_setIl;</span><span class="id"> apply/trivIsetP</span><span class="id"> =&gt;</span><span class="id"> i</span><span class="id"> j</span><span class="id"> iX</span><span class="id"> jX</span><span class="id"> /eqP</span><span class="id"> ij</span>.<br/>
@@ -898,13 +926,11 @@ Qed.</div></details>
 <span class="id">rewrite</span><span class="id"> -preimage_bigcup</span><span class="id"> =&gt;</span><span class="id"> {mAX</span><span class="id"> tAX}PXU</span>.<br/>
 <span class="id">rewrite</span><span class="id"> -{1}</span>(<span class="id">setIT</span><span class="id"> A</span>)<span class="id"> -</span>(<span class="id">setUv</span> (<span class="id">\bigcup_</span>(<span class="id">i</span><span class="gallina-kwd"> in</span><span class="id"> dRV_dom</span><span class="id"> X</span>)<span class="id"> [set</span><span class="id"> dRV_enum</span><span class="id"> X</span><span class="id"> i]</span>)).<br/>
 <span class="id">rewrite</span><span class="id"> setIUr</span><span class="id"> preimage_setU</span><span class="id"> measureU;</span><span class="id"> last</span><span class="id"> 3</span><span class="id"> first</span>.<br/>
-&nbsp;&nbsp;<span class="id">-</span><span class="id"> rewrite</span><span class="id"> preimage_setI;</span><span class="id"> apply:</span><span class="id"> measurableI</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> measurable_sfunP</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> measurable_sfunP;</span><span class="id"> exact:</span><span class="id"> bigcup_measurable</span>.<br/>
-&nbsp;&nbsp;<span class="id">-</span><span class="id"> apply:</span><span class="id"> measurable_sfunP;</span><span class="id"> apply:</span><span class="id"> measurableI</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> measurableC;</span><span class="id"> exact:</span><span class="id"> bigcup_measurable</span>.<br/>
-&nbsp;&nbsp;<span class="id">-</span><span class="id"> rewrite</span><span class="id"> 2!preimage_setI</span><span class="id"> setIACA</span><span class="id"> -!setIA</span><span class="id"> -preimage_setI</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> setICr</span><span class="id"> preimage_set0</span><span class="id"> 2!setI0</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> preimage_setI;</span><span class="id"> apply:</span><span class="id"> measurableI;</span><span class="id"> rewrite</span><span class="id"> //-[X</span><span class="gallina-kwd"> in</span><span class="id"> _</span><span class="id"> X]setTI;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply/measurable_funP</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> bigcup_measurable</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> preimage_setI;</span><span class="id"> apply:</span><span class="id"> measurableI;</span><span class="id"> rewrite</span><span class="id"> //-[X</span><span class="gallina-kwd"> in</span><span class="id"> _</span><span class="id"> X]setTI;</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">apply/measurable_funP</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> apply:</span><span class="id"> measurableC;</span><span class="id"> exact:</span><span class="id"> bigcup_measurable</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> rewrite</span><span class="id"> -preimage_setI</span><span class="id"> -setIIr</span><span class="id"> setIA</span><span class="id"> setICK</span><span class="id"> preimage_set0</span>.<br/>
 <span class="id">rewrite</span><span class="id"> [X</span><span class="gallina-kwd"> in</span><span class="id"> _</span><span class="id"> +</span><span class="id"> X</span><span class="id"> =</span><span class="id"> _]</span>(_<span class="id"> :</span><span class="id"> _</span><span class="id"> =</span><span class="id"> 0</span>)<span class="id"> ?adde0;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
 &nbsp;&nbsp;<span class="id">rewrite</span> (_<span class="id"> :</span><span class="id"> _</span><span class="id"> @^-1`</span><span class="id"> _</span><span class="id"> =</span><span class="id"> set0</span>)<span class="id"> ?measure0//;</span><span class="id"> apply/disjoints_subset</span><span class="id"> =&gt;</span><span class="id"> x</span><span class="id"> AXx</span>.<br/>
 &nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> setCK</span><span class="id"> /bigcup</span><span class="id"> /=;</span><span class="gallina-kwd"> exists</span> ((<span class="id">dRV_enum</span><span class="id"> X</span>)<span class="id">^-1</span> (<span class="id">X</span><span class="id"> x</span>))<span class="id">%function</span>.<br/>
@@ -1162,8 +1188,7 @@ Qed.</div></details>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">\sum_</span>(<span class="id">b</span><span class="id"> &lt;-</span><span class="id"> fset_set</span><span class="id"> Ys</span>) (<span class="id">bernoulli_pmf</span><span class="id"> t</span><span class="id"> b</span>)<span class="id">%:E</span>)).<br/>
 &nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> x</span><span class="id"> /set_mem[_/=</span><span class="id"> x01]</span>.<br/>
 &nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> fsbig_finite//=</span>.<br/>
-<span class="id">apply:</span><span class="id"> emeasurable_fun_sum</span><span class="id"> =&gt;</span><span class="id"> n</span>.<br/>
-<span class="id">move=&gt;</span><span class="id"> k</span><span class="id"> Ysk;</span><span class="id"> apply/measurableT_comp</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+<span class="id">apply:</span><span class="id"> emeasurable_sum</span><span class="id"> =&gt;</span><span class="id"> n;</span><span class="id"> move=&gt;</span><span class="id"> k</span><span class="id"> Ysk;</span><span class="id"> apply/measurableT_comp</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
 <span class="id">exact:</span><span class="id"> measurable_bernoulli_pmf</span>.<br/>
 Qed.</div></details>
 <br/>
@@ -1372,7 +1397,7 @@ Qed.</div></details>
 &nbsp;&nbsp;<span class="id">move=&gt;</span><span class="id"> x</span><span class="id"> /set_mem[_/=</span><span class="id"> x01]</span>.<br/>
 &nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> nneseries_esum//</span><span class="id"> -1?[in</span><span class="id"> RHS]</span>(<span class="id">set_mem_set</span><span class="id"> Ys</span>)<span class="id">//</span><span class="id"> =&gt;</span><span class="id"> k</span><span class="id"> kYs</span>.<br/>
 &nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> rewrite</span><span class="id"> lee_fin</span><span class="id"> binomial_pmf_ge0</span>.<br/>
-<span class="id">apply:</span><span class="id"> ge0_emeasurable_fun_sum</span>.<br/>
+<span class="id">apply:</span><span class="id"> ge0_emeasurable_sum</span>.<br/>
 &nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> move=&gt;</span><span class="id"> k</span><span class="id"> x/=</span><span class="id"> [_</span><span class="id"> x01]</span><span class="id"> _;</span><span class="id"> rewrite</span><span class="id"> lee_fin</span><span class="id"> binomial_pmf_ge0</span>.<br/>
 <span class="id">move=&gt;</span><span class="id"> k</span><span class="id"> Ysk;</span><span class="id"> apply/measurableT_comp</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
 <span class="id">exact:</span><span class="id"> measurable_binomial_pmf</span>.<br/>
@@ -1562,21 +1587,22 @@ Qed.</div></details>
 <summary class="toggleproof">Proof.</summary>
 <div class="proofscript">
 <span class="id">move=&gt;</span><span class="id"> mf</span><span class="id"> f0</span>.<br/>
-<span class="id">have</span><span class="id"> [f_</span><span class="id"> [ndf_</span><span class="id"> f_f]]</span><span class="id"> :=</span><span class="id"> approximation</span><span class="id"> measurableT</span><span class="id"> mf</span> (<span class="gallina-kwd">fun</span><span class="id"> y</span><span class="id"> _</span><span class="id"> =&gt;</span><span class="id"> f0</span><span class="id"> y</span>).<br/>
+<span class="id">pose</span><span class="id"> f_</span><span class="id"> :=</span><span class="id"> nnsfun_approx</span><span class="id"> measurableT</span><span class="id"> mf</span>.<br/>
 <span class="id">transitivity</span> (<span class="id">lim</span> (<span class="id">\int[uniform_prob</span><span class="id"> ab]_x</span> (<span class="id">f_</span><span class="id"> n</span><span class="id"> x</span>)<span class="id">%:E</span><span class="id"> @[n</span><span class="id"> --&gt;</span><span class="id"> \oo]</span>)<span class="id">%E</span>).<br/>
 &nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -monotone_convergence//=</span>.<br/>
 &nbsp;&nbsp;<span class="id">-</span><span class="id"> apply:</span><span class="id"> eq_integral</span><span class="id"> =&gt;</span><span class="id"> ?</span><span class="id"> /[!inE]</span><span class="id"> xD;</span><span class="id"> apply/esym/cvg_lim</span><span class="id"> =&gt;</span><span class="id"> //=</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> f_f</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> cvg_nnsfun_approx</span>.<br/>
 &nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> n;</span><span class="id"> exact/measurable_EFinP/measurable_funTS</span>.<br/>
 &nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> n</span><span class="id"> ?</span><span class="id"> _;</span><span class="id"> rewrite</span><span class="id"> lee_fin</span>.<br/>
-&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> _</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> mn;</span><span class="id"> rewrite</span><span class="id"> lee_fin;</span><span class="id"> exact/lefP/ndf_</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> _</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> mn;</span><span class="id"> rewrite</span><span class="id"> lee_fin;</span><span class="id"> exact/lefP/nd_nnsfun_approx</span>.<br/>
 <span class="id">rewrite</span><span class="id"> [X</span><span class="gallina-kwd"> in</span><span class="id"> _</span><span class="id"> =</span> (_<span class="id"> *</span><span class="id"> X</span>)<span class="id">%E]</span>(_<span class="id"> :</span><span class="id"> _</span><span class="id"> =</span><span class="id"> lim</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">\int[mu]_</span>(<span class="id">x</span><span class="gallina-kwd"> in</span><span class="id"> `[a,</span><span class="id"> b]</span>) (<span class="id">f_</span><span class="id"> n</span><span class="id"> x</span>)<span class="id">%:E</span><span class="id"> @[n</span><span class="id"> --&gt;</span><span class="id"> \oo]</span>)<span class="id">%E</span>)<span class="id">;</span><span class="id"> last</span><span class="id"> first</span>.<br/>
 &nbsp;&nbsp;<span class="id">rewrite</span><span class="id"> -monotone_convergence//=</span>.<br/>
-&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> apply:</span><span class="id"> eq_integral</span><span class="id"> =&gt;</span><span class="id"> ?</span><span class="id"> /[!inE]</span><span class="id"> xD;</span><span class="id"> apply/esym/cvg_lim</span><span class="id"> =&gt;</span><span class="id"> //;</span><span class="id"> exact:</span><span class="id"> f_f</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="id"> apply:</span><span class="id"> eq_integral</span><span class="id"> =&gt;</span><span class="id"> ?</span><span class="id"> /[!inE]</span><span class="id"> xD;</span><span class="id"> apply/esym/cvg_lim</span><span class="id"> =&gt;</span><span class="id"> //</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exact:</span><span class="id"> cvg_nnsfun_approx</span>.<br/>
 &nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> n;</span><span class="id"> exact/measurable_EFinP/measurable_funTS</span>.<br/>
 &nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> n</span><span class="id"> ?</span><span class="id"> _;</span><span class="id"> rewrite</span><span class="id"> lee_fin</span>.<br/>
-&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> _</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> /ndf_</span><span class="id"> /lefP;</span><span class="id"> rewrite</span><span class="id"> lee_fin</span>.<br/>
+&nbsp;&nbsp;<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> _</span><span class="id"> ?</span><span class="id"> ?</span><span class="id"> ?;</span><span class="id"> rewrite</span><span class="id"> lee_fin;</span><span class="id"> exact/lefP/nd_nnsfun_approx</span>.<br/>
 <span class="id">rewrite</span><span class="id"> -limeMl//</span>.<br/>
 &nbsp;&nbsp;<span class="gallina-kwd">by</span><span class="id"> apply:</span><span class="id"> congr_lim;</span><span class="id"> apply/funext</span><span class="id"> =&gt;</span><span class="id"> n</span><span class="id"> /=;</span><span class="id"> exact:</span><span class="id"> integral_uniform_nnsfun</span>.<br/>
 <span class="id">apply/ereal_nondecreasing_is_cvgn</span><span class="id"> =&gt;</span><span class="id"> x</span><span class="id"> y</span><span class="id"> xy;</span><span class="id"> apply:</span><span class="id"> ge0_le_integral</span><span class="id"> =&gt;</span><span class="id"> //=</span>.<br/>
@@ -1584,7 +1610,7 @@ Qed.</div></details>
 <span class="id">-</span><span class="id"> exact/measurable_EFinP/measurable_funTS</span>.<br/>
 <span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> _;</span><span class="id"> rewrite</span><span class="id"> lee_fin</span>.<br/>
 <span class="id">-</span><span class="id"> exact/measurable_EFinP/measurable_funTS</span>.<br/>
-<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> _;</span><span class="id"> rewrite</span><span class="id"> lee_fin;</span><span class="id"> move/ndf_</span><span class="id"> :</span><span class="id"> xy</span><span class="id"> =&gt;</span><span class="id"> /lefP</span>.<br/>
+<span class="id">-</span><span class="gallina-kwd"> by</span><span class="id"> move=&gt;</span><span class="id"> ?</span><span class="id"> _;</span><span class="id"> rewrite</span><span class="id"> lee_fin;</span><span class="id"> exact/lefP/nd_nnsfun_approx</span>.<br/>
 Qed.</div></details>
 <br/>
 <span class="vernacular">End</span><span class="id"> uniform_probability</span>.<br/>
